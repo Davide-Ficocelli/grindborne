@@ -1,1 +1,40 @@
 @import "tailwindcss";
+@import "tailwindcss/utilities";
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  overflow-x: hidden;
+  margin: 0;
+  font-family: Georgia, "Times New Roman", Times, serif;
+  background-color: #111;
+  color: #ffffff;
+}
+
+@layer components {
+  .small-font-size {
+    @apply text-xl;
+  }
+
+  .standard-font-size {
+    @apply text-2xl;
+  }
+
+  .h1-font-size {
+    @apply text-5xl;
+  }
+
+  .h2-font-size {
+    @apply text-4xl;
+  }
+
+  .info-text-spacing {
+    @apply px-4;
+  }
+
+  .bottom-gradient-border {
+    @apply relative after:absolute after:content-[''] after:w-full after:h-0.5 after:left-0 after:bottom-0 after:bg-linear-to-r after:from-[#ffffff] after:to-[#111];
+  }
+}

@@ -1,10 +1,10 @@
-import React from 'react'
+import PlayerStatusPage from './pages/PlayerStatusPage'
 
 function App() {
 
   return (
     <>
-      
+      <PlayerStatusPage />
     </>
   )
 }
