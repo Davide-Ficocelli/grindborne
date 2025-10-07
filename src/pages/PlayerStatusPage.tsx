@@ -1,5 +1,6 @@
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faPlus } from '@fortawesome/free-solid-svg-icons'
+import AttributesChart from '../components/AttributesChart'
 import strengthIcon from "../assets/icons/attribute-placeholder-icon.webp"
 
 export default function PlayerStatusPage() {
@@ -17,8 +18,8 @@ export default function PlayerStatusPage() {
 
             <main>
                 <section className="flex flex-col gap-y-18">
-                    <h1 className="h1-font-size text-center">Status</h1>
-                    <section aria-labelledby="main-info-heading" className="flex flex-col gap-y-4">
+                    <h1 aria-labelledby='status-heading' className="h1-font-size text-center">Status</h1>
+                    <section className="flex flex-col gap-y-4">
                         <h2 id="main-info-heading" className="h2-font-size info-text-spacing text-orange-100 pb-4 bottom-gradient-border after:from-orange-100">Main Info</h2>
                         <dl className="flex flex-col gap-y-4">
                             <dt className="standard-font-size flex justify-between pb-4 bottom-gradient-border">
@@ -35,10 +36,9 @@ export default function PlayerStatusPage() {
                                 <p className="info-text-spacing">1</p>
                             </dt>
                         </dl>
-                    </section>
-                    
+                    </section>  
 
-                    <section aria-labelledby="attributes-heading" className="flex flex-col gap-y-4">
+                    <section className="flex flex-col gap-y-4">
                         <h2 id="attributes-heading" className="h2-font-size info-text-spacing text-orange-100 pb-4 bottom-gradient-border after:from-orange-100">Attributes</h2>
                         <dl className="flex flex-col gap-y-4">
                             <dt className="standard-font-size grid grid-cols-[4rem_1fr_1fr] gap-y-2 bottom-gradient-border">
@@ -54,10 +54,18 @@ export default function PlayerStatusPage() {
                                 <span className="col-span-full small-font-size info-text-spacing mb-4">7 days left before XP decaying</span>
                             </dt>
                         </dl>
-                        <div className="bottom-gradient-border small-font-size w-50 self-start flex items-center gap-x-2 pb-4 info-text-spacing">
+                        <div className="small-font-size w-50 self-start flex items-center gap-x-2 info-text-spacing">
                             <FontAwesomeIcon icon={faPlus} className="border-2 rounded-xl p-1" />
                             <p>Add attribute</p>
                         </div>
+                    </section>
+
+                    <section className="w-screen flex flex-col justify-center items-center gap-y-8 pb-4">
+                        <h2 aria-labelledby="attributes-chart-heading"
+                        className=
+                        "h2-font-size text-orange-100 bottom-gradient-border after:from-orange-100 pb-4 w-full self-start info-text-spacing"
+                        >Proficiency</h2>
+                        <AttributesChart />
                     </section>
                 </section>
             </main>
