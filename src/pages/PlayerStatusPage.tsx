@@ -1,12 +1,16 @@
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { faPlus } from '@fortawesome/free-solid-svg-icons'
+import strengthIcon from "../assets/icons/attribute-placeholder-icon.webp"
+
 export default function PlayerStatusPage() {
     return (
         <>
             <header className="py-4">
                 <nav>
                     <menu className="flex w-screen justify-around text-center">
-                        <li className="small-font-size text-orange-200">Grinds</li>
-                        <li className="small-font-size text-orange-200">Status</li>
-                        <li className="small-font-size text-orange-200">Quests</li>
+                        <li className="medium-font-size text-orange-200">Grinds</li>
+                        <li className="medium-font-size text-orange-200">Status</li>
+                        <li className="medium-font-size text-orange-200">Quests</li>
                     </menu>
                 </nav>
             </header>
@@ -35,13 +39,17 @@ export default function PlayerStatusPage() {
                 <section aria-labelledby="attributes-heading" className="flex flex-col gap-y-4">
                     <h2 id="attributes-heading" className="h2-font-size info-text-spacing text-orange-100 pb-4 bottom-gradient-border after:from-orange-100">Attributes</h2>
                     <dl className="flex flex-col gap-y-4">
-                        <dt className="standard-font-size grid grid-cols-2 gap-y-2 bottom-gradient-border">
-                            <p className="text-start info-text-spacing">Strength</p>
-                            <p className="col-span-1 text-end info-text-spacing">1</p>
+                        <dt className="standard-font-size grid grid-cols-[4rem_1fr_1fr] gap-y-2 bottom-gradient-border">
+                            <img src={strengthIcon} className="col-start-1 w-20 info-text-spacing" />
+                            <p className="col-start-2 text-start">Strength</p>
+                            <p className="col-start-3 text-end info-text-spacing">1</p>
                             <progress max="100" value="45" className="col-span-full w-full h-3 mb-4"></progress>
                         </dt>
                     </dl>
-                    <button className="small-font-size border min-w-56 w-full self-start">Add attribute</button>
+                    <div className="small-font-size w-50 self-start flex items-center justify-start gap-x-2 ml-4">
+                        <FontAwesomeIcon icon={faPlus} className="border-2 rounded-xl p-1" />
+                        <p>Add attribute</p>
+                    </div>
                 </section>
             </main>
         </> 

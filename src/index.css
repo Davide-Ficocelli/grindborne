@@ -15,6 +15,10 @@ body {
 
 @layer components {
   .small-font-size {
+    @apply text-sm;
+  }
+
+  .medium-font-size {
     @apply text-xl;
   }
 
@@ -23,7 +27,7 @@ body {
   }
 
   .h1-font-size {
-    @apply text-5xl;
+    @apply text-6xl;
   }
 
   .h2-font-size {
