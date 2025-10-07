@@ -40,10 +40,16 @@ export default function PlayerStatusPage() {
                     <h2 id="attributes-heading" className="h2-font-size info-text-spacing text-orange-100 pb-4 bottom-gradient-border after:from-orange-100">Attributes</h2>
                     <dl className="flex flex-col gap-y-4">
                         <dt className="standard-font-size grid grid-cols-[4rem_1fr_1fr] gap-y-2 bottom-gradient-border">
-                            <img src={strengthIcon} className="col-start-1 w-20 info-text-spacing" />
-                            <p className="col-start-2 text-start">Strength</p>
-                            <p className="col-start-3 text-end info-text-spacing">1</p>
-                            <progress max="100" value="45" className="col-span-full w-full h-3 mb-4"></progress>
+                            <img src={strengthIcon} className="col-start-1 row-span-1 w-20 info-text-spacing" />
+                            <p className="col-start-2 row-span-1 text-start">Strength</p>
+                            <p className="col-start-3 row-span-1 text-end info-text-spacing">1</p>
+                            <div className="col-span-full w-full relative">
+                                <progress max="100" value="45" className="w-full h-3"></progress>
+                                <span className="absolute top-3 left-4 w-full text-start text-[0.6rem] leading-none">
+                                    45/100
+                                </span>
+                            </div>
+                            <span className="col-span-full small-font-size info-text-spacing mb-4">7 days before XP decaying</span>
                         </dt>
                     </dl>
                     <div className="small-font-size w-50 self-start flex items-center justify-start gap-x-2 ml-4">
