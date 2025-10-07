@@ -45,8 +45,8 @@ export default function PlayerStatusPage() {
                             <p className="col-start-3 row-span-1 text-end info-text-spacing">1</p>
                             <div className="col-span-full w-full relative">
                                 <progress max="100" value="45" className="w-full h-3"></progress>
-                                <span className="absolute top-3 left-4 w-full text-start text-[0.6rem] leading-none">
-                                    45/100
+                                <span className="absolute top-3 left-4 text-start text-[0.6rem] leading-none">
+                                    45/100 XP
                                 </span>
                             </div>
                             <span className="col-span-full small-font-size info-text-spacing mb-4">7 days before XP decaying</span>
