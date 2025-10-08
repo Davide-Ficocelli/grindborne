@@ -1,12 +1,11 @@
-import PlayerStatusPage from './pages/PlayerStatusPage'
+import PlayerStatusPage from "./pages/PlayerStatusPage";
 
 function App() {
-
   return (
     <>
       <PlayerStatusPage />
     </>
-  )
+  );
 }
 
-export default App
+export default App;
