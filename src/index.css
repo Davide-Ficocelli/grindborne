@@ -34,11 +34,7 @@ body {
     @apply text-4xl;
   }
 
-  .info-text-spacing {
-    @apply px-4;
-  }
-
-  .bottom-gradient-border {
-    @apply relative after:absolute after:content-[''] after:w-full after:h-[1px] after:left-0 after:bottom-0 after:bg-linear-to-r after:from-[#ffffff] after:to-[#111];
+  .bottom-linear-gradient-border {
+    @apply relative after:absolute after:content-[''] after:w-full after:h-[1px] after:left-0 after:bottom-0 after:bg-linear-to-r;
   }
 }
