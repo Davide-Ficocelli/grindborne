@@ -18,6 +18,7 @@ export default function Attribute({ classStyles }: AttributeProps) {
       <img
         src={strengthIcon}
         className={`col-start-1 row-span-1 w-20 ${classStyles.horizontalPadding}`}
+        alt="strength icon"
       />
       <p className="col-start-2 row-span-1 text-start">Strength</p>
       <p

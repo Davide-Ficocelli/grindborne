@@ -6,6 +6,7 @@ import Attribute from "../components/Attribute";
 import type { ObjOfStrings } from "../utils/types";
 import { faPlus } from "@fortawesome/free-solid-svg-icons";
 import { useTranslation } from "react-i18next";
+import statusIcon from "../assets/icons/ER_Main_Menu_Icon_Status.webp";
 
 export default function PlayerStatusPage() {
   const { t } = useTranslation();
@@ -50,14 +51,25 @@ export default function PlayerStatusPage() {
       <Header />
 
       <MainContent>
-        <section className="flex flex-col gap-y-18">
-          <h1
-            aria-labelledby="status-heading"
-            className="h1-font-size text-center"
+        <section
+          aria-labelledby="status-page"
+          className="flex flex-col gap-y-18 md:gap-y-0 status-grid-area-container"
+        >
+          <div
+            className={`flex gap-x-8 items-center py-16 ${classStyles.horizontalPadding} status-heading`}
           >
-            {statusHeading}
-          </h1>
-          <section className={classStyles.verticalFlexContainer}>
+            <h1
+              aria-labelledby="status-heading"
+              className="h1-font-size order-1"
+            >
+              {statusHeading}
+            </h1>
+            <img src={statusIcon} className="size-20" />
+          </div>
+          <section
+            aria-labelledby="main-info-section"
+            className={`${classStyles.verticalFlexContainer} main-info-section`}
+          >
             <h2 id="main-info-heading" className={classStyles.sectionHeading}>
               {mainInfoHeading}
             </h2>
@@ -69,7 +81,11 @@ export default function PlayerStatusPage() {
               <dt className="flex flex-col standard-font-size gap-y-2 bottom-linear-gradient-border after:from-[#ffffff] after:to-[#111]">
                 <p className={classStyles.horizontalPadding}>{staminaLabel}</p>
                 <div className="w-full relative">
-                  <meter max="100" value="75" className="w-screen mb-4"></meter>
+                  <meter
+                    max="100"
+                    value="75"
+                    className="w-screen mb-4 md:w-full"
+                  ></meter>
                   <span className="absolute top-[0.30rem] left-4 text-start text-[0.6rem] leading-none">
                     10:50/22:00
                   </span>
@@ -83,7 +99,10 @@ export default function PlayerStatusPage() {
             </dl>
           </section>
 
-          <section className={classStyles.verticalFlexContainer}>
+          <section
+            aria-labelledby="attributes-section"
+            className={`${classStyles.verticalFlexContainer} attributes-section`}
+          >
             <h2 id="attributes-heading" className={classStyles.sectionHeading}>
               {attributesHeading}
             </h2>
@@ -91,7 +110,7 @@ export default function PlayerStatusPage() {
               <Attribute classStyles={classStyles} />
             </dl>
             <div
-              className={`small-font-size w-50 self-start flex items-center gap-x-2 ${classStyles.horizontalPadding}`}
+              className={`small-font-size w-50 self-start flex items-center gap-x-2 md:pb-4 ${classStyles.horizontalPadding}`}
             >
               <FontAwesomeIcon
                 icon={faPlus}
@@ -101,10 +120,13 @@ export default function PlayerStatusPage() {
             </div>
           </section>
 
-          <section className="flex flex-col justify-center items-center gap-y-8 pb-4">
+          <section
+            aria-labelledby="proficiency-section"
+            className="flex flex-col justify-center items-center gap-y-8 pb-4 proficiency-section"
+          >
             <h2
-              aria-labelledby="attributes-chart-heading"
-              className={`${classStyles.sectionHeading} w-screen self-start`}
+              aria-labelledby="proficiency-heading"
+              className={`${classStyles.sectionHeading} w-full self-start`}
             >
               {proficiencyHeading}
             </h2>

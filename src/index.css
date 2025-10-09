@@ -1,9 +1,15 @@
 @import "tailwindcss";
 @import "tailwindcss/utilities";
 
+/* ------ GLOBAL STYLES ------ */
+
 * {
   box-sizing: border-box;
 }
+
+/* * {
+  outline: 1px solid red;
+} */
 
 body {
   overflow-x: hidden;
@@ -14,6 +20,8 @@ body {
 }
 
 @layer components {
+  /* Font sizes */
+
   .small-font-size {
     @apply text-sm;
   }
@@ -34,7 +42,49 @@ body {
     @apply text-4xl;
   }
 
+  /* Other */
+
   .bottom-linear-gradient-border {
     @apply relative after:absolute after:content-[''] after:w-full after:h-[1px] after:left-0 after:bottom-0 after:bg-linear-to-r;
+  }
+}
+
+/* ------ PLAYER STATUS PAGE STYLES ------ */
+
+/* --- Media queries --- */
+
+/* md: */
+@media (min-width: 768px) {
+  .status-grid-area-container {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    grid-template-rows: repeat(4, auto);
+
+    grid-template-areas:
+      "heading ."
+      "info proficiency"
+      "info ."
+      "attributes attributes";
+  }
+
+  .status-grid-area-container > * {
+    border-right: 1px solid #ccc;
+  }
+
+  .status-heading {
+    grid-area: heading;
+    border-right: none;
+  }
+
+  .main-info-section {
+    grid-area: info;
+  }
+
+  .attributes-section {
+    grid-area: attributes;
+  }
+
+  .proficiency-section {
+    grid-area: proficiency;
   }
 }

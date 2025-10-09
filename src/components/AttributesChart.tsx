@@ -68,5 +68,11 @@ export default function AttributesChart() {
     return;
   }, []);
 
-  return <canvas id="attributesChart" ref={chartRef}></canvas>;
+  return (
+    <canvas
+      id="attributesChart"
+      ref={chartRef}
+      className="w-full md:max-w-md"
+    ></canvas>
+  );
 }
