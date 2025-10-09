@@ -1,3 +1,3 @@
-export type TailwindClasses = {
-    [key: string]: string;
-  };
+export type ObjOfStrings = {
+  [key: string]: string;
+};

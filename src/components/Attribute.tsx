@@ -1,11 +1,18 @@
 import strengthIcon from "../assets/icons/attribute-placeholder-icon.webp";
-import type { TailwindClasses } from "../utils/types";
+import type { ObjOfStrings } from "../utils/types";
+import { useTranslation } from "react-i18next";
 
 interface AttributeProps {
-  classStyles: TailwindClasses;
+  classStyles: ObjOfStrings;
 }
 
 export default function Attribute({ classStyles }: AttributeProps) {
+  const { t } = useTranslation();
+
+  const tAttribute = t("playerStatusPage.attribute", {
+    returnObjects: true,
+  }) as { attributeDecayingWarning: string };
+
   return (
     <dt className="standard-font-size grid grid-cols-[4rem_1fr_1fr] gap-y-2 bottom-linear-gradient-border after:from-[#ffffff] after:to-[#111]">
       <img
@@ -27,7 +34,7 @@ export default function Attribute({ classStyles }: AttributeProps) {
       <span
         className={`col-span-full small-font-size ${classStyles.horizontalPadding} mb-4`}
       >
-        7 days left before XP decaying
+        {tAttribute.attributeDecayingWarning}
       </span>
     </dt>
   );
