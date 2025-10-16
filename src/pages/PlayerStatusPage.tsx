@@ -82,11 +82,12 @@ export default function PlayerStatusPage() {
                 <p className={classStyles.horizontalPadding}>{staminaLabel}</p>
                 <div className="w-full relative">
                   <meter
+                    id="stamina-bar"
                     max="100"
                     value="75"
                     className="w-screen mb-4 md:w-full"
                   ></meter>
-                  <span className="absolute top-[0.30rem] left-4 text-start text-[0.6rem] leading-none">
+                  <span className="absolute top-[5.5px] left-4 text-start text-[0.6rem] leading-none">
                     10:50/22:00
                   </span>
                 </div>
@@ -110,7 +111,7 @@ export default function PlayerStatusPage() {
               <Attribute classStyles={classStyles} />
             </dl>
             <div
-              className={`small-font-size w-50 self-start flex items-center gap-x-2 md:pb-4 ${classStyles.horizontalPadding}`}
+              className={`small-font-size w-50 self-start flex items-center gap-x-2 md:pb-4 cursor-pointer focus:opacity-80 hover:opacity-80 ${classStyles.horizontalPadding}`}
             >
               <FontAwesomeIcon
                 icon={faPlus}

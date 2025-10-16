@@ -27,8 +27,13 @@ export default function Attribute({ classStyles }: AttributeProps) {
         1
       </p>
       <div className="col-span-full w-full relative">
-        <progress max="100" value="45" className="w-full h-3"></progress>
-        <span className="absolute top-3 left-4 text-start text-[0.6rem] leading-none">
+        <progress
+          id="xp-bar"
+          max="100"
+          value="45"
+          className="w-full h-3"
+        ></progress>
+        <span className="absolute top-[14px] left-4 text-start text-[0.6rem] leading-none">
           45/100 XP
         </span>
       </div>

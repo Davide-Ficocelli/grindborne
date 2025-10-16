@@ -96,3 +96,23 @@ body {
     grid-area: proficiency;
   }
 }
+
+#stamina-bar::-webkit-meter-bar {
+  height: 1rem;
+  background: #808080;
+}
+
+#stamina-bar::-webkit-meter-optimum-value {
+  background: #17743c;
+  border-right: 1px solid white;
+}
+
+#xp-bar::-webkit-progress-bar {
+  background: #808080;
+  height: 1rem;
+}
+
+#xp-bar::-webkit-progress-value {
+  background: #0f689b;
+  border-right: 1px solid white;
+}
