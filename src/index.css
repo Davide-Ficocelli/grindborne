@@ -15,8 +15,16 @@ body {
   overflow-x: hidden;
   margin: 0;
   font-family: Georgia, "Times New Roman", Times, serif;
-  background-color: #111;
+  /* background-color: #111; */
   color: #ffffff;
+  background-image: linear-gradient(
+    135deg,
+    #0a0a0ad0 0%,
+    #110f12f5 25%,
+    #121013e2 50%,
+    #131114f5 75%,
+    #18161be9 100%
+  );
 }
 
 @layer components {
