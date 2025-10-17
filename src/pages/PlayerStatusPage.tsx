@@ -1,26 +1,40 @@
+import { lazy, Suspense } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import Header from "../layout/Header";
-import MainContent from "../layout/MainContent";
-import AttributesChart from "../components/AttributesChart";
-import Attribute from "../components/Attribute";
-import type { ObjOfStrings } from "../utils/types";
 import { faPlus } from "@fortawesome/free-solid-svg-icons";
 import { useTranslation } from "react-i18next";
-import statusIcon from "../assets/icons/ER_Main_Menu_Icon_Status.webp";
+import LoadingFallback from "../components/LoadingFallback";
+
+// Lazy load all components
+const Header = lazy(() => import("../layout/Header"));
+const MainContent = lazy(() => import("../layout/MainContent"));
+const AttributesChart = lazy(() => import("../components/AttributesChart"));
+const Attribute = lazy(() => import("../components/Attribute"));
+
+// Lazy load the image
+const StatusIcon = lazy(() =>
+  import("../assets/icons/ER_Main_Menu_Icon_Status.webp").then((module) => ({
+    default: () => <img src={module.default} className="size-20" />,
+  }))
+);
+
+// Type definitions remain the same
+interface PlayerStatusPageTranslations {
+  statusHeading: string;
+  mainInfoHeading: string;
+  playerLabel: string;
+  staminaLabel: string;
+  levelLabel: string;
+  attributesHeading: string;
+  addAttributeBtnLabel: string;
+  proficiencyHeading: string;
+}
+
+type ObjOfStrings = {
+  [key: string]: string;
+};
 
 export default function PlayerStatusPage() {
   const { t } = useTranslation();
-
-  interface PlayerStatusPageTranslations {
-    statusHeading: string;
-    mainInfoHeading: string;
-    playerLabel: string;
-    staminaLabel: string;
-    levelLabel: string;
-    attributesHeading: string;
-    addAttributeBtnLabel: string;
-    proficiencyHeading: string;
-  }
 
   const tPlayerStatusPage = t("playerStatusPage", {
     returnObjects: true,
@@ -48,93 +62,115 @@ export default function PlayerStatusPage() {
 
   return (
     <>
-      <Header />
+      <Suspense fallback={<LoadingFallback />}>
+        <Header />
+      </Suspense>
 
-      <MainContent>
-        <section
-          aria-labelledby="status-page"
-          className="flex flex-col gap-y-18 md:gap-y-0 status-grid-area-container"
-        >
-          <div
-            className={`flex gap-x-8 items-center py-16 ${classStyles.horizontalPadding} status-heading`}
-          >
-            <h1
-              aria-labelledby="status-heading"
-              className="h1-font-size order-1"
-            >
-              {statusHeading}
-            </h1>
-            <img src={statusIcon} className="size-20" />
-          </div>
+      <Suspense fallback={<LoadingFallback />}>
+        <MainContent>
           <section
-            aria-labelledby="main-info-section"
-            className={`${classStyles.verticalFlexContainer} main-info-section`}
+            aria-labelledby="status-page"
+            className="flex flex-col gap-y-18 md:gap-y-0 status-grid-area-container"
           >
-            <h2 id="main-info-heading" className={classStyles.sectionHeading}>
-              {mainInfoHeading}
-            </h2>
-            <dl className={classStyles.verticalFlexContainer}>
-              <dt className={classStyles.playerAndLevelInfoFlexContainer}>
-                <p className={classStyles.horizontalPadding}>{playerLabel}:</p>
-                <p className={classStyles.horizontalPadding}>SolidDavid03</p>
-              </dt>
-              <dt className="flex flex-col standard-font-size gap-y-2 bottom-linear-gradient-border after:from-[#ffffff] after:to-[#111]">
-                <p className={classStyles.horizontalPadding}>{staminaLabel}</p>
-                <div className="w-full relative">
-                  <meter
-                    id="stamina-bar"
-                    max="100"
-                    value="75"
-                    className="w-screen mb-4 md:w-full"
-                  ></meter>
-                  <span className="absolute top-[5.5px] left-4 text-start text-[0.6rem] leading-none">
-                    10:50/22:00
-                  </span>
-                </div>
-              </dt>
-
-              <dt className={classStyles.playerAndLevelInfoFlexContainer}>
-                <p className={classStyles.horizontalPadding}>{levelLabel}</p>
-                <p className={classStyles.horizontalPadding}>1</p>
-              </dt>
-            </dl>
-          </section>
-
-          <section
-            aria-labelledby="attributes-section"
-            className={`${classStyles.verticalFlexContainer} attributes-section`}
-          >
-            <h2 id="attributes-heading" className={classStyles.sectionHeading}>
-              {attributesHeading}
-            </h2>
-            <dl className={classStyles.verticalFlexContainer}>
-              <Attribute classStyles={classStyles} />
-            </dl>
             <div
-              className={`small-font-size w-50 self-start flex items-center gap-x-2 md:pb-4 cursor-pointer focus:opacity-80 hover:opacity-80 ${classStyles.horizontalPadding}`}
+              className={`flex gap-x-8 items-center py-16 ${classStyles.horizontalPadding} status-heading`}
             >
-              <FontAwesomeIcon
-                icon={faPlus}
-                className="border-2 rounded-xl p-1"
-              />
-              <p>{addAttributeBtnLabel}</p>
+              <h1
+                aria-labelledby="status-heading"
+                className="h1-font-size order-1"
+              >
+                {statusHeading}
+              </h1>
+              <Suspense
+                fallback={
+                  <div className="size-20 bg-gray-300 animate-pulse rounded" />
+                }
+              >
+                <StatusIcon />
+              </Suspense>
             </div>
-          </section>
 
-          <section
-            aria-labelledby="proficiency-section"
-            className="flex flex-col justify-center items-center gap-y-8 pb-4 proficiency-section"
-          >
-            <h2
-              aria-labelledby="proficiency-heading"
-              className={`${classStyles.sectionHeading} w-full self-start`}
+            <section
+              aria-labelledby="main-info-section"
+              className={`${classStyles.verticalFlexContainer} main-info-section`}
             >
-              {proficiencyHeading}
-            </h2>
-            <AttributesChart />
+              <h2 id="main-info-heading" className={classStyles.sectionHeading}>
+                {mainInfoHeading}
+              </h2>
+              <dl className={classStyles.verticalFlexContainer}>
+                <dt className={classStyles.playerAndLevelInfoFlexContainer}>
+                  <p className={classStyles.horizontalPadding}>
+                    {playerLabel}:
+                  </p>
+                  <p className={classStyles.horizontalPadding}>SolidDavid03</p>
+                </dt>
+                <dt className="flex flex-col standard-font-size gap-y-2 bottom-linear-gradient-border after:from-[#ffffff] after:to-[#111]">
+                  <p className={classStyles.horizontalPadding}>
+                    {staminaLabel}
+                  </p>
+                  <div className="w-full relative">
+                    <meter
+                      id="stamina-bar"
+                      max="100"
+                      value="75"
+                      className="w-screen mb-4 md:w-full"
+                    ></meter>
+                    <span className="absolute top-[5.5px] left-4 text-start text-[0.6rem] leading-none">
+                      10:50/22:00
+                    </span>
+                  </div>
+                </dt>
+
+                <dt className={classStyles.playerAndLevelInfoFlexContainer}>
+                  <p className={classStyles.horizontalPadding}>{levelLabel}</p>
+                  <p className={classStyles.horizontalPadding}>1</p>
+                </dt>
+              </dl>
+            </section>
+
+            <section
+              aria-labelledby="attributes-section"
+              className={`${classStyles.verticalFlexContainer} attributes-section`}
+            >
+              <h2
+                id="attributes-heading"
+                className={classStyles.sectionHeading}
+              >
+                {attributesHeading}
+              </h2>
+              <dl className={classStyles.verticalFlexContainer}>
+                <Suspense fallback={<LoadingFallback />}>
+                  <Attribute classStyles={classStyles} />
+                </Suspense>
+              </dl>
+              <div
+                className={`small-font-size w-50 self-start flex items-center gap-x-2 md:pb-4 cursor-pointer focus:opacity-80 hover:opacity-80 ${classStyles.horizontalPadding}`}
+              >
+                <FontAwesomeIcon
+                  icon={faPlus}
+                  className="border-2 rounded-xl p-1"
+                />
+                <p>{addAttributeBtnLabel}</p>
+              </div>
+            </section>
+
+            <section
+              aria-labelledby="proficiency-section"
+              className="flex flex-col justify-center items-center gap-y-8 pb-4 proficiency-section"
+            >
+              <h2
+                aria-labelledby="proficiency-heading"
+                className={`${classStyles.sectionHeading} w-full self-start`}
+              >
+                {proficiencyHeading}
+              </h2>
+              <Suspense fallback={<LoadingFallback />}>
+                <AttributesChart />
+              </Suspense>
+            </section>
           </section>
-        </section>
-      </MainContent>
+        </MainContent>
+      </Suspense>
     </>
   );
 }
