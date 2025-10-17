@@ -1,11 +1,15 @@
-import { StrictMode, Suspense } from "react";
+import { StrictMode, Suspense, lazy } from "react";
 import { createRoot } from "react-dom/client";
 import "./utils/i18next/index.ts";
-import App from "./App.tsx";
+import LoadingFallback from "./components/LoadingFallback.tsx";
+
+const App = lazy(() => import("./App"));
+
+console.log(App);
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
-    <Suspense fallback={<div>Loading...</div>}>
+    <Suspense fallback={<LoadingFallback />}>
       <App />
     </Suspense>
   </StrictMode>

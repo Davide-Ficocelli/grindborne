@@ -1,6 +1,10 @@
-import strengthIcon from "../assets/icons/attribute-placeholder-icon.webp";
-import type { ObjOfStrings } from "../utils/types";
+import { lazy, Suspense } from "react";
 import { useTranslation } from "react-i18next";
+import LoadingFallback from "../components/LoadingFallback";
+
+type ObjOfStrings = {
+  [key: string]: string;
+};
 
 interface AttributeProps {
   classStyles: ObjOfStrings;
@@ -13,13 +17,25 @@ export default function Attribute({ classStyles }: AttributeProps) {
     returnObjects: true,
   }) as { attributeDecayingWarning: string };
 
+  const StrengthIcon = lazy(() =>
+    import("../assets/icons/attribute-placeholder-icon.webp").then(
+      (module) => ({
+        default: () => (
+          <img
+            src={module.default}
+            alt="strength icon"
+            className={`col-start-1 row-span-1 w-20 ${classStyles.horizontalPadding}`}
+          />
+        ),
+      })
+    )
+  );
+
   return (
     <dt className="standard-font-size grid grid-cols-[4rem_1fr_1fr] gap-y-2 bottom-linear-gradient-border after:from-[#ffffff] after:to-[#111]">
-      <img
-        src={strengthIcon}
-        className={`col-start-1 row-span-1 w-20 ${classStyles.horizontalPadding}`}
-        alt="strength icon"
-      />
+      <Suspense fallback={<LoadingFallback />}>
+        <StrengthIcon />
+      </Suspense>
       <p className="col-start-2 row-span-1 text-start">Strength</p>
       <p
         className={`col-start-3 row-span-1 text-end ${classStyles.horizontalPadding}`}
