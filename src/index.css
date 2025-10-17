@@ -1,1 +1,118 @@
 @import "tailwindcss";
+@import "tailwindcss/utilities";
+
+/* ------ GLOBAL STYLES ------ */
+
+* {
+  box-sizing: border-box;
+}
+
+/* * {
+  outline: 1px solid red;
+} */
+
+body {
+  overflow-x: hidden;
+  margin: 0;
+  font-family: Georgia, "Times New Roman", Times, serif;
+  /* background-color: #111; */
+  color: #ffffff;
+  background-image: linear-gradient(
+    135deg,
+    #0a0a0ad0 0%,
+    #110f12f5 25%,
+    #121013e2 50%,
+    #131114f5 75%,
+    #18161be9 100%
+  );
+}
+
+@layer components {
+  /* Font sizes */
+
+  .small-font-size {
+    @apply text-sm;
+  }
+
+  .medium-font-size {
+    @apply text-xl;
+  }
+
+  .standard-font-size {
+    @apply text-2xl;
+  }
+
+  .h1-font-size {
+    @apply text-6xl;
+  }
+
+  .h2-font-size {
+    @apply text-4xl;
+  }
+
+  /* Other */
+
+  .bottom-linear-gradient-border {
+    @apply relative after:absolute after:content-[''] after:w-full after:h-[1px] after:left-0 after:bottom-0 after:bg-linear-to-r;
+  }
+}
+
+/* ------ PLAYER STATUS PAGE STYLES ------ */
+
+/* --- Media queries --- */
+
+/* md: */
+@media (min-width: 768px) {
+  .status-grid-area-container {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    grid-template-rows: repeat(4, auto);
+
+    grid-template-areas:
+      "heading ."
+      "info proficiency"
+      "info ."
+      "attributes attributes";
+  }
+
+  .status-grid-area-container > * {
+    border-right: 1px solid #ccc;
+  }
+
+  .status-heading {
+    grid-area: heading;
+    border-right: none;
+  }
+
+  .main-info-section {
+    grid-area: info;
+  }
+
+  .attributes-section {
+    grid-area: attributes;
+  }
+
+  .proficiency-section {
+    grid-area: proficiency;
+  }
+}
+
+#stamina-bar::-webkit-meter-bar {
+  height: 1rem;
+  background: #808080;
+}
+
+#stamina-bar::-webkit-meter-optimum-value {
+  background: #17743c;
+  border-right: 1px solid white;
+}
+
+#xp-bar::-webkit-progress-bar {
+  background: #808080;
+  height: 1rem;
+}
+
+#xp-bar::-webkit-progress-value {
+  background: #0f689b;
+  border-right: 1px solid white;
+}

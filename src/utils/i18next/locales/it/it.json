@@ -1,0 +1,22 @@
+{
+  "header": {
+    "navigation": {
+      "grinds": "Abitudini",
+      "status": "Stato",
+      "quests": "Missioni"
+    }
+  },
+  "playerStatusPage": {
+    "statusHeading": "Stato",
+    "mainInfoHeading": "Informazioni principali",
+    "playerLabel": "Giocatore",
+    "staminaLabel": "Energia",
+    "levelLabel": "Livello",
+    "attributesHeading": "Attributi",
+    "addAttributeBtnLabel": "Aggiungi attributo",
+    "proficiencyHeading": "Maestria",
+    "attribute": {
+      "attributeDecayingWarning": "7 giorni al decadimento"
+    }
+  }
+}

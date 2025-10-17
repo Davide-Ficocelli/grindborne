@@ -1,0 +1,22 @@
+{
+  "header": {
+    "navigation": {
+      "grinds": "Grinds",
+      "status": "Status",
+      "quests": "Quests"
+    }
+  },
+  "playerStatusPage": {
+    "statusHeading": "Status",
+    "mainInfoHeading": "Main info",
+    "playerLabel": "Player",
+    "staminaLabel": "Stamina",
+    "levelLabel": "Level",
+    "attributesHeading": "Attributes",
+    "addAttributeBtnLabel": "Add attribute",
+    "proficiencyHeading": "Proficiency",
+    "attribute": {
+      "attributeDecayingWarning": "7 days before decaying"
+    }
+  }
+}
