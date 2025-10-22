@@ -2,15 +2,7 @@ import { lazy, Suspense } from "react";
 import { useTranslation } from "react-i18next";
 import LoadingFallback from "../components/LoadingFallback";
 
-type ObjOfStrings = {
-  [key: string]: string;
-};
-
-interface AttributeProps {
-  classStyles: ObjOfStrings;
-}
-
-export default function Attribute({ classStyles }: AttributeProps) {
+export default function Attribute() {
   const { t } = useTranslation();
 
   const tAttribute = t("playerStatusPage.attribute", {
@@ -18,31 +10,29 @@ export default function Attribute({ classStyles }: AttributeProps) {
   }) as { attributeDecayingWarning: string };
 
   const StrengthIcon = lazy(() =>
-    import("../assets/icons/attribute-placeholder-icon.webp").then(
-      (module) => ({
-        default: () => (
-          <img
-            src={module.default}
-            alt="strength icon"
-            className={`col-start-1 row-span-1 w-20 ${classStyles.horizontalPadding}`}
-          />
-        ),
-      })
-    )
+    import("../assets/icons/attribute-placeholder-icon.png").then((module) => ({
+      default: () => (
+        <img
+          src={module.default}
+          alt="strength icon"
+          className="w-15 rounded-lg"
+        />
+      ),
+    }))
   );
 
   return (
-    <dt className="standard-font-size grid grid-cols-[4rem_1fr_1fr] gap-y-2 bottom-linear-gradient-border after:from-[#ffffff] after:to-[#111]">
-      <Suspense fallback={<LoadingFallback />}>
-        <StrengthIcon />
-      </Suspense>
-      <p className="col-start-2 row-span-1 text-start">Strength</p>
-      <p
-        className={`col-start-3 row-span-1 text-end ${classStyles.horizontalPadding}`}
-      >
-        1
-      </p>
-      <div className="col-span-full w-full relative">
+    <dt className="flex flex-col gap-4 standard-font-size bottom-linear-gradient-border after:from-[#ffffff] after:to-[#111]">
+      <div className="flex justify-between items-center w-screen px-4">
+        <div className="attribute-name-grid-area flex items-center justify-between gap-x-4">
+          <Suspense fallback={<LoadingFallback />}>
+            <StrengthIcon />
+          </Suspense>
+          <p className="text-start">Forza</p>
+        </div>
+        <p className="text-end">1</p>
+      </div>
+      <div className="w-full relative">
         <progress
           id="xp-bar"
           max="100"
@@ -53,9 +43,7 @@ export default function Attribute({ classStyles }: AttributeProps) {
           45/100 XP
         </span>
       </div>
-      <span
-        className={`col-span-full small-font-size ${classStyles.horizontalPadding} mb-4`}
-      >
+      <span className="small-font-size mb-4 px-4">
         {tAttribute.attributeDecayingWarning}
       </span>
     </dt>
