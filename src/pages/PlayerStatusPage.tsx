@@ -12,8 +12,14 @@ const Attribute = lazy(() => import("../components/Attribute"));
 
 // Lazy load the image
 const StatusIcon = lazy(() =>
-  import("../assets/icons/ER_Main_Menu_Icon_Status.webp").then((module) => ({
-    default: () => <img src={module.default} className="size-20" />,
+  import("../assets/icons/player-status.png").then((module) => ({
+    default: () => (
+      <img
+        src={module.default}
+        alt="Player status icon"
+        className="size-20 rounded-lg"
+      />
+    ),
   }))
 );
 
@@ -140,7 +146,7 @@ export default function PlayerStatusPage() {
               </h2>
               <dl className={classStyles.verticalFlexContainer}>
                 <Suspense fallback={<LoadingFallback />}>
-                  <Attribute classStyles={classStyles} />
+                  <Attribute />
                 </Suspense>
               </dl>
               <div
