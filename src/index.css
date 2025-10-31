@@ -5,14 +5,13 @@
 
 * {
   box-sizing: border-box;
+  /* outline: red solid 1px; */
 }
-
-/* * {
-  outline: 1px solid red;
-} */
 
 body {
   overflow-x: hidden;
+  width: 100vw;
+  height: 100vh;
   margin: 0;
   font-family: Georgia, "Times New Roman", Times, serif;
   /* background-color: #111; */
@@ -25,6 +24,7 @@ body {
     #131114f5 75%,
     #18161bd2 100%
   );
+  background-repeat: no-repeat;
 }
 
 @layer components {
@@ -79,6 +79,8 @@ body {
   border-right: 1px solid white;
 }
 
+/* ------ QUEST LOG PAGE STYLES ------ */
+
 /* --- Media queries --- */
 
 /* md: */
@@ -99,7 +101,7 @@ body {
     border-right: 1px solid #ccc;
   }
 
-  .status-heading {
+  .status-heading-grid-area {
     grid-area: heading;
     border-right: none;
   }

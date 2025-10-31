@@ -6,7 +6,6 @@ import LoadingFallback from "../components/LoadingFallback";
 
 // Lazy load all components
 const Header = lazy(() => import("../layout/Header"));
-const MainContent = lazy(() => import("../layout/MainContent"));
 const AttributesChart = lazy(() => import("../components/AttributesChart"));
 const Attribute = lazy(() => import("../components/Attribute"));
 
@@ -73,13 +72,13 @@ export default function PlayerStatusPage() {
       </Suspense>
 
       <Suspense fallback={<LoadingFallback />}>
-        <MainContent>
+        <main>
           <section
             aria-labelledby="status-page"
             className="flex flex-col gap-y-18 md:gap-y-0 status-grid-area-container"
           >
             <div
-              className={`flex gap-x-8 items-center py-16 ${classStyles.horizontalPadding} status-heading`}
+              className={`flex gap-x-8 items-center py-16 ${classStyles.horizontalPadding} status-heading-grid-area`}
             >
               <h1
                 aria-labelledby="status-heading"
@@ -175,7 +174,7 @@ export default function PlayerStatusPage() {
               </Suspense>
             </section>
           </section>
-        </MainContent>
+        </main>
       </Suspense>
     </>
   );
