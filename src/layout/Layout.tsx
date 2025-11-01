@@ -1,15 +1,23 @@
 import { Outlet } from "react-router-dom";
-import Header from "./Header";
-import Footer from "./Footer";
+import { lazy, Suspense } from "react";
+import LoadingFallback from "../components/LoadingFallback";
 
 export default function Layout() {
+  // Lazy load components
+  const Header = lazy(() => import("./Header"));
+  const Footer = lazy(() => import("./Footer"));
+
   return (
     <>
-      <Header />
+      <Suspense fallback={<LoadingFallback />}>
+        <Header />
+      </Suspense>
       <main>
         <Outlet />
       </main>
-      <Footer />
+      <Suspense fallback={<LoadingFallback />}>
+        <Footer />
+      </Suspense>
     </>
   );
 }

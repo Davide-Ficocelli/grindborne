@@ -23,9 +23,13 @@ export default function QuestLogLayout() {
 
   return (
     <>
+      <style>
+        {`body {
+      height: 100vh;}`}
+      </style>
       <section
         aria-labelledby="quest-log-page"
-        className="flex flex-col items-center w-screen"
+        className="flex flex-col gap-y-4 items-center w-screen"
       >
         <div className="flex gap-x-8 items-center py-16 px-4">
           <h1 aria-labelledby="quest-log-heading" className="text-5xl order-1">
