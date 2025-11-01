@@ -22,30 +22,45 @@ export default function Quest() {
         role="toolbar"
         className="w-full flex items-baseline gap-x-2 justify-center"
       >
-        <div className="flex flex-col justify-center items-center gap-y-2">
+        <button className="flex flex-col justify-center items-center gap-y-2">
           <span className="order-1 text-center small-font-size">
             Segna come fallita
           </span>
-          <FontAwesomeIcon icon={faX} />
-        </div>
-        <div className="flex flex-col justify-center items-center gap-y-2">
+          <FontAwesomeIcon
+            className="text-white hover:text-gray-300 focus:text-gray-300 active:text-gray-300 cursor-pointer"
+            icon={faX}
+          />
+        </button>
+        <button className="flex flex-col justify-center items-center gap-y-2">
           <span className="order-1 text-center small-font-size">
             Segna come completata
           </span>
-          <FontAwesomeIcon icon={faCheck} />
-        </div>
-        <div className="flex flex-col justify-center items-center gap-y-2">
+          <FontAwesomeIcon
+            className="text-white hover:text-gray-300 focus:text-gray-300 active:text-gray-300 cursor-pointer"
+            icon={faCheck}
+          />
+        </button>
+        <button className="flex flex-col justify-center items-center gap-y-2">
           <span className="order-1 text-center small-font-size">Elimina</span>
-          <FontAwesomeIcon icon={faTrash} />
-        </div>
-        <div className="flex flex-col justify-center items-center gap-y-2">
+          <FontAwesomeIcon
+            className="text-white hover:text-gray-300 focus:text-gray-300 active:text-gray-300 cursor-pointer"
+            icon={faTrash}
+          />
+        </button>
+        <button className="flex flex-col justify-center items-center gap-y-2">
           <span className="order-1 text-center small-font-size">Modifica</span>
-          <FontAwesomeIcon icon={faPencil} />
-        </div>
-        <div className="flex flex-col justify-center items-center gap-y-2">
+          <FontAwesomeIcon
+            className="text-white hover:text-gray-300 focus:text-gray-300 active:text-gray-300 cursor-pointer"
+            icon={faPencil}
+          />
+        </button>
+        <button className="flex flex-col justify-center items-center gap-y-2">
           <span className="order-1 text-center small-font-size">Dettagli</span>
-          <FontAwesomeIcon icon={faInfo} />
-        </div>
+          <FontAwesomeIcon
+            className="text-white hover:text-gray-300 focus:text-gray-300 active:text-gray-300 cursor-pointer"
+            icon={faInfo}
+          />
+        </button>
       </nav>
 
       <h3 className="text-center medium-font-size">3 sotto-missioni</h3>
