@@ -22,7 +22,7 @@ export default function Attribute() {
   );
 
   return (
-    <dt className="flex flex-col gap-4 standard-font-size bottom-linear-gradient-border after:from-[#ffffff] after:to-[#111]">
+    <dt className="flex flex-col gap-4 standard-font-size bottom-linear-gradient-border pb-4 after:from-[#ffffff] after:to-[#111]">
       <div className="flex justify-between items-center w-screen px-4">
         <div className="attribute-name-grid-area flex items-center justify-between gap-x-4">
           <Suspense fallback={<LoadingFallback />}>

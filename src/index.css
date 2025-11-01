@@ -81,14 +81,12 @@ h6 {
 
 /* ------ GLOBAL STYLES ------ */
 
-* {
+/* * {
   outline: red solid 1px;
-}
+} */
 
 body {
   overflow-x: hidden;
-  width: 100vw;
-  height: 100vh;
   margin: 0;
   font-family: Georgia, "Times New Roman", Times, serif;
   /* background-color: #111; */

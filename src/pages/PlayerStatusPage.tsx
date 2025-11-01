@@ -99,9 +99,11 @@ export default function PlayerStatusPage() {
             <dl className={classStyles.verticalFlexContainer}>
               <dt className={classStyles.playerAndLevelInfoFlexContainer}>
                 <p className={classStyles.horizontalPadding}>{playerLabel}:</p>
-                <p className={classStyles.horizontalPadding}>SolidDavid03</p>
+                <p className={`text-end ${classStyles.horizontalPadding}`}>
+                  SolidDavid03
+                </p>
               </dt>
-              <dt className="flex flex-col standard-font-size gap-y-2 bottom-linear-gradient-border after:from-[#ffffff] after:to-[#111]">
+              <dt className="flex flex-col standard-font-size gap-y-2 bottom-linear-gradient-border pb-4 after:from-[#ffffff] after:to-[#111]">
                 <p className={classStyles.horizontalPadding}>{staminaLabel}</p>
                 <div className="w-full relative">
                   <meter
@@ -110,7 +112,7 @@ export default function PlayerStatusPage() {
                     value="75"
                     className="w-screen mb-4 md:w-full"
                   ></meter>
-                  <span className="absolute top-[5.5px] left-4 text-start text-[0.6rem] leading-none">
+                  <span className="absolute top-[10px] left-4 text-start text-[0.6rem] leading-none">
                     10:50/22:00
                   </span>
                 </div>
