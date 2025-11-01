@@ -1,4 +1,5 @@
 import { useTranslation } from "react-i18next";
+import { NavLink } from "react-router-dom";
 
 export default function Header() {
   const { t } = useTranslation();
@@ -11,12 +12,16 @@ export default function Header() {
 
   return (
     <header className="py-4 w-screen">
-      <nav>
-        <ul className="flex w-full justify-around text-center">
-          <li className="medium-font-size text-orange-200">{grinds}</li>
-          <li className="medium-font-size text-orange-200">{status}</li>
-          <li className="medium-font-size text-orange-200">{quests}</li>
-        </ul>
+      <nav className="flex w-full justify-around text-center">
+        <NavLink className="medium-font-size text-orange-200" to="grinds">
+          {grinds}
+        </NavLink>
+        <NavLink className="medium-font-size text-orange-200" to="/">
+          {status}
+        </NavLink>
+        <NavLink className="medium-font-size text-orange-200" to="quest-log">
+          {quests}
+        </NavLink>
       </nav>
     </header>
   );
