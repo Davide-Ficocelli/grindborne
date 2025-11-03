@@ -23,14 +23,14 @@ export default function Attribute() {
 
   return (
     <dt className="flex flex-col gap-4 standard-font-size bottom-linear-gradient-border pb-4 after:from-[#ffffff] after:to-[#111]">
-      <div className="flex justify-between items-center w-screen px-4">
+      <div className="flex justify-between items-center w-full px-4">
         <div className="attribute-name-grid-area flex items-center justify-between gap-x-4">
           <Suspense fallback={<LoadingFallback />}>
             <StrengthIcon />
           </Suspense>
           <p className="text-start">Forza</p>
         </div>
-        <p className="text-end">1</p>
+        <p className="text-center">1</p>
       </div>
       <div className="w-full relative">
         <progress

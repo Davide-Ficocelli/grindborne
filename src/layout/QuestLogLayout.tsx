@@ -21,12 +21,12 @@ export default function QuestLogLayout() {
     }))
   );
 
+  const normalStyles =
+    "medium-font-size text-orange-200 hover:text-yellow-500 focus:text-yellow-500 hover:border-b-yellow-500 focus:border-b-yellow-500 hover:border-b-2 focus:border-b-2 transition-[border] duration-100 ease-in";
+  const activeStyles = `${normalStyles} border-b-orange-200 border-b-2`;
+
   return (
     <>
-      <style>
-        {`body {
-      height: 100vh;}`}
-      </style>
       <section
         aria-labelledby="quest-log-page"
         className="flex flex-col gap-y-4 items-center w-screen"
@@ -49,14 +49,24 @@ export default function QuestLogLayout() {
           />
           <FontAwesomeIcon
             icon={faMagnifyingGlass}
-            className="absolute left-1 bottom-2 text-black"
+            className="absolute left-1 bottom-2 text-black cursor-pointer hover:opacity-70"
           />
         </form>
         <nav className="py-4 w-screen flex justify-around text-center">
-          <NavLink to="list" className="medium-font-size text-orange-200">
+          <NavLink
+            to="list"
+            className={({ isActive }) =>
+              isActive ? activeStyles : normalStyles
+            }
+          >
             Lista
           </NavLink>
-          <NavLink to="calendar" className="medium-font-size text-orange-200">
+          <NavLink
+            to="calendar"
+            className={({ isActive }) =>
+              isActive ? activeStyles : normalStyles
+            }
+          >
             Calendario
           </NavLink>
         </nav>
