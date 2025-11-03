@@ -137,15 +137,13 @@ export default function PlayerStatusPage() {
                 <Attribute />
               </Suspense>
             </dl>
-            <div
-              className={`small-font-size w-50 self-start flex items-center gap-x-2 md:pb-4 cursor-pointer focus:opacity-80 hover:opacity-80 ${classStyles.horizontalPadding}`}
-            >
+            <button className="small-font-size max-w-60 gap-x-2 self-start flex items-center justify-center pl-4 md:pb-4 cursor-pointer focus:opacity-80 hover:opacity-80">
               <FontAwesomeIcon
                 icon={faPlus}
                 className="border-2 rounded-xl p-1"
               />
-              <p>{addAttributeBtnLabel}</p>
-            </div>
+              <span className="w-full text-center">{addAttributeBtnLabel}</span>
+            </button>
           </section>
 
           <section

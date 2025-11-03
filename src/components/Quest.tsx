@@ -9,14 +9,29 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
-export default function Quest() {
+// Component representing a single quest
+
+interface QuestProps {
+  questTitle: string;
+  questDescription?: string;
+  questIcon?: string;
+  styles?: string;
+}
+
+export default function Quest(props: QuestProps) {
+  const { questTitle, questDescription, styles } = props;
+
   return (
-    <article className="flex flex-col gap-y-4 items-center p-4 border-b-2 border-white w-screen">
+    <article
+      className={`flex flex-col gap-y-4 items-center p-4 border-b-2 border-white w-screen ${styles}`}
+    >
       <div className="flex gap-x-8 items-center px-4">
-        <h2 className="order-1 h2-font-size">Titolo missione</h2>
-        <FontAwesomeIcon icon={faHammer} className="size-20" />
+        <h2 className="order-1 h2-font-size text-center font-semibold">
+          {questTitle}
+        </h2>
+        {/* <FontAwesomeIcon icon={faHammer} className="size-20" /> */}
       </div>
-      <p className="medium-font-size">Descrizione missione</p>
+      <p className="text-md text-center">{questDescription}</p>
       <nav
         aria-label="Actions"
         role="toolbar"
@@ -63,7 +78,7 @@ export default function Quest() {
         </button>
       </nav>
 
-      <h3 className="text-center medium-font-size">3 sotto-missioni</h3>
+      {/* <h3 className="text-center medium-font-size">3 sotto-missioni</h3> */}
     </article>
   );
 }
