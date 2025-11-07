@@ -1,6 +1,5 @@
 // import { useTranslation } from "react-i18next";
 import {
-  faHammer,
   faInfo,
   faPencil,
   faTrash,
@@ -29,7 +28,6 @@ export default function Quest(props: QuestProps) {
         <h2 className="order-1 h2-font-size text-center font-semibold">
           {questTitle}
         </h2>
-        {/* <FontAwesomeIcon icon={faHammer} className="size-20" /> */}
       </div>
       <p className="text-md text-center">{questDescription}</p>
       <nav
