@@ -11,14 +11,18 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 // Component representing a single quest
 
 interface QuestProps {
-  questTitle: string;
-  questDescription?: string;
-  questIcon?: string;
+  key: number;
+  questData: {
+    questTitle?: string;
+    questDescription?: string;
+    questIcon?: string;
+  };
   styles?: string;
 }
 
 export default function Quest(props: QuestProps) {
-  const { questTitle, questDescription, styles } = props;
+  const { questTitle, questDescription } = props.questData;
+  const { styles } = props;
 
   return (
     <article
