@@ -104,6 +104,28 @@ body {
   background-repeat: no-repeat;
 }
 
+/* Buttons */
+
+.btn-primary {
+  background: #a48621;
+  padding: 0.5rem;
+  border-radius: 8px;
+  box-shadow: 0px 0px 100px 3px #a48621;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.btn-primary:hover,
+.btn-primary:focus {
+  background: #a48521b7;
+}
+
+.btn-primary:active {
+  background: rgb(101, 82, 18);
+}
+
+/* Tailwind components */
+
 @layer components {
   /* Font sizes */
 

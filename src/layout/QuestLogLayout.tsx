@@ -4,6 +4,7 @@ import LoadingFallback from "../components/LoadingFallback";
 import { NavLink, Outlet } from "react-router-dom";
 import { faMagnifyingGlass } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import AddQuestBtn from "../components/AddQuestBtn";
 
 export default function QuestLogLayout() {
   //   const { t } = useTranslation();
@@ -29,7 +30,7 @@ export default function QuestLogLayout() {
     <>
       <section
         aria-labelledby="quest-log-page"
-        className="flex flex-col gap-y-4 items-center w-screen"
+        className="flex flex-col gap-y-4 items-center w-screen pb-20"
       >
         <div className="flex gap-x-8 items-center py-16 px-4">
           <h1 aria-labelledby="quest-log-heading" className="text-5xl order-1">
@@ -72,6 +73,7 @@ export default function QuestLogLayout() {
         </nav>
 
         <Outlet />
+        <AddQuestBtn positionClasses="fixed bottom-4 right-4" />
       </section>
     </>
   );
