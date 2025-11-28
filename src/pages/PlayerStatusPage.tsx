@@ -72,14 +72,10 @@ export default function PlayerStatusPage() {
           className="flex flex-col gap-y-18 md:gap-y-0 status-grid-area-container"
         >
           <div
-            className={`flex gap-x-8 items-center py-16 ${classStyles.horizontalPadding} status-heading-grid-area`}
+            aria-labelledby="status-heading"
+            className={`flex flex-wrap gap-x-8 gap-y-8 items-center justify-center py-16 ${classStyles.horizontalPadding} status-heading-grid-area`}
           >
-            <h1
-              aria-labelledby="status-heading"
-              className="h1-font-size order-1"
-            >
-              {statusHeading}
-            </h1>
+            <h1 className="h1-font-size break-all order-1">{statusHeading}</h1>
             <Suspense
               fallback={
                 <div className="size-20 bg-gray-300 animate-pulse rounded" />
