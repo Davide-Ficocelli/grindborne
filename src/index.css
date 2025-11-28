@@ -124,7 +124,19 @@ body {
   background: rgb(101, 82, 18);
 }
 
-/* Tailwind components */
+/* Inputs styles */
+
+input[type="radio"],
+input[type="checkbox"] {
+  cursor: pointer;
+}
+
+input[type="date"],
+input[type="time"] {
+  cursor: text;
+}
+
+/* Tailwind global components */
 
 @layer components {
   /* Font sizes */
@@ -178,10 +190,6 @@ body {
   border-right: 1px solid white;
 }
 
-/* ------ QUEST LOG PAGE STYLES ------ */
-
-/* --- Media queries --- */
-
 /* md: */
 @media (min-width: 768px) {
   .status-grid-area-container {
@@ -190,7 +198,7 @@ body {
     grid-template-rows: repeat(4, auto);
 
     grid-template-areas:
-      "heading ."
+      "heading heading"
       "info proficiency"
       "info ."
       "attributes attributes";
@@ -217,3 +225,124 @@ body {
     grid-area: proficiency;
   }
 }
+
+/* ------ QUEST LOG PAGE STYLES ------ */
+
+/* ------ QUEST FORM PAGE STYLES ------ */
+
+.quest-form-grid-area-container {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  row-gap: 4rem;
+  padding-block: 2rem;
+  grid-template-areas:
+    ". title-description ."
+    "divider-1 divider-1 divider-1"
+    ". attributes-duration ."
+    "divider-2 divider-2 divider-2"
+    ". date-time ."
+    "divider-3 divider-3 divider-3"
+    ". due-date-due-time ."
+    "divider-4 divider-4 divider-4"
+    ". do-track ."
+    "divider-5 divider-5 divider-5"
+    ". submit .";
+}
+
+.quest-title-description-grid-area {
+  grid-area: title-description;
+}
+
+.quest-attributes-duration-grid-area {
+  grid-area: attributes-duration;
+}
+
+.quest-date-time-grid-area {
+  grid-area: date-time;
+}
+
+.quest-due-date-due-time-grid-area {
+  grid-area: due-date-due-time;
+}
+
+.quest-do-track-grid-area {
+  grid-area: do-track;
+  place-self: center;
+}
+
+.quest-form-submit-grid-area {
+  grid-area: submit;
+  place-self: center;
+}
+
+.divider-1-grid-area {
+  grid-area: divider-1;
+}
+
+.divider-2-grid-area {
+  grid-area: divider-2;
+}
+
+.divider-3-grid-area {
+  grid-area: divider-3;
+}
+
+.divider-4-grid-area {
+  grid-area: divider-4;
+}
+
+.divider-5-grid-area {
+  grid-area: divider-5;
+}
+
+.input-label {
+  background: linear-gradient(to right, #ffffff, oklch(90.1% 0.076 70.697));
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+  font-size: 2.25rem;
+}
+
+.quest-form-input {
+  background: #ffffff;
+  border: solid 1px oklch(90.1% 0.076 70.697);
+  border-radius: 4px;
+  color: #111;
+  padding: 0.25rem 0.5rem;
+  width: 100%;
+  min-width: 165px;
+  max-width: 400px;
+}
+
+.quest-form-input[name="duration"] {
+  max-width: 150px;
+}
+
+.quest-form-input[name="due_date"],
+.quest-form-input[name="due_time"] {
+  max-width: 200px;
+}
+
+/* sm: */
+@media (min-width: 640px) {
+  .quest-form-grid-area-container {
+    grid-template-columns: repeat(5, 1fr);
+    grid-template-areas:
+      ". title-description title-description title-description ."
+      "divider-1 divider-1 divider-1 divider-1 divider-1"
+      ". attributes-duration attributes-duration attributes-duration ."
+      "divider-2 divider-2 divider-2 divider-2 divider-2"
+      ". date-time date-time date-time ."
+      "divider-3 divider-3 divider-3 divider-3 divider-3"
+      ". due-date-due-time due-date-due-time due-date-due-time ."
+      "divider-4 divider-4 divider-4 divider-4 divider-4"
+      ". do-track do-track do-track ."
+      "divider-5 divider-5 divider-5 divider-5 divider-5"
+      ". submit submit submit .";
+  }
+}
+
+/* * {
+  outline: 1px solid red;
+} */

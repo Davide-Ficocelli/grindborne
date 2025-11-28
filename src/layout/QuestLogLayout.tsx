@@ -32,8 +32,11 @@ export default function QuestLogLayout() {
         aria-labelledby="quest-log-page"
         className="flex flex-col gap-y-4 items-center w-screen pb-20"
       >
-        <div className="flex gap-x-8 items-center py-16 px-4">
-          <h1 aria-labelledby="quest-log-heading" className="text-5xl order-1">
+        <div className="flex flex-wrap gap-x-8 gap-y-8 items-center justify-center py-16 px-4">
+          <h1
+            aria-labelledby="quest-log-heading"
+            className="h1-font-size order-1 break-all"
+          >
             Missioni
           </h1>
           <Suspense fallback={<LoadingFallback />}>
