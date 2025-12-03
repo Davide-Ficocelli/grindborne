@@ -315,14 +315,14 @@ input[type="time"] {
   max-width: 400px;
 }
 
-.quest-form-input[name="duration"] {
+/* .quest-form-input[name="duration"] {
   max-width: 150px;
 }
 
 .quest-form-input[name="due_date"],
 .quest-form-input[name="due_time"] {
   max-width: 200px;
-}
+} */
 
 /* sm: */
 @media (min-width: 640px) {

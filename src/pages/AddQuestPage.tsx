@@ -96,15 +96,17 @@ export default function AddQuestPage() {
 
             <div className="bottom-linear-gradient-border after:from-orange-100 after:to-[#111] divider-1-grid-area"></div>
 
+            {/* Container for Attributes and duration field */}
+            {/* These are the main fields that will determine the total XP reward from quest completion */}
             <fieldset
               className={`${classStyles.inputsWrapper} quest-attributes-duration-grid-area`}
             >
-              {/* Fieldset Attributi */}
+              {/* Attributes fieldset */}
               <fieldset>
                 <legend className="input-label">Attributi coinvolti</legend>
 
                 <div>
-                  <div>
+                  <div className="flex gap-x-1">
                     <input
                       id="forza"
                       name="forza"
@@ -114,7 +116,7 @@ export default function AddQuestPage() {
                     <label htmlFor="forza">Forza</label>
                   </div>
 
-                  <div>
+                  <div className="flex gap-x-1">
                     <input
                       id="intelligenza"
                       name="intelligenza"
@@ -123,13 +125,11 @@ export default function AddQuestPage() {
                     />
                     <label htmlFor="intelligenza">Intelligenza</label>
                   </div>
-
-                  {/* XP reward from quest completion must be returned somewhere on this part of the UI*/}
                 </div>
               </fieldset>
 
-              {/* Campo Durata con unità di misura */}
-              <fieldset className={`${classStyles.labelAndInputContainer}`}>
+              {/* Duration field with measure unit */}
+              <fieldset className={classStyles.labelAndInputContainer}>
                 <label htmlFor="duration" className="input-label">
                   Durata stimata
                 </label>
@@ -146,12 +146,21 @@ export default function AddQuestPage() {
                   />
                   <span id="duration-unit">Espressa in minuti</span>
                 </div>
+
+                <div className="small-font-size pt-8 flex flex-col gap-y-4 justify-center items-start font-semibold">
+                  <p className="flex flex-col">
+                    Ricompensa XP per attributo:<span>200</span>
+                  </p>
+                  <p className="flex flex-col">
+                    Ricompensa totale XP:<span>400</span>
+                  </p>
+                </div>
               </fieldset>
             </fieldset>
 
             <div className="bottom-linear-gradient-border after:from-orange-100 after:to-[#111] divider-2-grid-area"></div>
 
-            {/* Sezione Data e Orario di Inizio */}
+            {/* Start date and time selection */}
             <fieldset
               className={`${classStyles.inputsWrapper} quest-date-time-grid-area`}
             >
@@ -182,7 +191,7 @@ export default function AddQuestPage() {
 
             <div className="bottom-linear-gradient-border after:from-orange-100 after:to-[#111] divider-3-grid-area"></div>
 
-            {/* Sezione Data e Orario di Scadenza */}
+            {/* Due date and due time selection */}
             <fieldset
               className={`${classStyles.inputsWrapper} quest-due-date-due-time-grid-area`}
             >
@@ -213,7 +222,7 @@ export default function AddQuestPage() {
 
             <div className="bottom-linear-gradient-border after:from-orange-100 after:to-[#111] divider-4-grid-area"></div>
 
-            {/* Fieldset Tracciamento */}
+            {/* Tracking fieldset */}
             <fieldset className="quest-do-track-grid-area">
               <legend className="input-label">
                 Traccia al momento della creazione?
