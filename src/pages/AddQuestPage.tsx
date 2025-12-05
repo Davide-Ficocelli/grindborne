@@ -1,10 +1,19 @@
-import { lazy, Suspense } from "react";
+import { lazy, Suspense, useState } from "react";
 import { Link } from "react-router-dom";
 import { faArrowLeft } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import LoadingFallback from "../components/LoadingFallback";
 
 export default function AddQuestPage() {
+  const [isQuestRewardable, setIsQuestRewardable] = useState(true);
+
+  console.log(isQuestRewardable);
+
+  function toggleQuestRewards(e: any) {
+    e.preventDefault();
+    setIsQuestRewardable((prevIsQuestRewardable) => !prevIsQuestRewardable);
+  }
+
   const AddQuestIcon = lazy(() =>
     import("../assets/icons/add-quest.png").then((module) => ({
       default: () => (
@@ -65,7 +74,7 @@ export default function AddQuestPage() {
               {/* Title field */}
               <fieldset className={`${classStyles.labelAndInputContainer}`}>
                 <label htmlFor="quest-title" className="input-label">
-                  Titolo
+                  Titolo *
                 </label>
                 <input
                   id="quest-title"
@@ -99,39 +108,51 @@ export default function AddQuestPage() {
             {/* Container for Attributes and duration field */}
             {/* These are the main fields that will determine the total XP reward from quest completion */}
             <fieldset
-              className={`${classStyles.inputsWrapper} quest-attributes-duration-grid-area`}
+              className={`${classStyles.inputsWrapper} sm:pt-20 sm:relative quest-attributes-duration-grid-area`}
             >
+              {/* Toggle quest rewards button */}
+              <div className="flex flex-col gap-y-4 sm:absolute sm:-top-10">
+                <span className="medium-font-size text-center">
+                  Ricompense missione
+                </span>
+                <button className="btn-primary" onClick={toggleQuestRewards}>
+                  {isQuestRewardable ? "Disattiva" : "Attiva"}
+                </button>
+              </div>
+
               {/* Attributes fieldset */}
-              <fieldset>
-                <legend className="input-label">Attributi coinvolti</legend>
+              {isQuestRewardable && (
+                <fieldset>
+                  <legend className="input-label">Attributi coinvolti *</legend>
 
-                <div>
-                  <div className="flex gap-x-1">
-                    <input
-                      id="forza"
-                      name="forza"
-                      type="checkbox"
-                      value="forza"
-                    />
-                    <label htmlFor="forza">Forza</label>
-                  </div>
+                  <div>
+                    <div className="flex gap-x-1">
+                      <input
+                        id="forza"
+                        name="forza"
+                        type="checkbox"
+                        value="forza"
+                      />
+                      <label htmlFor="forza">Forza</label>
+                    </div>
 
-                  <div className="flex gap-x-1">
-                    <input
-                      id="intelligenza"
-                      name="intelligenza"
-                      type="checkbox"
-                      value="intelligenza"
-                    />
-                    <label htmlFor="intelligenza">Intelligenza</label>
+                    <div className="flex gap-x-1">
+                      <input
+                        id="intelligenza"
+                        name="intelligenza"
+                        type="checkbox"
+                        value="intelligenza"
+                      />
+                      <label htmlFor="intelligenza">Intelligenza</label>
+                    </div>
                   </div>
-                </div>
-              </fieldset>
+                </fieldset>
+              )}
 
               {/* Duration field with measure unit */}
               <fieldset className={classStyles.labelAndInputContainer}>
                 <label htmlFor="duration" className="input-label">
-                  Durata stimata
+                  Durata stimata {isQuestRewardable ? "*" : null}
                 </label>
                 <div className="flex flex-col items-start gap-y-2">
                   <input
@@ -143,18 +164,21 @@ export default function AddQuestPage() {
                     placeholder="Durata..."
                     aria-describedby="duration-input"
                     className="quest-form-input order-1"
+                    required={isQuestRewardable ? true : false}
                   />
                   <span id="duration-unit">Espressa in minuti</span>
                 </div>
 
-                <div className="small-font-size pt-8 flex flex-col gap-y-4 justify-center items-start font-semibold">
-                  <p className="flex flex-col">
-                    Ricompensa XP per attributo:<span>200</span>
-                  </p>
-                  <p className="flex flex-col">
-                    Ricompensa totale XP:<span>400</span>
-                  </p>
-                </div>
+                {isQuestRewardable && (
+                  <div className="small-font-size pt-8 flex flex-col gap-y-4 justify-center items-start font-semibold">
+                    <p className="flex flex-col">
+                      Ricompensa XP per attributo:<span>200</span>
+                    </p>
+                    <p className="flex flex-col">
+                      Ricompensa totale XP:<span>400</span>
+                    </p>
+                  </div>
+                )}
               </fieldset>
             </fieldset>
 
@@ -223,31 +247,40 @@ export default function AddQuestPage() {
             <div className="bottom-linear-gradient-border after:from-orange-100 after:to-[#111] divider-4-grid-area"></div>
 
             {/* Tracking fieldset */}
-            <fieldset className="quest-do-track-grid-area">
-              <legend className="input-label">
-                Traccia al momento della creazione?
-              </legend>
+            {isQuestRewardable && (
+              <>
+                <fieldset className="quest-do-track-grid-area">
+                  <legend className="input-label">
+                    Traccia al momento della creazione?{" "}
+                  </legend>
 
-              <div>
-                <div className="flex gap-x-1">
-                  <input id="track-yes" name="track" type="radio" value="sì" />
-                  <label htmlFor="track-yes">Sì</label>
-                </div>
+                  <div>
+                    <div className="flex gap-x-1">
+                      <input
+                        id="track-yes"
+                        name="track"
+                        type="radio"
+                        value="sì"
+                      />
+                      <label htmlFor="track-yes">Sì</label>
+                    </div>
 
-                <div className="flex gap-x-1">
-                  <input
-                    id="track-no"
-                    name="track"
-                    type="radio"
-                    value="no"
-                    defaultChecked
-                  />
-                  <label htmlFor="track-no">No</label>
-                </div>
-              </div>
-            </fieldset>
+                    <div className="flex gap-x-1">
+                      <input
+                        id="track-no"
+                        name="track"
+                        type="radio"
+                        value="no"
+                        defaultChecked
+                      />
+                      <label htmlFor="track-no">No</label>
+                    </div>
+                  </div>
+                </fieldset>
 
-            <div className="bottom-linear-gradient-border after:from-[#FFFFFF] after:to-[#111] divider-5-grid-area"></div>
+                <div className="bottom-linear-gradient-border after:from-[#FFFFFF] after:to-[#111] divider-5-grid-area"></div>
+              </>
+            )}
 
             {/* Submit Button */}
             <button
