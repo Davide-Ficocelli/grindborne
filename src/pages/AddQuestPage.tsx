@@ -7,8 +7,6 @@ import LoadingFallback from "../components/LoadingFallback";
 export default function AddQuestPage() {
   const [isQuestRewardable, setIsQuestRewardable] = useState(true);
 
-  console.log(isQuestRewardable);
-
   function toggleQuestRewards(e: any) {
     e.preventDefault();
     setIsQuestRewardable((prevIsQuestRewardable) => !prevIsQuestRewardable);
@@ -20,7 +18,7 @@ export default function AddQuestPage() {
         <img
           src={module.default}
           alt="Add quest icon"
-          className="size-20 rounded-lg border border-[#FFD6A7]"
+          className="size-20 rounded-lg"
         />
       ),
     }))
