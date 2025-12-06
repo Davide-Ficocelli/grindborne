@@ -6,6 +6,7 @@ import {
   faCheck,
   faX,
 } from "@fortawesome/free-solid-svg-icons";
+import { Link } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 // Component representing a single quest
@@ -24,6 +25,16 @@ export default function Quest(props: QuestProps) {
   const { questTitle, questDescription } = props.questData;
   const { styles } = props;
 
+  type ObjOfStrings = {
+    [key: string]: string;
+  };
+
+  const classStyles: ObjOfStrings = {
+    actionIcon: "text-white cursor-pointer sm:text-2xl",
+    actionBtn:
+      "text-white flex flex-col justify-center items-center gap-y-2 hover:opacity-80 focus:opacity-80 active:opacity-80 cursor-pointer",
+  };
+
   return (
     <article
       className={`flex flex-col gap-y-4 items-center p-4 border-b-2 border-white w-screen ${styles}`}
@@ -37,47 +48,35 @@ export default function Quest(props: QuestProps) {
       <nav
         aria-label="Actions"
         role="toolbar"
-        className="w-full flex items-baseline gap-x-2 justify-center"
+        className="flex items-baseline gap-x-2 justify-center"
       >
-        <button className="flex flex-col justify-center items-center gap-y-2">
+        <button className={classStyles.actionBtn}>
           <span className="order-1 text-center small-font-size">
             Segna come fallita
           </span>
-          <FontAwesomeIcon
-            className="text-white hover:text-gray-300 focus:text-gray-300 active:text-gray-300 cursor-pointer"
-            icon={faX}
-          />
+          <FontAwesomeIcon className={classStyles.actionIcon} icon={faX} />
         </button>
-        <button className="flex flex-col justify-center items-center gap-y-2">
+        <button className={classStyles.actionBtn}>
           <span className="order-1 text-center small-font-size">
             Segna come completata
           </span>
-          <FontAwesomeIcon
-            className="text-white hover:text-gray-300 focus:text-gray-300 active:text-gray-300 cursor-pointer"
-            icon={faCheck}
-          />
+          <FontAwesomeIcon className={classStyles.actionIcon} icon={faCheck} />
         </button>
-        <button className="flex flex-col justify-center items-center gap-y-2">
+        <button className={classStyles.actionBtn}>
           <span className="order-1 text-center small-font-size">Elimina</span>
-          <FontAwesomeIcon
-            className="text-white hover:text-gray-300 focus:text-gray-300 active:text-gray-300 cursor-pointer"
-            icon={faTrash}
-          />
+          <FontAwesomeIcon className={classStyles.actionIcon} icon={faTrash} />
         </button>
-        <button className="flex flex-col justify-center items-center gap-y-2">
+        <button className={classStyles.actionBtn}>
           <span className="order-1 text-center small-font-size">Modifica</span>
-          <FontAwesomeIcon
-            className="text-white hover:text-gray-300 focus:text-gray-300 active:text-gray-300 cursor-pointer"
-            icon={faPencil}
-          />
+          <FontAwesomeIcon className={classStyles.actionIcon} icon={faPencil} />
         </button>
-        <button className="flex flex-col justify-center items-center gap-y-2">
+        <Link
+          className={classStyles.actionBtn}
+          to={`/quest-log/action/view/${1}`}
+        >
           <span className="order-1 text-center small-font-size">Dettagli</span>
-          <FontAwesomeIcon
-            className="text-white hover:text-gray-300 focus:text-gray-300 active:text-gray-300 cursor-pointer"
-            icon={faInfo}
-          />
-        </button>
+          <FontAwesomeIcon className={classStyles.actionIcon} icon={faInfo} />
+        </Link>
       </nav>
 
       {/* <h3 className="text-center medium-font-size">3 sotto-missioni</h3> */}

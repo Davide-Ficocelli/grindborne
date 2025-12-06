@@ -39,7 +39,6 @@ export default function QuestLogPage() {
         <section>
           {/* Render quests from array and removes bottom border to the last one */}
           {quests.map((q, _, qs) => {
-            console.log(omit(q, ["key", "styles"]));
             if (qs.indexOf(q) === qs.length - 1)
               return (
                 <Quest

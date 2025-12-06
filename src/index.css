@@ -230,11 +230,15 @@ input[type="time"] {
 
 /* ------ QUEST FORM PAGE STYLES ------ */
 
-.quest-form-grid-area-container {
+.quest-form-grid-area-container,
+.quest-details-grid-area-container {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   row-gap: 4rem;
   padding-block: 2rem;
+}
+
+.quest-form-grid-area-container {
   grid-template-areas:
     ". title-description ."
     "divider-1 divider-1 divider-1"
@@ -295,7 +299,8 @@ input[type="time"] {
   grid-area: divider-5;
 }
 
-.input-label {
+.input-label,
+.field-title {
   background: linear-gradient(to right, #ffffff, oklch(90.1% 0.076 70.697));
   -webkit-background-clip: text;
   background-clip: text;
@@ -326,8 +331,12 @@ input[type="time"] {
 
 /* sm: */
 @media (min-width: 640px) {
-  .quest-form-grid-area-container {
+  .quest-form-grid-area-container,
+  .quest-details-grid-area-container {
     grid-template-columns: repeat(5, 1fr);
+  }
+
+  .quest-form-grid-area-container {
     grid-template-areas:
       ". title-description title-description title-description ."
       "divider-1 divider-1 divider-1 divider-1 divider-1"
@@ -340,6 +349,41 @@ input[type="time"] {
       ". do-track do-track do-track ."
       "divider-5 divider-5 divider-5 divider-5 divider-5"
       ". submit submit submit .";
+  }
+}
+
+/* ------ QUEST DETAILS PAGE STYLES ------ */
+
+.quest-details-grid-area-container {
+  grid-template-areas:
+    ". title-description ."
+    "divider-1 divider-1 divider-1"
+    ". attributes-duration ."
+    "divider-2 divider-2 divider-2"
+    ". date-time ."
+    "divider-3 divider-3 divider-3"
+    ". due-date-due-time ."
+    "divider-4 divider-4 divider-4"
+    ". actions .";
+}
+
+.quest-actions-grid-area {
+  grid-area: actions;
+}
+
+/* sm: */
+@media (min-width: 640px) {
+  .quest-details-grid-area-container {
+    grid-template-areas:
+      ". title-description title-description title-description ."
+      "divider-1 divider-1 divider-1 divider-1 divider-1"
+      ". attributes-duration attributes-duration attributes-duration ."
+      "divider-2 divider-2 divider-2 divider-2 divider-2"
+      ". date-time date-time date-time ."
+      "divider-3 divider-3 divider-3 divider-3 divider-3"
+      ". due-date-due-time due-date-due-time due-date-due-time ."
+      "divider-4 divider-4 divider-4 divider-4 divider-4"
+      ". actions actions actions .";
   }
 }
 
