@@ -28,11 +28,15 @@ export default function AddQuestPage() {
     [key: string]: string;
   };
 
+  // sm:flex-row sm:justify-baseline sm:items-start sm:gap-x-30 lg:gap-x-80
+
   const classStyles: ObjOfStrings = {
     inputsWrapper:
-      "flex flex-col justify-center items-start gap-y-4 w-full sm:flex-row sm:justify-baseline sm:items-start sm:gap-x-30 lg:gap-x-80",
+      "flex flex-col justify-center items-start gap-y-12 w-full sm:grid sm:grid-cols-3",
     labelAndInputContainer:
       "flex flex-col gap-y-4 justify-center items-start sm:items-start sm:text-start",
+    firstGridInput: "sm:col-start-1 sm:col-end-2",
+    secondGridInput: "sm:col-start-3 sm:col-end-3",
   };
 
   return (
@@ -70,7 +74,9 @@ export default function AddQuestPage() {
               className={`${classStyles.inputsWrapper} quest-title-description-grid-area`}
             >
               {/* Title field */}
-              <fieldset className={`${classStyles.labelAndInputContainer}`}>
+              <fieldset
+                className={`${classStyles.labelAndInputContainer} ${classStyles.firstGridInput}`}
+              >
                 <label htmlFor="quest-title" className="input-label">
                   Titolo *
                 </label>
@@ -86,7 +92,9 @@ export default function AddQuestPage() {
               </fieldset>
 
               {/* Description field */}
-              <fieldset className={`${classStyles.labelAndInputContainer}`}>
+              <fieldset
+                className={`${classStyles.labelAndInputContainer} ${classStyles.secondGridInput}`}
+              >
                 <label htmlFor="quest-description" className="input-label">
                   Descrizione
                 </label>
@@ -106,10 +114,10 @@ export default function AddQuestPage() {
             {/* Container for Attributes and duration field */}
             {/* These are the main fields that will determine the total XP reward from quest completion */}
             <fieldset
-              className={`${classStyles.inputsWrapper} sm:pt-20 sm:relative quest-attributes-duration-grid-area`}
+              className={`${classStyles.inputsWrapper} quest-attributes-duration-grid-area`}
             >
               {/* Toggle quest rewards button */}
-              <div className="flex flex-col gap-y-4 sm:absolute sm:-top-10">
+              <div className="flex flex-col gap-y-4 sm:col-start-2 sm:col-end-2">
                 <span className="medium-font-size text-center">
                   Ricompense missione
                 </span>
@@ -120,7 +128,7 @@ export default function AddQuestPage() {
 
               {/* Attributes fieldset */}
               {isQuestRewardable && (
-                <fieldset>
+                <fieldset className={classStyles.firstGridInput}>
                   <legend className="input-label">Attributi coinvolti *</legend>
 
                   <div>
@@ -148,7 +156,13 @@ export default function AddQuestPage() {
               )}
 
               {/* Duration field with measure unit */}
-              <fieldset className={classStyles.labelAndInputContainer}>
+              <fieldset
+                className={`${classStyles.labelAndInputContainer} ${
+                  isQuestRewardable
+                    ? classStyles.secondGridInput
+                    : "col-start-2 col-end-2 row-span-2"
+                }`}
+              >
                 <label htmlFor="duration" className="input-label">
                   Durata stimata {isQuestRewardable ? "*" : null}
                 </label>
@@ -186,7 +200,9 @@ export default function AddQuestPage() {
             <fieldset
               className={`${classStyles.inputsWrapper} quest-date-time-grid-area`}
             >
-              <fieldset className={`${classStyles.labelAndInputContainer}`}>
+              <fieldset
+                className={`${classStyles.labelAndInputContainer} ${classStyles.firstGridInput}`}
+              >
                 <label htmlFor="date" className="input-label">
                   Data
                 </label>
@@ -198,7 +214,9 @@ export default function AddQuestPage() {
                 />
               </fieldset>
 
-              <fieldset className={`${classStyles.labelAndInputContainer}`}>
+              <fieldset
+                className={`${classStyles.labelAndInputContainer} ${classStyles.secondGridInput}`}
+              >
                 <label htmlFor="time" className="input-label">
                   Orario
                 </label>
@@ -217,7 +235,9 @@ export default function AddQuestPage() {
             <fieldset
               className={`${classStyles.inputsWrapper} quest-due-date-due-time-grid-area`}
             >
-              <fieldset className={`${classStyles.labelAndInputContainer}`}>
+              <fieldset
+                className={`${classStyles.labelAndInputContainer} ${classStyles.firstGridInput}`}
+              >
                 <label htmlFor="due-date" className="input-label">
                   Data di scadenza
                 </label>
@@ -229,7 +249,9 @@ export default function AddQuestPage() {
                 />
               </fieldset>
 
-              <fieldset className={`${classStyles.labelAndInputContainer}`}>
+              <fieldset
+                className={`${classStyles.labelAndInputContainer} ${classStyles.secondGridInput}`}
+              >
                 <label htmlFor="due-time" className="input-label">
                   Orario di scadenza
                 </label>
