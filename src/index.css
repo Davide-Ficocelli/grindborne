@@ -228,6 +228,20 @@ input[type="time"] {
 
 /* ------ QUEST LOG PAGE STYLES ------ */
 
+#quest-details-side-view ::-webkit-scrollbar {
+  width: 10px;
+  background: #111;
+}
+
+#quest-details-side-view ::-webkit-scrollbar-thumb {
+  background-color: oklch(90.1% 0.076 70.697);
+  border-radius: 1rem;
+}
+
+#quest-details-side-view ::-webkit-scrollbar-track {
+  background: #4b4b4b;
+}
+
 /* ------ QUEST FORM PAGE STYLES ------ */
 
 .quest-form-grid-area-container,
@@ -331,6 +345,11 @@ input[type="time"] {
 
 /* sm: */
 @media (min-width: 640px) {
+  .input-label,
+  .field-title {
+    word-break: break-all;
+  }
+
   .quest-form-grid-area-container,
   .quest-details-grid-area-container {
     grid-template-columns: repeat(5, 1fr);

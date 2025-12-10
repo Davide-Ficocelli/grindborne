@@ -37,7 +37,7 @@ export default function Quest(props: QuestProps) {
 
   return (
     <article
-      className={`flex flex-col gap-y-4 items-center p-4 border-b-2 border-white w-screen ${styles}`}
+      className={`flex flex-col gap-y-4 items-center p-4 bottom-linear-gradient-border after:from-white after:to-[#111] w-full ${styles}`}
     >
       <div className="flex gap-x-8 items-center px-4">
         <h2 className="order-1 h2-font-size text-center font-semibold">

@@ -6,7 +6,7 @@ import LoadingFallback from "./components/LoadingFallback";
 const PlayerStatusPage = lazy(() => import("./pages/PlayerStatusPage"));
 const QuestLogList = lazy(() => import("./pages/QuestLogList"));
 const AddQuestPage = lazy(() => import("./pages/AddQuestPage"));
-const QuestDetailsPage = lazy(() => import("./pages/QuestDetailsPage"));
+const QuestDetails = lazy(() => import("./components/QuestDetails"));
 const Layout = lazy(() => import("./layout/Layout"));
 const QuestLogLayout = lazy(() => import("./layout/QuestLogLayout"));
 
@@ -65,7 +65,7 @@ function App() {
                 path="view/:id"
                 element={
                   <Suspense fallback={<LoadingFallback />}>
-                    <QuestDetailsPage />
+                    <QuestDetails variant="full-page" />
                   </Suspense>
                 }
               />
