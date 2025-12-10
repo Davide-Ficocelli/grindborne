@@ -7,6 +7,7 @@ export default function QuestLogPage() {
 
   // Lazy load components
   const Quest = lazy(() => import("../components/Quest"));
+  const QuestDetails = lazy(() => import("../components/QuestDetails"));
 
   const quests = [
     {
@@ -36,22 +37,35 @@ export default function QuestLogPage() {
   return (
     <>
       <Suspense fallback={<LoadingFallback />}>
-        <section>
-          {/* Render quests from array and removes bottom border to the last one */}
-          {quests.map((q, _, qs) => {
-            if (qs.indexOf(q) === qs.length - 1)
-              return (
-                <Quest
-                  key={q.id}
-                  styles="border-none"
-                  questData={omit(q, ["key", "styles"])}
-                />
-              );
-            else
-              return (
-                <Quest key={q.id} questData={omit(q, ["key", "styles"])} />
-              );
-          })}
+        <section aria-label="quest-log-list" className="lg:grid lg:grid-cols-2">
+          {/* Quest details (large screens only) */}
+          <section
+            aria-label="quest-details"
+            className={`hidden ${
+              quests.length === 0 ? "lg:hidden" : "lg:block"
+            } lg:col-start-1`}
+          >
+            <Suspense fallback={<LoadingFallback />}>
+              <QuestDetails variant="side-view" />
+            </Suspense>
+          </section>
+          <section aria-label="quests-list">
+            {/* Render quests from array and removes bottom border to the last one */}
+            {quests.map((q, _, qs) => {
+              if (qs.indexOf(q) === qs.length - 1)
+                return (
+                  <Quest
+                    key={q.id}
+                    styles="border-none"
+                    questData={omit(q, ["key", "styles"])}
+                  />
+                );
+              else
+                return (
+                  <Quest key={q.id} questData={omit(q, ["key", "styles"])} />
+                );
+            })}
+          </section>
         </section>
       </Suspense>
     </>

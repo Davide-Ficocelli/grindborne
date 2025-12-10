@@ -249,7 +249,7 @@ export default function AddQuestPage() {
               <>
                 <fieldset className="quest-do-track-grid-area">
                   <legend className="input-label">
-                    Traccia al momento della creazione?{" "}
+                    Traccia al momento della creazione? *
                   </legend>
 
                   <div>
