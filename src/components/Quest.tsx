@@ -1,4 +1,5 @@
 // import { useTranslation } from "react-i18next";
+import { useQuest } from "../hooks/useQuest";
 import {
   faInfo,
   faPencil,
@@ -11,18 +12,14 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 // Component representing a single quest
 
-interface QuestProps {
+type QuestProps = {
   key: number;
-  questData: {
-    questTitle?: string;
-    questDescription?: string;
-    questIcon?: string;
-  };
+  questId: number;
   styles?: string;
-}
+};
 
 export default function Quest(props: QuestProps) {
-  const { questTitle, questDescription } = props.questData;
+  const currentQuest = useQuest(props.questId);
   const { styles } = props;
 
   type ObjOfStrings = {
@@ -41,10 +38,10 @@ export default function Quest(props: QuestProps) {
     >
       <div className="flex gap-x-8 items-center px-4">
         <h2 className="order-1 h2-font-size text-center font-semibold">
-          {questTitle}
+          {currentQuest?.questTitle}
         </h2>
       </div>
-      <p className="text-md text-center">{questDescription}</p>
+      <p className="text-md text-center">{currentQuest?.questDescription}</p>
       <nav
         aria-label="Actions"
         role="toolbar"
@@ -66,13 +63,16 @@ export default function Quest(props: QuestProps) {
           <span className="order-1 text-center small-font-size">Elimina</span>
           <FontAwesomeIcon className={classStyles.actionIcon} icon={faTrash} />
         </button>
-        <button className={classStyles.actionBtn}>
+        <Link
+          to={`/quest-log/action/edit/${currentQuest?.questId}`}
+          className={classStyles.actionBtn}
+        >
           <span className="order-1 text-center small-font-size">Modifica</span>
           <FontAwesomeIcon className={classStyles.actionIcon} icon={faPencil} />
-        </button>
+        </Link>
         <Link
           className={classStyles.actionBtn}
-          to={`/quest-log/action/view/${1}`}
+          to={`/quest-log/action/view/${currentQuest?.questId}`}
         >
           <span className="order-1 text-center small-font-size">Dettagli</span>
           <FontAwesomeIcon className={classStyles.actionIcon} icon={faInfo} />
