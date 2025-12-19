@@ -1,5 +1,6 @@
 import { lazy, Suspense } from "react";
-import { Link } from "react-router-dom";
+import { useQuest } from "../hooks/useQuest";
+import { Link, useParams } from "react-router-dom";
 import {
   faArrowLeft,
   faPencil,
@@ -15,6 +16,9 @@ type QuestDetailsProps = {
 };
 
 export default function QuestDetails(props: QuestDetailsProps) {
+  const { id } = useParams();
+  const currentQuest = useQuest(Number(id));
+
   const QuestDetailsIcon = lazy(() =>
     import("../assets/icons/quest-details.png").then((module) => ({
       default: () => (
@@ -26,11 +30,6 @@ export default function QuestDetails(props: QuestDetailsProps) {
       ),
     }))
   );
-
-  const involvedAttributes = [
-    { attributeName: "Forza" },
-    { attributeName: "Intelligenza" },
-  ];
 
   type ObjOfStrings = {
     [key: string]: string;
@@ -86,105 +85,140 @@ export default function QuestDetails(props: QuestDetailsProps) {
               className={`${classStyles.fieldsWrapper} quest-title-description-grid-area`}
             >
               <div
-                className={`${classStyles.labelAndFieldContainer} ${classStyles.firstGridField}`}
+                className={`${classStyles.labelAndFieldContainer} ${
+                  currentQuest?.questDescription
+                    ? classStyles.firstGridField
+                    : "sm:col-start-2 sm:col-end-3"
+                }`}
               >
                 <h2 className="field-title">Titolo</h2>
-                <p>Esercizi in palestra</p>
+                <p>{currentQuest?.questTitle}</p>
               </div>
 
-              <div
-                className={`${classStyles.labelAndFieldContainer} ${classStyles.secondGridField}`}
-              >
-                <h2 className="field-title">Descrizione</h2>
-                <p>Solleva dei pesi per migliorare la massa muscolare</p>
-              </div>
+              {currentQuest?.questDescription && (
+                <div
+                  className={`${classStyles.labelAndFieldContainer} ${classStyles.secondGridField}`}
+                >
+                  <h2 className="field-title">Descrizione</h2>
+                  <p>{currentQuest?.questDescription}</p>
+                </div>
+              )}
             </div>
 
             <div className="bottom-linear-gradient-border after:from-orange-100 after:to-[#111] divider-1-grid-area" />
 
             {/* Attributes and Duration */}
-            <div
-              className={`${classStyles.fieldsWrapper} gap-y-8 sm:relative quest-attributes-duration-grid-area`}
-            >
-              <div className="flex flex-col gap-y-4 sm:col-start-2 sm:col-end-2">
-                <p className="medium-font-size text-center">
-                  Ricompense missione <span className="font-bold">attive</span>
-                </p>
-              </div>
+            {currentQuest?.involvedAttributes &&
+              currentQuest.estimatedDuration && (
+                <>
+                  <div
+                    className={`${classStyles.fieldsWrapper} gap-y-8 sm:relative quest-attributes-duration-grid-area`}
+                  >
+                    <div className="flex flex-col gap-y-4 sm:col-start-2 sm:col-end-2">
+                      <p className="medium-font-size text-center">
+                        Ricompense missione{" "}
+                        <span className="font-bold">attive</span>
+                      </p>
+                    </div>
 
-              <div className={classStyles.firstGridField}>
-                <h3 className="field-title">Attributi coinvolti</h3>
-                <ul className="flex flex-col gap-y-2">
-                  {involvedAttributes.map((attribute) => (
-                    <li key={attribute.attributeName}>
-                      {attribute.attributeName}
-                    </li>
-                  ))}
-                </ul>
-              </div>
+                    {currentQuest?.involvedAttributes && (
+                      <div className={classStyles.firstGridField}>
+                        <h3 className="field-title">Attributi coinvolti</h3>
+                        <ul className="flex flex-col gap-y-2">
+                          {currentQuest?.involvedAttributes.map(
+                            (attribute, index) => (
+                              <li key={index}>{attribute}</li>
+                            )
+                          )}
+                        </ul>
+                      </div>
+                    )}
 
-              <div
-                className={`${classStyles.labelAndFieldContainer} ${classStyles.secondGridField}`}
-              >
-                <h3 className="field-title">Durata stimata</h3>
-                <p>
-                  30 <span>minuti</span>
-                </p>
+                    <div
+                      className={`${classStyles.labelAndFieldContainer} ${
+                        currentQuest.involvedAttributes
+                          ? classStyles.secondGridField
+                          : "col-start-2 col-end-3 row-start-2 row-end-2"
+                      }`}
+                    >
+                      <h3 className="field-title">Durata stimata</h3>
+                      <p>
+                        {currentQuest?.estimatedDuration} <span>minuti</span>
+                      </p>
 
-                <div className="small-font-size pt-8 flex flex-col gap-y-4 justify-center items-start font-semibold">
-                  <p>
-                    Ricompensa XP per attributo: <strong>200</strong>
-                  </p>
-                  <p>
-                    Ricompensa totale XP: <strong>400</strong>
-                  </p>
-                </div>
-              </div>
-            </div>
-
-            <div className="bottom-linear-gradient-border after:from-orange-100 after:to-[#111] divider-2-grid-area" />
+                      <div className="small-font-size pt-8 flex flex-col gap-y-4 justify-center items-start font-semibold">
+                        <p>
+                          Ricompensa XP per attributo: <strong>200</strong>
+                        </p>
+                        <p>
+                          Ricompensa totale XP: <strong>400</strong>
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="bottom-linear-gradient-border after:from-orange-100 after:to-[#111] divider-2-grid-area" />
+                </>
+              )}
 
             {/* Start Date and Time */}
-            <div
-              className={`${classStyles.fieldsWrapper} quest-date-time-grid-area`}
-            >
-              <div
-                className={`${classStyles.labelAndFieldContainer} ${classStyles.firstGridField}`}
-              >
-                <h3 className="field-title">Data</h3>
-                <time dateTime="2025-12-16">16/12/2025</time>
-              </div>
+            {currentQuest?.startDate && currentQuest?.startTime && (
+              <>
+                <div
+                  className={`${classStyles.fieldsWrapper} quest-date-time-grid-area`}
+                >
+                  {currentQuest.startDate && (
+                    <div
+                      className={`${classStyles.labelAndFieldContainer} ${
+                        currentQuest.startTime
+                          ? classStyles.firstGridField
+                          : "col-start-2 col-end-2"
+                      }`}
+                    >
+                      <h3 className="field-title">Data</h3>
+                      <time dateTime="2025-12-16">
+                        {currentQuest?.startDate}
+                      </time>
+                    </div>
+                  )}
 
-              <div
-                className={`${classStyles.labelAndFieldContainer} ${classStyles.secondGridField}`}
-              >
-                <h3 className="field-title">Orario</h3>
-                <time dateTime="18:30">18:30</time>
-              </div>
-            </div>
+                  {currentQuest.startTime && (
+                    <div
+                      className={`${classStyles.labelAndFieldContainer} ${classStyles.secondGridField}`}
+                    >
+                      <h3 className="field-title">Orario</h3>
+                      <time dateTime="18:30">{currentQuest?.startTime}</time>
+                    </div>
+                  )}
+                </div>
 
-            <div className="bottom-linear-gradient-border after:from-orange-100 after:to-[#111] divider-3-grid-area" />
+                <div className="bottom-linear-gradient-border after:from-orange-100 after:to-[#111] divider-3-grid-area" />
+              </>
+            )}
 
             {/* Due Date and Time */}
-            <div
-              className={`${classStyles.fieldsWrapper} quest-due-date-due-time-grid-area`}
-            >
-              <div
-                className={`${classStyles.labelAndFieldContainer} ${classStyles.firstGridField}`}
-              >
-                <h3 className="field-title">Data di scadenza</h3>
-                <time dateTime="2025-12-18">18/12/2025</time>
-              </div>
+            {currentQuest?.dueDate && currentQuest.dueTime && (
+              <>
+                <div
+                  className={`${classStyles.fieldsWrapper} quest-due-date-due-time-grid-area`}
+                >
+                  <div
+                    className={`${classStyles.labelAndFieldContainer} ${classStyles.firstGridField}`}
+                  >
+                    <h3 className="field-title">Data di scadenza</h3>
+                    <time dateTime="2025-12-18">{currentQuest?.dueDate}</time>
+                  </div>
 
-              <div
-                className={`${classStyles.labelAndFieldContainer} ${classStyles.secondGridField}`}
-              >
-                <h3 className="field-title">Orario di scadenza</h3>
-                <time dateTime="15:00">15:00</time>
-              </div>
-            </div>
+                  <div
+                    className={`${classStyles.labelAndFieldContainer} ${classStyles.secondGridField}`}
+                  >
+                    <h3 className="field-title">Orario di scadenza</h3>
+                    <time dateTime="15:00">{currentQuest?.dueTime}</time>
+                  </div>
+                </div>
 
-            <div className="bottom-linear-gradient-border after:from-orange-100 after:to-[#111] divider-4-grid-area" />
+                <div className="bottom-linear-gradient-border after:from-orange-100 after:to-[#111] divider-4-grid-area" />
+              </>
+            )}
 
             {/* Actions Toolbar */}
             <nav
@@ -232,7 +266,7 @@ export default function QuestDetails(props: QuestDetailsProps) {
                 />
               </button>
               <Link
-                to=""
+                to={`/quest-log/action/edit/${1}`}
                 className={classStyles.actionBtn}
                 aria-label="Modifica questa missione"
               >
@@ -308,11 +342,8 @@ export default function QuestDetails(props: QuestDetailsProps) {
               <div className={classStyles.firstGridField}>
                 <h4 className="field-title">Attributi coinvolti</h4>
                 <ul className="flex flex-col gap-y-2">
-                  {involvedAttributes.map((attribute) => (
-                    <li key={attribute.attributeName}>
-                      {attribute.attributeName}
-                    </li>
-                  ))}
+                  <li>Forza</li>
+                  <li>Intelligenza</li>
                 </ul>
               </div>
 

@@ -5,7 +5,7 @@ import { Link } from "react-router-dom";
 export default function AddQuestBtn(props: { positionClasses?: string }) {
   return (
     <>
-      <Link to="/quest-log/action/add-quest">
+      <Link to="/quest-log/action/add">
         <button
           className={`flex items-center justify-center gap-x-2 btn-primary ${props.positionClasses}`}
         >

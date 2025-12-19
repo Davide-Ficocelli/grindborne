@@ -1,32 +1,16 @@
-import { lazy, Suspense } from "react";
+import { lazy, Suspense, useContext } from "react";
+import { QuestsContext } from "../App";
 // import { useTranslation } from "react-i18next";
 import LoadingFallback from "../components/LoadingFallback";
 
 export default function QuestLogPage() {
   // const { t } = useTranslation();
 
+  const quests = useContext(QuestsContext);
+
   // Lazy load components
   const Quest = lazy(() => import("../components/Quest"));
   const QuestDetails = lazy(() => import("../components/QuestDetails"));
-
-  const quests = [
-    {
-      id: 1,
-      questTitle: "Esercizi in palestra",
-      questDescription: "Solleva dei pesi per migliorare la massa muscolare",
-    },
-    {
-      id: 2,
-      questTitle: "Raccogli la legna",
-      questDescription: "Raccogli 10 pezzi di legna nella foresta.",
-    },
-    {
-      id: 3,
-      questTitle: "Colloquio di lavoro",
-      questDescription:
-        "Partecipa al colloquio di lavoro presso l'azienda locale.",
-    },
-  ];
 
   // Omit function - removes specific keys from an object
   const omit = (obj: {}, keys: string[]): {} =>
@@ -55,15 +39,12 @@ export default function QuestLogPage() {
               if (qs.indexOf(q) === qs.length - 1)
                 return (
                   <Quest
-                    key={q.id}
+                    key={q.questId}
+                    questId={q.questId}
                     styles="border-none"
-                    questData={omit(q, ["key", "styles"])}
                   />
                 );
-              else
-                return (
-                  <Quest key={q.id} questData={omit(q, ["key", "styles"])} />
-                );
+              else return <Quest key={q.questId} questId={q.questId} />;
             })}
           </section>
         </section>
