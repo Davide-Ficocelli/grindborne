@@ -8,6 +8,7 @@
 ## 📋 Indice
 
 - [Panoramica](#-panoramica)
+- [Stato del progetto](#-stato-del-progetto)
 - [Funzionalità](#-funzionalità)
 - [Design e UI/UX](#-design-e-uiux)
 - [Tecnologie](#-tecnologie)
@@ -83,6 +84,27 @@ Un'app che trasforma:
 - **Competenze reali** in **Statistiche**
 - **Progresso** in **Livelli**
 
+## 🛠️ Stato del progetto
+
+Grindborne è attualmente un progetto **work in progress**.
+
+In questa fase, lo sviluppo del frontend è temporaneamente in pausa per dare priorità
+alla progettazione dell'API e del backend, con l'obiettivo di costruire fondamenta solide
+prima di proseguire con l'interfaccia utente.
+
+### Focus attuale
+
+- Sviluppo backend con Node.js, Express e PostgreSQL
+- Progettazione e organizzazione degli endpoint API
+- Gestione autenticazione con JWT
+- Definizione della logica applicativa per quest, grind, attributi e stato utente
+
+### Stato delle componenti
+
+- **Frontend**: prototipi UI e prime schermate disponibili, sviluppo momentaneamente sospeso
+- **Backend/API**: sviluppo attivo
+- **Database**: struttura in evoluzione insieme alla logica backend
+
 ## 🎮 Funzionalità
 
 ### Funzionalità chiave
@@ -133,3 +155,8 @@ Un'app che trasforma:
 - Linguaggio: TypeScript (Node.js)
 - Framework: Express
 - Database: PostgreSQL
+
+## 📘 Repository correlati
+
+- **Frontend / App principale**: questo repository
+- **Backend / API**: [grindborne-api](https://github.com/Davide-Ficocelli/grindborne-api)
