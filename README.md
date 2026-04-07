@@ -8,7 +8,7 @@
 ## 📋 Indice
 
 - [Panoramica](#-panoramica)
-- [Stato del progetto](#-stato-del-progetto)
+- [Stato del progetto](#stato-del-progetto)
 - [Funzionalità](#-funzionalità)
 - [Design e UI/UX](#-design-e-uiux)
 - [Tecnologie](#-tecnologie)
@@ -83,6 +83,8 @@ Un'app che trasforma:
 - **Abitudini** in **Grind**
 - **Competenze reali** in **Statistiche**
 - **Progresso** in **Livelli**
+
+<a id="stato-del-progetto"></a>
 
 ## 🛠️ Stato del progetto
 
