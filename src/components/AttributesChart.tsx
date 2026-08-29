@@ -11,16 +11,16 @@ export default function AttributesChart() {
     const data = {
       // The names of your attributes (the "stats")
       labels: [
-        "Strength",
-        "Dexterity",
-        "Constitution",
-        "Intelligence",
-        "Wisdom",
-        "Charisma",
+        "Forza",
+        "Destrezza",
+        "Tempra",
+        "Resistenza",
+        "Intelligenza",
+        "Carisma",
       ],
       datasets: [
         {
-          label: "My Proficiency",
+          label: "La mia maestria",
           // The proficiency values for each attribute
           data: [10, 59, 90, 81, 56, 55],
           backgroundColor: "rgba(255, 99, 132, 0.2)", // Fill color

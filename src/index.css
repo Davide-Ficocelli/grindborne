@@ -1,19 +1,95 @@
 @import "tailwindcss";
 @import "tailwindcss/utilities";
 
-/* ------ GLOBAL STYLES ------ */
+/* ------ RESET STYLES ------ */
 
-* {
+/* 1. Use a more-intuitive box-sizing model */
+*,
+*::before,
+*::after {
   box-sizing: border-box;
 }
 
+/* 2. Remove default margin */
+* {
+  margin: 0;
+}
+
+/* 3. Enable keyword animations */
+@media (prefers-reduced-motion: no-preference) {
+  html {
+    interpolate-size: allow-keywords;
+  }
+}
+
+body {
+  /* 4. Add accessible line-height */
+  line-height: 1.5;
+  /* 5. Improve text rendering */
+  -webkit-font-smoothing: antialiased;
+}
+
+/* 6. Improve media defaults */
+img,
+picture,
+video,
+canvas,
+svg {
+  display: block;
+  max-width: 100%;
+}
+
+/* 7. Inherit fonts for form controls */
+input,
+button,
+textarea,
+select {
+  font: inherit;
+}
+
+/* 8. Avoid text overflows */
+p,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  overflow-wrap: break-word;
+}
+
+/* 9. Improve line wrapping */
+p {
+  text-wrap: pretty;
+}
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  text-wrap: balance;
+}
+
+/*
+  10. Create a root stacking context
+*/
+#root,
+#__next {
+  isolation: isolate;
+}
+
+/* ------ GLOBAL STYLES ------ */
+
 /* * {
-  outline: 1px solid red;
+  outline: red solid 1px;
 } */
 
 body {
   overflow-x: hidden;
   margin: 0;
+  height: 100%;
+  min-height: 100vh;
   font-family: Georgia, "Times New Roman", Times, serif;
   /* background-color: #111; */
   color: #ffffff;
@@ -25,7 +101,42 @@ body {
     #131114f5 75%,
     #18161bd2 100%
   );
+  background-repeat: no-repeat;
 }
+
+/* Buttons */
+
+.btn-primary {
+  background: #a48621;
+  padding: 0.5rem;
+  border-radius: 8px;
+  box-shadow: 0px 0px 100px 3px #a48621;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.btn-primary:hover,
+.btn-primary:focus {
+  background: #a48521b7;
+}
+
+.btn-primary:active {
+  background: rgb(101, 82, 18);
+}
+
+/* Inputs styles */
+
+input[type="radio"],
+input[type="checkbox"] {
+  cursor: pointer;
+}
+
+input[type="date"],
+input[type="time"] {
+  cursor: text;
+}
+
+/* Tailwind global components */
 
 @layer components {
   /* Font sizes */
@@ -79,8 +190,6 @@ body {
   border-right: 1px solid white;
 }
 
-/* --- Media queries --- */
-
 /* md: */
 @media (min-width: 768px) {
   .status-grid-area-container {
@@ -89,7 +198,7 @@ body {
     grid-template-rows: repeat(4, auto);
 
     grid-template-areas:
-      "heading ."
+      "heading heading"
       "info proficiency"
       "info ."
       "attributes attributes";
@@ -99,7 +208,7 @@ body {
     border-right: 1px solid #ccc;
   }
 
-  .status-heading {
+  .status-heading-grid-area {
     grid-area: heading;
     border-right: none;
   }
@@ -116,3 +225,187 @@ body {
     grid-area: proficiency;
   }
 }
+
+/* ------ QUEST LOG PAGE STYLES ------ */
+
+#quest-details-side-view ::-webkit-scrollbar {
+  width: 10px;
+  background: #111;
+}
+
+#quest-details-side-view ::-webkit-scrollbar-thumb {
+  background-color: oklch(90.1% 0.076 70.697);
+  border-radius: 1rem;
+}
+
+#quest-details-side-view ::-webkit-scrollbar-track {
+  background: #4b4b4b;
+}
+
+/* ------ QUEST FORM PAGE STYLES ------ */
+
+.quest-form-grid-area-container,
+.quest-details-grid-area-container {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  row-gap: 4rem;
+  padding-block: 2rem;
+}
+
+.quest-form-grid-area-container {
+  grid-template-areas:
+    ". title-description ."
+    "divider-1 divider-1 divider-1"
+    ". attributes-duration ."
+    "divider-2 divider-2 divider-2"
+    ". date-time ."
+    "divider-3 divider-3 divider-3"
+    ". due-date-due-time ."
+    "divider-4 divider-4 divider-4"
+    ". do-track ."
+    "divider-5 divider-5 divider-5"
+    ". submit .";
+}
+
+.quest-title-description-grid-area {
+  grid-area: title-description;
+}
+
+.quest-attributes-duration-grid-area {
+  grid-area: attributes-duration;
+}
+
+.quest-date-time-grid-area {
+  grid-area: date-time;
+}
+
+.quest-due-date-due-time-grid-area {
+  grid-area: due-date-due-time;
+}
+
+.quest-do-track-grid-area {
+  grid-area: do-track;
+  place-self: center;
+}
+
+.quest-form-submit-grid-area {
+  grid-area: submit;
+  place-self: center;
+}
+
+.divider-1-grid-area {
+  grid-area: divider-1;
+}
+
+.divider-2-grid-area {
+  grid-area: divider-2;
+}
+
+.divider-3-grid-area {
+  grid-area: divider-3;
+}
+
+.divider-4-grid-area {
+  grid-area: divider-4;
+}
+
+.divider-5-grid-area {
+  grid-area: divider-5;
+}
+
+.input-label,
+.field-title {
+  background: linear-gradient(to right, #ffffff, oklch(90.1% 0.076 70.697));
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+  font-size: 2.25rem;
+}
+
+.quest-form-input {
+  background: #ffffff;
+  border: solid 1px oklch(90.1% 0.076 70.697);
+  border-radius: 4px;
+  color: #111;
+  padding: 0.25rem 0.5rem;
+  width: 100%;
+  min-width: 165px;
+  max-width: 400px;
+}
+
+/* .quest-form-input[name="duration"] {
+  max-width: 150px;
+}
+
+.quest-form-input[name="due_date"],
+.quest-form-input[name="due_time"] {
+  max-width: 200px;
+} */
+
+/* sm: */
+@media (min-width: 640px) {
+  .input-label,
+  .field-title {
+    word-break: break-all;
+  }
+
+  .quest-form-grid-area-container,
+  .quest-details-grid-area-container {
+    grid-template-columns: repeat(5, 1fr);
+  }
+
+  .quest-form-grid-area-container {
+    grid-template-areas:
+      ". title-description title-description title-description ."
+      "divider-1 divider-1 divider-1 divider-1 divider-1"
+      ". attributes-duration attributes-duration attributes-duration ."
+      "divider-2 divider-2 divider-2 divider-2 divider-2"
+      ". date-time date-time date-time ."
+      "divider-3 divider-3 divider-3 divider-3 divider-3"
+      ". due-date-due-time due-date-due-time due-date-due-time ."
+      "divider-4 divider-4 divider-4 divider-4 divider-4"
+      ". do-track do-track do-track ."
+      "divider-5 divider-5 divider-5 divider-5 divider-5"
+      ". submit submit submit .";
+  }
+}
+
+/* ------ QUEST DETAILS PAGE STYLES ------ */
+
+.quest-details-grid-area-container {
+  grid-template-areas:
+    ". title-description ."
+    "divider-1 divider-1 divider-1"
+    ". attributes-duration ."
+    "divider-2 divider-2 divider-2"
+    ". date-time ."
+    "divider-3 divider-3 divider-3"
+    ". due-date-due-time ."
+    "divider-4 divider-4 divider-4"
+    ". actions .";
+}
+
+.quest-actions-grid-area {
+  grid-area: actions;
+}
+
+/* sm: */
+@media (min-width: 640px) {
+  .quest-details-grid-area-container {
+    grid-template-areas:
+      ". title-description title-description title-description ."
+      "divider-1 divider-1 divider-1 divider-1 divider-1"
+      ". attributes-duration attributes-duration attributes-duration ."
+      "divider-2 divider-2 divider-2 divider-2 divider-2"
+      ". date-time date-time date-time ."
+      "divider-3 divider-3 divider-3 divider-3 divider-3"
+      ". due-date-due-time due-date-due-time due-date-due-time ."
+      "divider-4 divider-4 divider-4 divider-4 divider-4"
+      ". actions actions actions .";
+  }
+}
+
+/* * {
+  outline: 1px solid red;
+} */
