@@ -1,6 +1,7 @@
 import { lazy, Suspense, createContext } from "react";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import LoadingFallback from "./components/LoadingFallback";
+import { useAuth } from "./context/AuthContext";
 
 // Lazy load components
 const PlayerStatusPage = lazy(() => import("./pages/PlayerStatusPage"));
@@ -36,6 +37,9 @@ const quests = [
 export const QuestsContext = createContext(quests);
 
 function App() {
+  const { accessToken, isAuthenticated } = useAuth();
+  console.log("API URL:", import.meta.env.VITE_API_URL);
+  console.log({ accessToken, isAuthenticated });
   return (
     <>
       <QuestsContext.Provider value={quests}>
