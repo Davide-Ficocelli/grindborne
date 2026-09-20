@@ -1,129 +1,185 @@
 // ---------------------------------------------------------------------------
 // AuthContext.tsx
 //
-// PURPOSE
-//   Holds the JWT access token in React state (which lives only in the running
-//   page's memory) and exposes it—along with a setter and a convenience
-//   boolean—to any component in the tree.
+// AFTER STEP 3: THE STORE IS THE SOURCE OF TRUTH.
 //
-// WHY CONTEXT
-//   React passes data to children through props. If a deeply nested component
-//   needs the token, prop-drilling it down through every intermediate
-//   component is painful. Context lets us "provide" a value at a high level
-//   and "consume" it anywhere below, without touching the intermediate layers.
+// In Step 1, AuthProvider held the access token in React state. That worked
+// for display, but the interceptor couldn't WRITE to React state (it runs
+// outside React). So we moved the token to an external store (tokenStore.ts)
+// and now React READS from it instead of owning it.
 //
-// WHY REACT STATE == "IN MEMORY"
-//   useState stores its value in the JavaScript heap of the running page.
-//   It is NOT written to localStorage, sessionStorage, cookies, or IndexedDB.
-//   Refreshing or closing the tab wipes it. That's the property we want for
-//   the access token: XSS payloads cannot read it out of a storage API
-//   because there is no storage API involved.
+// This component has two jobs now:
+//
+//   1. Provide the login and logout ACTIONS to the rest of the app. Context
+//      is a fine place for these—they're the same for every component.
+//
+//   2. Wrap everything in a Provider so components can call useAuth().
+//
+// The token itself is no longer stored here. The useAuth hook combines the
+// actions from Context with the token from the external store.
 // ---------------------------------------------------------------------------
 
-import { createContext, useContext, useState, type ReactNode } from "react";
+import {
+  createContext,
+  useContext,
+  useMemo,
+  type ReactNode,
+  useSyncExternalStore,
+} from "react";
+import axios from "axios";
+import {
+  getAccessToken,
+  setAccessToken,
+  subscribe,
+  getRefreshToken,
+  setRefreshToken,
+} from "../lib/tokenStore";
 
-// The TypeScript "shape" of the value we'll share through the Context.
-// Every consumer gets autocomplete + type checking against these three fields.
+// The value Context actually provides. Notice it holds NO token—just the
+// actions. This is a deliberate change from Step 1: state lives in the
+// store, actions live in Context.
 interface AuthContextType {
-  // The JWT string, or null when logged out.
-  // We use `string | null` rather than `string | undefined` because `null`
-  // is an explicit "there is no token" value, whereas `undefined` typically
-  // means "this field was never set." Being explicit about "logged out"
-  // avoids a whole class of bugs where you can't tell the two apart.
-  accessToken: string | null;
+  // Takes credentials, calls the backend, stores the returned tokens.
+  // Throws if the backend rejects (so the login form can show an error).
+  login: (email: string, password: string) => Promise<void>;
 
-  // The setter. Mirrors React's useState setter signature: takes a new value
-  // (string or null) and returns nothing. Calling it updates React state AND
-  // triggers a re-render of this component and every consumer below.
-  setAccessToken: (token: string | null) => void;
-
-  // A derived convenience boolean so consumers can write `if (isAuthenticated)`
-  // instead of `if (accessToken !== null && accessToken !== '')`.
-  isAuthenticated: boolean;
+  // Tells the backend to invalidate the refresh token, then clears local
+  // state. Never throws—logout should always succeed from the user's POV.
+  logout: () => Promise<void>;
 }
 
-// createContext returns a Context object. The generic <AuthContextType | undefined>
-// says: "the value stored here is either an AuthContextType or undefined."
-//
-// WHY ALLOW undefined?
-//   We pass `undefined` as the default value—the value React returns if a
-//   component calls useContext(AuthContext) OUTSIDE of any provider.
-//
-//   That's not a real situation we want to happen; it means a component tried
-//   to read auth data without the app being wrapped in <AuthProvider>. If we
-//   used a fake default object instead, that mistake would go unnoticed and
-//   cause silently broken behavior. By making `undefined` the default and
-//   typing it in, we can force a loud runtime check in `useAuth` below.
-//   This is a common React pattern: the `undefined` default is a tripwire.
+// Same tripwire pattern as Step 1: undefined default + loud error in useAuth.
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-// The Provider component. It wraps the rest of the app and injects the
-// Context value into the tree.
-//
-// `{ children }` is destructuring: React passes a single `props` object to
-// every component, and `children` is a special property holding whatever JSX
-// you nest inside <AuthProvider>...</AuthProvider>. That nested JSX arrives
-// here as `children`, and we render it inside the Context.Provider below.
+// Vite env var, extracted here since we use it twice below.
+const API_URL = import.meta.env.VITE_API_URL;
+
 export function AuthProvider({ children }: { children: ReactNode }) {
-  // useState returns [currentValue, setterFunction].
-  //   - `accessToken` starts as null (logged out).
-  //   - `setAccessToken` updates the value AND re-renders this component.
+  // useMemo with an empty dependency array means the value is created ONCE
+  // and never changes for the lifetime of the app. The functions inside are
+  // stable references—consumers won't re-render just because AuthProvider
+  // re-rendered (which shouldn't happen anymore, since it no longer holds
+  // state, but defense in depth is cheap here).
   //
-  // TWO THINGS TO INTERNALIZE:
-  //   1. The initial value (null) is used ONLY on the first render.
-  //      On subsequent renders, `accessToken` holds whatever you last set.
-  //   2. Calling setAccessToken('newtoken') re-renders this component and
-  //      every consumer. That's the entire point: log in → token set →
-  //      navbar updates; log out → token nulled → protected routes redirect.
-  //
-  // The <string | null> generic guarantees `accessToken` is always a string
-  // or null—never undefined or a number. This is what lets you safely write
-  // `accessToken.length` in a component AFTER a null check.
-  const [accessToken, setAccessToken] = useState<string | null>(null);
+  // The functions are defined INSIDE useMemo so they close over the fresh
+  // `axios` and store imports. They don't close over any prop or state, so
+  // there's no staleness risk.
+  const value = useMemo<AuthContextType>(
+    () => ({
+      // -----------------------------------------------------------------
+      // LOGIN
+      // -----------------------------------------------------------------
+      // Uses RAW axios, not our `api` instance. Two reasons:
+      //
+      //   1. The login endpoint doesn't need an Authorization header—you
+      //      don't have a token yet.
+      //
+      //   2. If login fails with a 401 (bad credentials), we do NOT want
+      //      the response interceptor to try to "refresh" and retry. That
+      //      would hammer the refresh endpoint pointlessly and could mask
+      //      the real error ("wrong password") behind a confusing chain.
+      //
+      // This is the same reasoning as the refresh call inside the api.ts
+      // interceptor: endpoints that are ABOUT authentication should not go
+      // through the authentication pipeline.
+      // -----------------------------------------------------------------
+      async login(email: string, password: string) {
+        const { data: responseBody } = await axios.post(
+          `${API_URL}/auth/login`,
+          { email, password },
+          { withCredentials: true }, // harmless now, needed later for cookies
+        );
 
-  // The object we share with the world. Shorthand syntax:
-  //   { accessToken } is equivalent to { accessToken: accessToken }
-  //
-  // `!!accessToken` coerces any value to a boolean:
-  //   !!'some.jwt.string'  → true
-  //   !!null               → false
-  //   !!''                 → false   (empty string is falsy)
-  //
-  // So `isAuthenticated` is true exactly when we have a non-empty token.
-  //
-  // NOTE: this object is recreated on every render of AuthProvider. That
-  // means every consumer re-renders whenever AuthProvider re-renders, even
-  // if the token didn't change. For a small app this is completely fine. If
-  // you ever notice performance issues, wrap this in useMemo. Don't bother
-  // now—premature optimization here causes more bugs than it prevents.
-  const value = {
-    accessToken,
-    setAccessToken,
-    isAuthenticated: !!accessToken,
-  };
+        const { accessToken, refreshToken } = responseBody.data;
 
-  // Render the Context's built-in Provider component, hand it the `value`,
-  // and render `children` inside it. Everything inside `children`—which will
-  // be your entire app—can now call useContext(AuthContext) or useAuth()
-  // and receive this value.
+        // Store the access token in memory (reactive—consumers re-render).
+        setAccessToken(accessToken);
+
+        // Store the refresh token in sessionStorage (imperative—no re-render
+        // needed since nothing displays it). Removed in the future when the
+        // backend sends it as an httpOnly cookie instead.
+        setRefreshToken(refreshToken);
+      },
+
+      // -----------------------------------------------------------------
+      // LOGOUT
+      // -----------------------------------------------------------------
+      // Also uses raw axios, for the same "don't route auth endpoints
+      // through the auth pipeline" reason.
+      //
+      // Strategy: best-effort server-side revocation, then guaranteed
+      // local cleanup. If the server call fails (network down, token
+      // already expired, whatever), we STILL clear the client—otherwise
+      // the user would be stuck "logged in" with a dead token.
+      // -----------------------------------------------------------------
+      async logout() {
+        const refreshToken = getRefreshToken();
+
+        // Only hit the backend if we have something to revoke. If there's
+        // no refresh token, we're already effectively logged out server-
+        // side; skip the round trip.
+        if (refreshToken) {
+          try {
+            await axios.delete(`${API_URL}/auth/logout`, {
+              data: { token: refreshToken },
+            });
+          } catch {
+            // Swallow the error. A failed logout call is not a reason to
+            // refuse to log out locally. Log it if you have a logger, but
+            // don't throw.
+          }
+        }
+
+        // Clear local state. This triggers re-renders in every component
+        // that reads the token—including any ProtectedRoute wrapper, which
+        // will then redirect to /login on its next render. No imperative
+        // navigation needed from here.
+        setAccessToken(null);
+        setRefreshToken(null);
+      },
+    }),
+    [],
+  );
+
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }
 
-// Custom hook. Just a function whose name starts with `use`. Wraps useContext
-// with two additions:
+// ---------------------------------------------------------------------------
+// useAuth — the hook components actually call.
 //
-//   1. THE SAFETY CHECK. If `context` is undefined, someone called useAuth()
-//      outside of <AuthProvider>. Rather than let the app crash later with a
-//      confusing "cannot read property 'accessToken' of undefined" error, we
-//      throw a clear message right away. This is the payoff for choosing the
-//      `undefined` default earlier—the tripwire fires exactly here.
+// It merges TWO sources:
+//   - The actions (login, logout) from Context.
+//   - The reactive token from the external store, via useSyncExternalStore.
 //
-//   2. A CLEAN API. Components write `const { accessToken } = useAuth()`
-//      instead of importing AuthContext and calling useContext themselves.
-//      If you ever swap Context for Zustand or Redux, only this function
-//      changes—not every consumer.
+// useSyncExternalStore is React 18's official way to subscribe a component
+// to non-React state. It takes:
+//   - `subscribe`: how to register a listener for changes.
+//   - `getAccessToken`: how to read the current value during render.
+// It returns the current value and re-renders the component whenever the
+// store notifies—automatically, with no useEffect needed.
+//
+// WHY THIS IS BETTER THAN useState + useEffect:
+//   The naive approach (subscribe in an effect, set state in the callback)
+//   has subtle bugs around concurrent rendering—React can render a component
+//   with a stale value mid-update. useSyncExternalStore handles all of that.
+//   You get correctness for free.
+//
+// RULE OF HOOKS: both useContext and useSyncExternalStore are called
+// unconditionally, in the same order, on every render. Never wrap these in
+// an if or a loop.
+// ---------------------------------------------------------------------------
 export function useAuth() {
   const context = useContext(AuthContext);
   if (!context) throw new Error("useAuth must be used within AuthProvider");
-  return context;
+
+  // Read the token reactively. Because this is what triggers re-renders,
+  // we derive `isAuthenticated` from it here rather than storing it
+  // separately anywhere.
+  const accessToken = useSyncExternalStore(subscribe, getAccessToken);
+
+  return {
+    ...context, // login, logout
+    accessToken,
+    isAuthenticated: !!accessToken,
+  };
 }
