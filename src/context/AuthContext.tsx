@@ -25,6 +25,8 @@ import {
   useMemo,
   type ReactNode,
   useSyncExternalStore,
+  useEffect,
+  useState,
 } from "react";
 import axios from "axios";
 import {
@@ -34,6 +36,7 @@ import {
   getRefreshToken,
   setRefreshToken,
 } from "../lib/tokenStore";
+import { refreshAccessToken } from "../lib/refreshAccessToken";
 
 // The value Context actually provides. Notice it holds NO token—just the
 // actions. This is a deliberate change from Step 1: state lives in the
@@ -46,6 +49,8 @@ interface AuthContextType {
   // Tells the backend to invalidate the refresh token, then clears local
   // state. Never throws—logout should always succeed from the user's POV.
   logout: () => Promise<void>;
+
+  isInitialized: boolean;
 }
 
 // Same tripwire pattern as Step 1: undefined default + loud error in useAuth.
@@ -55,6 +60,46 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 const API_URL = import.meta.env.VITE_API_URL;
 
 export function AuthProvider({ children }: { children: ReactNode }) {
+  // Tracks whether the app has finished its initial "am I logged in?"
+  // check. Starts false. Becomes true after the mount refresh completes
+  // (success OR failure). Consumers wait for this before redirecting.
+  const [isInitialized, setIsInitialized] = useState(false);
+
+  // -------------------------------------------------------------------------
+  // SILENT REFRESH ON MOUNT
+  //
+  // On app startup, if a refresh token exists in sessionStorage, exchange
+  // it for a fresh access token. This is what makes the user "stay logged
+  // in" across page reloads despite the access token being memory-only.
+  //
+  // WHY useEffect AND NOT top-level code:
+  //   The refresh must run AFTER the first render, not during it. React
+  //   renders must be pure—no network calls, no side effects. useEffect
+  //   is React's escape hatch for "run this after the render commits."
+  //
+  // WHY THE EMPTY DEPENDENCY ARRAY:
+  //   We want this to run exactly once per mount. [] means "no dependencies,
+  //   so never re-run." Without it, the effect would fire after every
+  //   render—a refresh storm.
+  //
+  // ABOUT REACT 18 STRICT MODE:
+  //   In development, Strict Mode deliberately mounts, unmounts, and
+  //   remounts components to surface bugs. This effect runs TWICE in dev.
+  //   Thanks to single-flight in refreshAccessToken, the second call
+  //   returns the first call's in-flight promise—so we still only send
+  //   ONE network request. This is exactly why single-flight matters.
+  //
+  //   In production, Strict Mode does nothing and the effect runs once.
+  // -------------------------------------------------------------------------
+  useEffect(() => {
+    // `.finally` (rather than `.then`) ensures setIsInitialized(true) runs
+    // whether the refresh succeeded or failed. Both outcomes mean "we've
+    // determined the session state"—which is what isInitialized tracks.
+    refreshAccessToken().finally(() => {
+      setIsInitialized(true);
+    });
+  }, []);
+
   // useMemo with an empty dependency array means the value is created ONCE
   // and never changes for the lifetime of the app. The functions inside are
   // stable references—consumers won't re-render just because AuthProvider
@@ -137,8 +182,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         setAccessToken(null);
         setRefreshToken(null);
       },
+
+      isInitialized,
     }),
-    [],
+    [isInitialized],
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
@@ -168,17 +215,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 // unconditionally, in the same order, on every render. Never wrap these in
 // an if or a loop.
 // ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
+// useAuth — updated to expose isInitialized.
+// ---------------------------------------------------------------------------
 export function useAuth() {
   const context = useContext(AuthContext);
   if (!context) throw new Error("useAuth must be used within AuthProvider");
 
-  // Read the token reactively. Because this is what triggers re-renders,
-  // we derive `isAuthenticated` from it here rather than storing it
-  // separately anywhere.
   const accessToken = useSyncExternalStore(subscribe, getAccessToken);
 
   return {
-    ...context, // login, logout
+    ...context,
     accessToken,
     isAuthenticated: !!accessToken,
   };
