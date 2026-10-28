@@ -1,0 +1,17 @@
+# .env.example
+
+# Copy this file to `.env` for local development.
+
+# Never commit actual `.env` files—they may contain environment-specific URLs.
+
+# Vite only exposes variables prefixed with VITE\_ to the client bundle.
+
+# Anything without that prefix is ignored on the frontend (by design, to
+
+# prevent accidentally leaking server-side secrets into client code).
+
+# The base URL of the Grindborne backend API.
+
+# Development (default Node/Express port):
+
+VITE_API_URL=http://localhost:3000
