@@ -1,9 +1,7 @@
 // ---------------------------------------------------------------------------
-// AuthContext.tsx
+// THE STORE IS THE SOURCE OF TRUTH.
 //
-// AFTER STEP 3: THE STORE IS THE SOURCE OF TRUTH.
-//
-// In Step 1, AuthProvider held the access token in React state. That worked
+// Earlier AuthProvider held the access token in React state. That worked
 // for display, but the interceptor couldn't WRITE to React state (it runs
 // outside React). So we moved the token to an external store (tokenStore.ts)
 // and now React READS from it instead of owning it.
@@ -29,13 +27,7 @@ import {
   useState,
 } from "react";
 import axios from "axios";
-import {
-  getAccessToken,
-  setAccessToken,
-  subscribe,
-  getRefreshToken,
-  setRefreshToken,
-} from "../lib/tokenStore";
+import { getAccessToken, setAccessToken, subscribe } from "../lib/tokenStore";
 import { refreshAccessToken } from "../lib/refreshAccessToken";
 
 // The value Context actually provides. Notice it holds NO token—just the
@@ -68,9 +60,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   // -------------------------------------------------------------------------
   // SILENT REFRESH ON MOUNT
   //
-  // On app startup, if a refresh token exists in sessionStorage, exchange
-  // it for a fresh access token. This is what makes the user "stay logged
-  // in" across page reloads despite the access token being memory-only.
+  // On app startup, exchange the refresh token cookie (if present) for a
+  // fresh access token. This is what makes the user "stay logged in"
+  // across page reloads despite the access token being memory-only.
   //
   // WHY useEffect AND NOT top-level code:
   //   The refresh must run AFTER the first render, not during it. React
@@ -88,6 +80,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   //   Thanks to single-flight in refreshAccessToken, the second call
   //   returns the first call's in-flight promise—so we still only send
   //   ONE network request. This is exactly why single-flight matters.
+
+  // call refreshAccessToken() at the mount. Now it works even better,
+  // why does the cookie survive reload even if sessionStorage had been emptied
   //
   //   In production, Strict Mode does nothing and the effect runs once.
   // -------------------------------------------------------------------------
@@ -129,21 +124,23 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       // through the authentication pipeline.
       // -----------------------------------------------------------------
       async login(email: string, password: string) {
+        // withCredentials: true is also needed here: the backend
+        // will respond with Set-Cookie for the refresh token. Without this
+        // option, the browser would discard the Set-Cookie and refresh
+        // would not work after reload.
         const { data: responseBody } = await axios.post(
           `${API_URL}/auth/login`,
           { email, password },
-          { withCredentials: true }, // harmless now, needed later for cookies
+          { withCredentials: true },
         );
 
-        const { accessToken, refreshToken } = responseBody.data;
+        // The body now contains only the access token. The refresh token
+        // arrives as an HttpOnly cookie: the client doesn't see it, it doesn't
+        // touch, it doesn't store it.
+        const { accessToken } = responseBody.data;
 
         // Store the access token in memory (reactive—consumers re-render).
         setAccessToken(accessToken);
-
-        // Store the refresh token in sessionStorage (imperative—no re-render
-        // needed since nothing displays it). Removed in the future when the
-        // backend sends it as an httpOnly cookie instead.
-        setRefreshToken(refreshToken);
       },
 
       // -----------------------------------------------------------------
@@ -156,23 +153,24 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       // local cleanup. If the server call fails (network down, token
       // already expired, whatever), we STILL clear the client—otherwise
       // the user would be stuck "logged in" with a dead token.
+      //
+      // We no longer send the refresh token in the body: it travels in the cookie.
+      // withCredentials: true automatically attaches it.
+      //
+      // The backend will invalidate the refresh token in the DB and delete the
+      // cookie with an expired Set-Cookie. If the call fails,
+      // let's clean the access token in memory anyway: the user must not
+      // stay "logged in" with a dead token.
       // -----------------------------------------------------------------
       async logout() {
-        const refreshToken = getRefreshToken();
-
-        // Only hit the backend if we have something to revoke. If there's
-        // no refresh token, we're already effectively logged out server-
-        // side; skip the round trip.
-        if (refreshToken) {
-          try {
-            await axios.delete(`${API_URL}/auth/logout`, {
-              data: { token: refreshToken },
-            });
-          } catch {
-            // Swallow the error. A failed logout call is not a reason to
-            // refuse to log out locally. Log it if you have a logger, but
-            // don't throw.
-          }
+        try {
+          await axios.delete(`${API_URL}/auth/logout`, {
+            withCredentials: true,
+          });
+        } catch {
+          // Swallow the error. A failed logout call is not a reason to
+          // refuse to log out locally. Log it if you have a logger, but
+          // don't throw.
         }
 
         // Clear local state. This triggers re-renders in every component
@@ -180,7 +178,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         // will then redirect to /login on its next render. No imperative
         // navigation needed from here.
         setAccessToken(null);
-        setRefreshToken(null);
       },
 
       isInitialized,

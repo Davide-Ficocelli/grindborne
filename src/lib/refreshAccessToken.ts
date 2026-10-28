@@ -1,6 +1,4 @@
 // ---------------------------------------------------------------------------
-// refreshAccessToken.ts
-//
 // THE SINGLE-FLIGHT REFRESH.
 //
 // Both the app-mount effect and the response interceptor call this. If a
@@ -20,7 +18,7 @@
 // ---------------------------------------------------------------------------
 
 import axios from "axios";
-import { getRefreshToken, setAccessToken, setRefreshToken } from "./tokenStore";
+import { setAccessToken } from "./tokenStore";
 
 // The in-flight promise, or null when no refresh is running. This is a
 // module-level variable—shared across every importer—which is what makes
@@ -53,20 +51,25 @@ export function refreshAccessToken(): Promise<string | null> {
   // arrives during the network round-trip finds the in-flight promise.
   inflightRefresh = (async () => {
     try {
-      const refreshToken = getRefreshToken();
-
-      // No refresh token → nothing to refresh. Return null so the caller
-      // knows to treat the user as logged out.
-      if (!refreshToken) return null;
-
+      // The refresh token is no longer readable from JS: it lives in an
+      // HttpOnly cookie managed by the browser. There is no longer an "if
+      // (!refreshToken) return null" check because we cannot know in advance
+      // whether the cookie is present. The backend will respond with 401 if it is missing.
+      //
+      // withCredentials: true is MANDATORY: without it, Axios does not attach
+      // cookies to the request and the backend would never receive the refresh
+      // token.
+      //
       // RAW axios, not our `api` instance. Same reasoning as the
       // interceptor in api.ts: this call must NOT go through the pipeline
       // that triggers it, or a 401 here would try to refresh again,
       // recursing forever (well, until the _retry guard saved us—but
       // cleaner to just bypass).
-      const { data } = await axios.post(`${API_URL}/auth/refresh`, {
-        token: refreshToken,
-      });
+      const { data } = await axios.post(
+        `${API_URL}/auth/refresh`,
+        {}, // body vuoto: il token viaggia nel cookie
+        { withCredentials: true },
+      );
 
       // HANDLE THE NESTED RESPONSE SHAPE. Your backend wraps payloads as
       // `{ success, message, data: {...} }`. So the actual tokens are at
@@ -82,11 +85,9 @@ export function refreshAccessToken(): Promise<string | null> {
       // displaying the token re-renders with the fresh value.
       setAccessToken(payload.accessToken);
 
-      // If the backend rotates refresh tokens (recommended—a leaked token
-      // is only valid until the next refresh), store the new one.
-      if (payload.refreshToken) {
-        setRefreshToken(payload.refreshToken);
-      }
+      // Refresh token rotation is handled by the backend via
+      // Set-Cookie in the response. The browser updates the cookie itself:
+      // no longer need to call setRefreshToken here.
 
       return payload.accessToken as string;
     } catch {
@@ -97,8 +98,9 @@ export function refreshAccessToken(): Promise<string | null> {
       //     const token = await refreshAccessToken();
       //     if (!token) { /* not logged in */ }
       // without wrapping in try/catch. Returning null is the failure signal.
+      // Now there is only the access token to clean, the refresh token is a cookie and the
+      // will clear the backend on the next /logout or expiration.
       setAccessToken(null);
-      setRefreshToken(null);
       return null;
     } finally {
       // Clear the in-flight promise so the NEXT refresh (after this one

@@ -1,16 +1,13 @@
-// ---------------------------------------------------------------------------
-// api.ts
+// THE INTERCEPTOR DELEGATES TO refreshAccessToken().
 //
-// AFTER STEP 4: THE INTERCEPTOR DELEGATES TO refreshAccessToken().
-//
-// All the reasoning from Steps 2 and 3 still applies—the request interceptor
+// The request interceptor
 // attaches the token, the response interceptor handles 401s with a retry
-// guard. What changed: the refresh logic no longer lives inline. It lives
+// guard. The refresh logic doesn't live inline. It lives
 // in refreshAccessToken.ts so the app-mount effect can share it.
 // ---------------------------------------------------------------------------
 
 import axios from "axios";
-import { getAccessToken, setAccessToken } from "./tokenStore";
+import { getAccessToken } from "./tokenStore";
 import { refreshAccessToken } from "./refreshAccessToken";
 
 const api = axios.create({
