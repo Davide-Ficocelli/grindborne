@@ -166,6 +166,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         try {
           await axios.delete(`${API_URL}/auth/logout`, {
             withCredentials: true,
+            headers: { "X-CSRF-Token": "required" },
           });
         } catch {
           // Swallow the error. A failed logout call is not a reason to

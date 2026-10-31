@@ -20,6 +20,10 @@
 import axios from "axios";
 import { setAccessToken } from "./tokenStore";
 
+// Arbitrary value: The backend ONLY checks for the presence of the header,
+// not the content. See verifyCsrf.ts in the backend repo for full motivation.
+const CSRF_HEADER = "required";
+
 // The in-flight promise, or null when no refresh is running. This is a
 // module-level variable—shared across every importer—which is what makes
 // the "same promise for all callers" behavior possible.
@@ -68,7 +72,7 @@ export function refreshAccessToken(): Promise<string | null> {
       const { data } = await axios.post(
         `${API_URL}/auth/refresh`,
         {}, // body vuoto: il token viaggia nel cookie
-        { withCredentials: true },
+        { withCredentials: true, headers: { "X-CSRF-Token": CSRF_HEADER } },
       );
 
       // HANDLE THE NESTED RESPONSE SHAPE. Your backend wraps payloads as
