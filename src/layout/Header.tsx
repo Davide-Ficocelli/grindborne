@@ -17,12 +17,20 @@ export default function Header() {
   return (
     <header className="py-4 w-screen">
       <nav className="flex w-full justify-around text-center">
-        <NavLink
-          className={({ isActive }) => (isActive ? activeStyles : normalStyles)}
-          to="grinds"
-        >
-          {grinds}
-        </NavLink>
+        {/* 
+          GRINDS TAB COMMENTED OUT:
+          The backend endpoint for grinds is currently empty, and the frontend
+          has no route for it. Clicking this link would lead to a blank page.
+          We keep the UI cleaner by hiding it until the feature is developed.
+          Re-enable when the /grinds route and logic are ready.
+          
+          <NavLink
+            className={({ isActive }) => (isActive ? activeStyles : normalStyles)}
+            to="grinds"
+          >
+            {grinds}
+          </NavLink>
+        */}
         <NavLink
           className={({ isActive }) => (isActive ? activeStyles : normalStyles)}
           to="/"

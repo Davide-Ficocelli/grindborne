@@ -1,6 +1,8 @@
 import { lazy, Suspense, createContext } from "react";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import LoadingFallback from "./components/LoadingFallback";
+import LoginPage from "./pages/LoginPage";
+import ProtectedRoute from "./components/ProtectedRoute";
 import { useAuth } from "./context/AuthContext";
 
 // Lazy load components
@@ -59,67 +61,81 @@ function App() {
         <BrowserRouter>
           {/* All routes included in the Routes component */}
           <Routes>
-            {/* Base route */}
+            {/* Public route: login page has its own full-screen layout */}
             <Route
-              path="/"
+              path="/login"
               element={
                 <Suspense fallback={<LoadingFallback />}>
-                  <Layout />
+                  <LoginPage />
                 </Suspense>
               }
-            >
+            />
+
+            {/* Protected routes: wrapped in ProtectedRoute.
+              If not authenticated, they redirect to /login.
+              If authenticated, they render <Layout> which contains <Outlet />. */}
+            <Route element={<ProtectedRoute />}>
               <Route
-                index
+                path="/"
                 element={
                   <Suspense fallback={<LoadingFallback />}>
-                    <PlayerStatusPage />
-                  </Suspense>
-                }
-              />
-              {/* Route for quest log pages */}
-              <Route
-                path="quest-log"
-                element={
-                  <Suspense fallback={<LoadingFallback />}>
-                    <QuestLogLayout />
+                    <Layout />
                   </Suspense>
                 }
               >
                 <Route
-                  path="list"
+                  index
                   element={
                     <Suspense fallback={<LoadingFallback />}>
-                      <QuestLogList />
+                      <PlayerStatusPage />
                     </Suspense>
                   }
                 />
-              </Route>
-              {/* Route for quest log actions pages */}
-              <Route path="quest-log/action">
+                {/* Route for quest log pages */}
                 <Route
-                  path="view/:id"
+                  path="quest-log"
                   element={
                     <Suspense fallback={<LoadingFallback />}>
-                      <QuestDetails variant="full-page" />
+                      <QuestLogLayout />
                     </Suspense>
                   }
-                />
-                <Route
-                  path="add"
-                  element={
-                    <Suspense fallback={<LoadingFallback />}>
-                      <QuestForm variant="add-quest" />
-                    </Suspense>
-                  }
-                />
-                <Route
-                  path="edit/:id"
-                  element={
-                    <Suspense fallback={<LoadingFallback />}>
-                      <QuestForm variant="edit-quest" />
-                    </Suspense>
-                  }
-                />
+                >
+                  <Route
+                    path="list"
+                    element={
+                      <Suspense fallback={<LoadingFallback />}>
+                        <QuestLogList />
+                      </Suspense>
+                    }
+                  />
+                </Route>
+                {/* Route for quest log actions pages */}
+                <Route path="quest-log/action">
+                  <Route
+                    path="view/:id"
+                    element={
+                      <Suspense fallback={<LoadingFallback />}>
+                        <QuestDetails variant="full-page" />
+                      </Suspense>
+                    }
+                  />
+                  <Route
+                    path="add"
+                    element={
+                      <Suspense fallback={<LoadingFallback />}>
+                        <QuestForm variant="add-quest" />
+                      </Suspense>
+                    }
+                  />
+                  <Route
+                    path="edit/:id"
+                    element={
+                      <Suspense fallback={<LoadingFallback />}>
+                        <QuestForm variant="edit-quest" />
+                      </Suspense>
+                    }
+                  />
+                </Route>
               </Route>
             </Route>
           </Routes>
