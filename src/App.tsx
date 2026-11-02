@@ -1,6 +1,8 @@
-import { lazy, Suspense, createContext } from "react";
+import { lazy, Suspense } from "react";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import LoadingFallback from "./components/LoadingFallback";
+import LoginPage from "./pages/LoginPage";
+import ProtectedRoute from "./components/ProtectedRoute";
 import { useAuth } from "./context/AuthContext";
 
 // Lazy load components
@@ -10,31 +12,6 @@ const QuestForm = lazy(() => import("./components/QuestForm"));
 const QuestDetails = lazy(() => import("./components/QuestDetails"));
 const Layout = lazy(() => import("./layout/Layout"));
 const QuestLogLayout = lazy(() => import("./layout/QuestLogLayout"));
-
-const quests = [
-  {
-    questId: 1,
-    questTitle: "Esercizi in palestra",
-    questDescription: "Solleva dei pesi per migliorare la massa muscolare",
-    involvedAttributes: ["Forza", "Intelligenza"],
-    estimatedDuration: 30,
-    startDate: "16/12/2025",
-    startTime: "18:30",
-    dueDate: "18/12/2025",
-    dueTime: "15:00",
-  },
-  {
-    questId: 2,
-    questTitle: "Raccogli la legna",
-    questDescription: "Raccogli 10 pezzi di legna nella foresta.",
-  },
-  {
-    questId: 3,
-    questTitle: "Colloquio di lavoro",
-  },
-];
-
-export const QuestsContext = createContext(quests);
 
 function App() {
   const { isInitialized, isAuthenticated } = useAuth();
@@ -55,11 +32,23 @@ function App() {
   // have a login page.
   return (
     <>
-      <QuestsContext.Provider value={quests}>
-        <BrowserRouter>
-          {/* All routes included in the Routes component */}
-          <Routes>
-            {/* Base route */}
+      <BrowserRouter>
+        {/* All routes included in the Routes component */}
+        <Routes>
+          {/* Public route: login page has its own full-screen layout */}
+          <Route
+            path="/login"
+            element={
+              <Suspense fallback={<LoadingFallback />}>
+                <LoginPage />
+              </Suspense>
+            }
+          />
+
+          {/* Protected routes: wrapped in ProtectedRoute.
+              If not authenticated, they redirect to /login.
+              If authenticated, they render <Layout> which contains <Outlet />. */}
+          <Route element={<ProtectedRoute />}>
             <Route
               path="/"
               element={
@@ -122,9 +111,9 @@ function App() {
                 />
               </Route>
             </Route>
-          </Routes>
-        </BrowserRouter>
-      </QuestsContext.Provider>
+          </Route>
+        </Routes>
+      </BrowserRouter>
     </>
   );
 }

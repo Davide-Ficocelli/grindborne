@@ -30,6 +30,24 @@ import axios from "axios";
 import { getAccessToken, setAccessToken, subscribe } from "../lib/tokenStore";
 import { refreshAccessToken } from "../lib/refreshAccessToken";
 
+// Decode the JWT payload without verifying the signature (verification
+// it's always up to the backend). We only need it to extract client-side 'id'.
+const decodeJwtPayload = (token: string): { id: string } | null => {
+  try {
+    const base64Url = token.split(".")[1];
+    const base64 = base64Url.replace(/-/g, "+").replace(/_/g, "/");
+    const jsonPayload = decodeURIComponent(
+      atob(base64)
+        .split("")
+        .map((c) => "%" + ("00" + c.charCodeAt(0).toString(16)).slice(-2))
+        .join(""),
+    );
+    return JSON.parse(jsonPayload);
+  } catch {
+    return null;
+  }
+};
+
 // The value Context actually provides. Notice it holds NO token—just the
 // actions. This is a deliberate change from Step 1: state lives in the
 // store, actions live in Context.
@@ -222,9 +240,14 @@ export function useAuth() {
 
   const accessToken = useSyncExternalStore(subscribe, getAccessToken);
 
+  // Decodifichiamo l'ID utente dal token per usarlo nelle chiamate API
+  // (es. per recuperare i dati del profilo o gli attributi).
+  const userId = accessToken ? decodeJwtPayload(accessToken)?.id : null;
+
   return {
     ...context,
     accessToken,
+    userId,
     isAuthenticated: !!accessToken,
   };
 }

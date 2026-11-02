@@ -3,6 +3,11 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPlus } from "@fortawesome/free-solid-svg-icons";
 import { useTranslation } from "react-i18next";
 import LoadingFallback from "../components/LoadingFallback";
+import { useApi } from "../hooks/useApi";
+import { useAuth } from "../context/AuthContext";
+import api from "../lib/api";
+import type { UserInDb } from "../types/user";
+import type { AttributeInDb } from "../types/attribute";
 
 // Lazy load all components
 const AttributesChart = lazy(() => import("../components/AttributesChart"));
@@ -18,7 +23,7 @@ const StatusIcon = lazy(() =>
         className="size-20 rounded-lg"
       />
     ),
-  }))
+  })),
 );
 
 // Type definitions remain the same
@@ -39,6 +44,7 @@ type ObjOfStrings = {
 
 export default function PlayerStatusPage() {
   const { t } = useTranslation();
+  const { userId } = useAuth();
 
   const tPlayerStatusPage = t("playerStatusPage", {
     returnObjects: true,
@@ -63,6 +69,31 @@ export default function PlayerStatusPage() {
       "flex justify-between pb-4 standard-font-size bottom-linear-gradient-border after:from-[#ffffff] after:to-[#111]",
     horizontalPadding: "px-4",
   };
+
+  // We retrieve the player's real data
+  const {
+    data: user,
+    loading: userLoading,
+    error: userError,
+  } = useApi<UserInDb>(
+    () => api.get(`/users/${userId}`),
+    [userId], // Difesa: se cambia userId, rifà la fetch
+  );
+
+  // Let's retrieve the real attributes
+  const {
+    data: attributes,
+    loading: attrLoading,
+    error: attrError,
+  } = useApi<AttributeInDb[]>(() => api.get("/attributes"), []);
+
+  if (userLoading || attrLoading) return <LoadingFallback />;
+  if (userError || attrError)
+    return (
+      <div className="text-red-500 text-center py-8">
+        {userError || attrError}
+      </div>
+    );
 
   return (
     <>
@@ -96,7 +127,8 @@ export default function PlayerStatusPage() {
               <dt className={classStyles.playerAndLevelInfoFlexContainer}>
                 <p className={classStyles.horizontalPadding}>{playerLabel}:</p>
                 <p className={`text-end ${classStyles.horizontalPadding}`}>
-                  SolidDavid03
+                  {/* We use the real name of the user */}
+                  {user?.name || "N/A"}
                 </p>
               </dt>
               <dt className="flex flex-col standard-font-size gap-y-2 bottom-linear-gradient-border pb-4 after:from-[#ffffff] after:to-[#111]">
@@ -105,18 +137,21 @@ export default function PlayerStatusPage() {
                   <meter
                     id="stamina-bar"
                     max="100"
-                    value="75"
+                    value={user?.stamina || 0}
                     className="w-screen mb-4 md:w-full"
                   ></meter>
                   <span className="absolute top-[10px] left-4 text-start text-[0.6rem] leading-none">
-                    10:50/22:00
+                    {/* Note: The backend does not yet have the logic for maximum stamina/hourly decay. Let's put a placeholder or calculate if you have the fields. */}
+                    {user?.stamina || 0}/100
                   </span>
                 </div>
               </dt>
 
               <dt className={classStyles.playerAndLevelInfoFlexContainer}>
                 <p className={classStyles.horizontalPadding}>{levelLabel}</p>
-                <p className={classStyles.horizontalPadding}>1</p>
+                <p className={classStyles.horizontalPadding}>
+                  {user?.level || 1}
+                </p>
               </dt>
             </dl>
           </section>
@@ -130,7 +165,12 @@ export default function PlayerStatusPage() {
             </h2>
             <dl className={classStyles.verticalFlexContainer}>
               <Suspense fallback={<LoadingFallback />}>
-                <Attribute />
+                {/* We pass the real data to the Attribute component. 
+                    You will need to update Attribute.tsx to accept an 'attr' prop of type AttributeInDb.
+                    Example: <Attribute key={attr.id} attr={attr} /> */}
+                {attributes?.map((attr) => (
+                  <Attribute key={attr.id} attrData={attr}></Attribute>
+                ))}
               </Suspense>
             </dl>
             <button className="small-font-size max-w-60 gap-x-2 self-start flex items-center justify-center pl-4 md:pb-4 cursor-pointer focus:opacity-80 hover:opacity-80">
@@ -153,7 +193,9 @@ export default function PlayerStatusPage() {
               {proficiencyHeading}
             </h2>
             <Suspense fallback={<LoadingFallback />}>
-              <AttributesChart />
+              {/* AttributesChart currently has hardcoded data. To pass the real data, 
+                  you will need to modify it to accept a 'data' prop and update the chart. */}
+              <AttributesChart data={attributes} />
             </Suspense>
           </section>
         </section>

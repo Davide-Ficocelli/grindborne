@@ -19,5 +19,37 @@
     "attribute": {
       "attributeDecayingWarning": "7 giorni al decadimento"
     }
+  },
+  "questLog": {
+    "title": "Missioni",
+    "searchPlaceholder": "Cerca...",
+    "list": "Lista",
+    "calendar": "Calendario",
+    "noQuests": "Nessuna missione trovata. Creane una nuova!",
+    "loadingQuest": "Caricamento missione...",
+    "actions": {
+      "fail": "Segna come fallita",
+      "complete": "Segna come completata",
+      "delete": "Elimina",
+      "edit": "Modifica",
+      "details": "Dettagli"
+    },
+    "details": {
+      "back": "Ritorna al registro missioni",
+      "title": "Dettagli missione",
+      "questTitle": "Titolo",
+      "description": "Descrizione",
+      "rewardsActive": "Ricompense missione attive",
+      "involvedAttributes": "Attributi coinvolti",
+      "estimatedDuration": "Durata stimata",
+      "minutes": "minuti",
+      "xpPerAttribute": "Ricompensa XP per attributo",
+      "totalXp": "Ricompensa totale XP",
+      "date": "Data",
+      "time": "Orario",
+      "dueDate": "Data di scadenza",
+      "dueTime": "Orario di scadenza",
+      "actionsLabel": "Azioni della missione"
+    }
   }
 }
