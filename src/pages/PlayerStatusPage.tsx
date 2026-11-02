@@ -169,16 +169,7 @@ export default function PlayerStatusPage() {
                     You will need to update Attribute.tsx to accept an 'attr' prop of type AttributeInDb.
                     Example: <Attribute key={attr.id} attr={attr} /> */}
                 {attributes?.map((attr) => (
-                  <div
-                    key={attr.id}
-                    className="p-4 border border-gray-700 rounded my-2"
-                  >
-                    <p>Attributo: {attr.name}</p>
-                    <p>
-                      Livello: {attr.level} | XP: {attr.xp}/
-                      {attr.xp_to_next_level}
-                    </p>
-                  </div>
+                  <Attribute key={attr.id} attrData={attr}></Attribute>
                 ))}
               </Suspense>
             </dl>
@@ -202,8 +193,8 @@ export default function PlayerStatusPage() {
               {proficiencyHeading}
             </h2>
             <Suspense fallback={<LoadingFallback />}>
-              {/* AttributesChart attualmente ha dati hardcoded. Per passare i dati reali, 
-                  dovrai modificarlo per accettare una prop `data` e aggiornare il grafico. */}
+              {/* AttributesChart currently has hardcoded data. To pass the real data, 
+                  you will need to modify it to accept a 'data' prop and update the chart. */}
               <AttributesChart data={attributes} />
             </Suspense>
           </section>
