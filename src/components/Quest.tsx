@@ -1,5 +1,4 @@
-// import { useTranslation } from "react-i18next";
-import { useQuest } from "../hooks/useQuest";
+import { useTranslation } from "react-i18next";
 import {
   faInfo,
   faPencil,
@@ -9,18 +8,18 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import { Link } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import type { QuestInDb } from "../types/quest";
 
 // Component representing a single quest
 
 type QuestProps = {
-  key: number;
-  questId: number;
+  quest: QuestInDb; // Accept the full object
   styles?: string;
 };
 
 export default function Quest(props: QuestProps) {
-  const currentQuest = useQuest(props.questId);
-  const { styles } = props;
+  const { t } = useTranslation();
+  const { quest, styles } = props;
 
   type ObjOfStrings = {
     [key: string]: string;
@@ -38,10 +37,10 @@ export default function Quest(props: QuestProps) {
     >
       <div className="flex gap-x-8 items-center px-4">
         <h2 className="order-1 h2-font-size text-center font-semibold">
-          {currentQuest?.questTitle}
+          {quest.name}
         </h2>
       </div>
-      <p className="text-md text-center">{currentQuest?.questDescription}</p>
+      <p className="text-md text-center">{quest.description}</p>
       <nav
         aria-label="Actions"
         role="toolbar"
@@ -49,32 +48,38 @@ export default function Quest(props: QuestProps) {
       >
         <button className={classStyles.actionBtn}>
           <span className="order-1 text-center small-font-size">
-            Segna come fallita
+            {t("questLog.actions.fail")}
           </span>
           <FontAwesomeIcon className={classStyles.actionIcon} icon={faX} />
         </button>
         <button className={classStyles.actionBtn}>
           <span className="order-1 text-center small-font-size">
-            Segna come completata
+            {t("questLog.actions.complete")}
           </span>
           <FontAwesomeIcon className={classStyles.actionIcon} icon={faCheck} />
         </button>
         <button className={classStyles.actionBtn}>
-          <span className="order-1 text-center small-font-size">Elimina</span>
+          <span className="order-1 text-center small-font-size">
+            {t("questLog.actions.delete")}
+          </span>
           <FontAwesomeIcon className={classStyles.actionIcon} icon={faTrash} />
         </button>
         <Link
-          to={`/quest-log/action/edit/${currentQuest?.questId}`}
+          to={`/quest-log/action/edit/${quest.id}`}
           className={classStyles.actionBtn}
         >
-          <span className="order-1 text-center small-font-size">Modifica</span>
+          <span className="order-1 text-center small-font-size">
+            {t("questLog.actions.edit")}
+          </span>
           <FontAwesomeIcon className={classStyles.actionIcon} icon={faPencil} />
         </Link>
         <Link
           className={classStyles.actionBtn}
-          to={`/quest-log/action/view/${currentQuest?.questId}`}
+          to={`/quest-log/action/view/${quest.id}`}
         >
-          <span className="order-1 text-center small-font-size">Dettagli</span>
+          <span className="order-1 text-center small-font-size">
+            {t("questLog.actions.details")}
+          </span>
           <FontAwesomeIcon className={classStyles.actionIcon} icon={faInfo} />
         </Link>
       </nav>

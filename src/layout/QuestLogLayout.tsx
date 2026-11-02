@@ -5,9 +5,10 @@ import { NavLink, Outlet } from "react-router-dom";
 import { faMagnifyingGlass } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import AddQuestBtn from "../components/AddQuestBtn";
+import { useTranslation } from "react-i18next";
 
 export default function QuestLogLayout() {
-  //   const { t } = useTranslation();
+  const { t } = useTranslation();
 
   // Lazy Load the image
   const QuestLogIcon = lazy(() =>
@@ -19,7 +20,7 @@ export default function QuestLogLayout() {
           className="size-20 rounded-lg border border-[#FFD6A7]"
         />
       ),
-    }))
+    })),
   );
 
   const normalStyles =
@@ -35,7 +36,7 @@ export default function QuestLogLayout() {
               aria-labelledby="quest-log-heading"
               className="h1-font-size order-1 break-all"
             >
-              Missioni
+              {t("questLog.title")}
             </h1>
             <Suspense fallback={<LoadingFallback />}>
               <QuestLogIcon />
@@ -47,7 +48,7 @@ export default function QuestLogLayout() {
               className="bg-white rounded-lg text-black py-1 pr-3 pl-9"
               type="text"
               name="search-quests"
-              placeholder="Cerca..."
+              placeholder={t("questLog.searchPlaceholder")}
             />
             <FontAwesomeIcon
               icon={faMagnifyingGlass}
@@ -61,7 +62,7 @@ export default function QuestLogLayout() {
                 isActive ? activeStyles : normalStyles
               }
             >
-              Lista
+              {t("questLog.list")}
             </NavLink>
             <NavLink
               to="calendar"
@@ -69,7 +70,7 @@ export default function QuestLogLayout() {
                 isActive ? activeStyles : normalStyles
               }
             >
-              Calendario
+              {t("questLog.calendar")}
             </NavLink>
           </nav>
         </section>

@@ -19,5 +19,37 @@
     "attribute": {
       "attributeDecayingWarning": "7 days before decaying"
     }
+  },
+  "questLog": {
+    "title": "Quests",
+    "searchPlaceholder": "Search...",
+    "list": "List",
+    "calendar": "Calendar",
+    "noQuests": "No quests found. Create a new one!",
+    "loadingQuest": "Loading quest...",
+    "actions": {
+      "fail": "Mark as failed",
+      "complete": "Mark as completed",
+      "delete": "Delete",
+      "edit": "Edit",
+      "details": "Details"
+    },
+    "details": {
+      "back": "Return to quest log",
+      "title": "Quest details",
+      "questTitle": "Title",
+      "description": "Description",
+      "rewardsActive": "Quest rewards active",
+      "involvedAttributes": "Involved attributes",
+      "estimatedDuration": "Estimated duration",
+      "minutes": "minutes",
+      "xpPerAttribute": "XP reward per attribute",
+      "totalXp": "Total XP reward",
+      "date": "Date",
+      "time": "Time",
+      "dueDate": "Due date",
+      "dueTime": "Due time",
+      "actionsLabel": "Quest actions"
+    }
   }
 }

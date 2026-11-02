@@ -1,10 +1,12 @@
 import { lazy, Suspense } from "react";
+import { useTranslation } from "react-i18next";
 import LoadingFallback from "../components/LoadingFallback";
 import { useApi } from "../hooks/useApi";
 import api from "../lib/api";
 import type { QuestInDb } from "../types/quest";
 
 export default function QuestLogPage() {
+  const { t } = useTranslation();
   // Using useApi: Handles loading, error, and data automatically.
   // Decision: We call the real API instead of reading from QuestsContext.
   const {
@@ -23,20 +25,10 @@ export default function QuestLogPage() {
   if (!quests || quests.length === 0) {
     return (
       <div className="text-center py-8 text-orange-200">
-        Nessuna missione trovata. Creane una nuova!
+        {t("questLog.noQuests")}
       </div>
     );
   }
-
-  // We map the backend data (QuestInDb) to the format expected by the Quest component.
-  // The backend uses 'id', 'name', 'description'; the frontend uses 'questId', 'questTitle', etc.
-  const mappedQuests = quests.map((q) => ({
-    questId: q.id as any, // Cast necessario perché il tipo UI usa numero, il backend stringa
-    questTitle: q.name,
-    questDescription: q.description || "",
-    estimatedDuration: q.estimated_time || undefined,
-    // is_tracked, is_completed, etc. can be mapped if needed by components
-  }));
 
   return (
     <Suspense fallback={<LoadingFallback />}>
@@ -45,26 +37,26 @@ export default function QuestLogPage() {
         <section
           aria-label="quest-details"
           className={`hidden ${
-            mappedQuests.length === 0 ? "lg:hidden" : "lg:block"
+            quests.length === 0 ? "lg:hidden" : "lg:block"
           } lg:col-start-1`}
         >
           <Suspense fallback={<LoadingFallback />}>
-            {/* Note: QuestDetails will need to be updated to accept the real ID */}
-            <QuestDetails variant="side-view" />
+            {/* We pass the id of the first quest by default to the side view,
+                so it shows something meaningful on desktop. */}
+            <QuestDetails variant="side-view" questId={quests[0]?.id} />
           </Suspense>
         </section>
         <section aria-label="quests-list">
-          {/* Render quests from array and removes bottom border to the last one */}
-          {mappedQuests.map((q, _, qs) => {
-            if (qs.indexOf(q) === qs.length - 1)
-              return (
-                <Quest
-                  key={q.questId}
-                  questId={q.questId}
-                  styles="border-none"
-                />
-              );
-            else return <Quest key={q.questId} questId={q.questId} />;
+          {/* Render real quests from array and remove bottom border to the last one */}
+          {quests.map((q, index) => {
+            const isLast = index === quests.length - 1;
+            return (
+              <Quest
+                key={q.id}
+                quest={q}
+                styles={isLast ? "border-none" : undefined}
+              />
+            );
           })}
         </section>
       </section>
