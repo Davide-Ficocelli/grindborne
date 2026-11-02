@@ -37,9 +37,22 @@ const quests = [
 export const QuestsContext = createContext(quests);
 
 function App() {
-  const { accessToken, isAuthenticated } = useAuth();
-  console.log("API URL:", import.meta.env.VITE_API_URL);
-  console.log({ accessToken, isAuthenticated });
+  const { isInitialized, isAuthenticated } = useAuth();
+
+  // Don't render routes until we know the auth state.
+  // isInitialized flips to true only after the mount refresh resolves
+  // (success OR failure). Without this gate, isAuthenticated is false
+  // for a moment on every reload, and any consumer that redirects on
+  // !isAuthenticated would flash the login page during the refresh.
+  if (!isInitialized) return <LoadingFallback />;
+
+  // Decision point: what to show when the user is not authenticated.
+  // Option A (simplest, current stage): just render the routes anyway
+  // and let individual pages handle "not logged in" — useful while
+  // you are still building and want to navigate freely.
+  // Option B (proper): wrap protected routes in a ProtectedRoute that
+  // redirects to /login when !isAuthenticated. Recommended once you
+  // have a login page.
   return (
     <>
       <QuestsContext.Provider value={quests}>

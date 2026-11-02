@@ -7,14 +7,12 @@ import DebugPanel from "./components/DebugPanel.tsx";
 
 const App = lazy(() => import("./App"));
 
-console.log(App);
-
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
     <Suspense fallback={<LoadingFallback />}>
       <AuthProvider>
-        <DebugPanel />
-        {/* <App /> */}
+        {import.meta.env.DEV && <DebugPanel />}
+        <App />
       </AuthProvider>
     </Suspense>
   </StrictMode>,
