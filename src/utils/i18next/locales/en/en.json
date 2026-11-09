@@ -1,5 +1,10 @@
 {
   "loading": "Loading...",
+  "common": {
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "confirm": "Confirm"
+  },
   "header": {
     "navigation": {
       "grinds": "Grinds",
@@ -17,7 +22,46 @@
     "addAttributeBtnLabel": "Add attribute",
     "proficiencyHeading": "Proficiency",
     "attribute": {
-      "attributeDecayingWarning": "7 days before decaying"
+      "attributeDecayingWarning": "7 days before decaying",
+      "actions": {
+        "edit": "Edit",
+        "details": "Details",
+        "delete": "Delete"
+      }
+    }
+  },
+  "attributesPage": {
+    "fields": {
+      "name": "Name",
+      "description": "Description",
+      "icon": "Icon",
+      "level": "Level",
+      "xp": "XP",
+      "decayDate": "Decay date"
+    },
+    "add": {
+      "title": "New attribute",
+      "back": "Back to status",
+      "submit": "Create attribute",
+      "creating": "Creating attribute…",
+      "created": "Attribute created successfully"
+    },
+    "edit": {
+      "title": "Edit attribute",
+      "back": "Back to status",
+      "submit": "Save changes",
+      "saving": "Saving…",
+      "saved": "Attribute updated successfully"
+    },
+    "details": {
+      "back": "Back to status",
+      "edit": "Edit",
+      "delete": "Delete",
+      "notFound": "Attribute not found",
+      "deleting": "Deleting…",
+      "deleted": "Attribute deleted successfully",
+      "confirmDeleteTitle": "Delete attribute?",
+      "confirmDeleteDescription": "The attribute will no longer be visible. The operation is irreversible."
     }
   },
   "questLog": {
@@ -50,6 +94,30 @@
       "dueDate": "Due date",
       "dueTime": "Due time",
       "actionsLabel": "Quest actions"
+    },
+    "form": {
+      "submit": "Create quest",
+      "creating": "Creating quest…",
+      "created": "Quest created successfully",
+      "saving": "Saving quest…",
+      "saved": "Quest updated successfully",
+      "attributesNotEditable": "Attributes are not editable in this version."
+    },
+    "mutations": {
+      "deleting": "Deleting quest…",
+      "deleted": "Quest deleted",
+      "completing": "Completing quest…",
+      "completed": "Quest completed!",
+      "failing": "Marking quest as failed…",
+      "failed": "Quest marked as failed"
+    },
+    "modals": {
+      "deleteTitle": "Delete quest?",
+      "deleteDescription": "The quest will be hidden from the log. The operation is irreversible.",
+      "completeTitle": "Complete quest?",
+      "completeDescription": "XP will be assigned to the involved attributes.",
+      "failTitle": "Mark as failed?",
+      "failDescription": "The quest will not grant XP."
     }
   }
 }

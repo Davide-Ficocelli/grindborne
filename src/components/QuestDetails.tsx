@@ -1,5 +1,5 @@
-import { lazy, Suspense } from "react";
-import { Link, useParams } from "react-router-dom";
+import { lazy, Suspense, useState } from "react";
+import { Link, useParams, useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import {
   faArrowLeft,
@@ -10,18 +10,28 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import LoadingFallback from "./LoadingFallback";
+import ConfirmModal from "./ConfirmModal";
 import { useApi } from "../hooks/useApi";
+import { useMutation } from "../hooks/useMutation";
 import api from "../lib/api";
 import type { QuestInDb } from "../types/quest";
 
 type QuestDetailsProps = {
   variant: string;
   questId?: string;
+  // Optional callbacks: if present, the component does nothing ‘on its own’
+  // and delegates to the parent (in the case of a side-view within QuestLogList). If absent
+  // (in the case of a full-page view), the component opens a local confirmation modal
+  // and uses its own `useMutation`.
+  onRequestComplete?: (quest: QuestInDb) => void;
+  onRequestFail?: (quest: QuestInDb) => void;
+  onRequestDelete?: (quest: QuestInDb) => void;
 };
 
 export default function QuestDetails(props: QuestDetailsProps) {
   const { t } = useTranslation();
   const { id } = useParams();
+  const navigate = useNavigate();
 
   // Use the id from params (full-page) or the prop (side-view).
   // Decision: Fallback to null if neither is present, so the hook doesn't crash.
@@ -32,7 +42,132 @@ export default function QuestDetails(props: QuestDetailsProps) {
     data: currentQuest,
     loading,
     error,
+    refetch,
   } = useApi<QuestInDb>(() => api.get(`/quests/${targetId}`), [targetId]);
+
+  // --- Local state for the "full-page" case -----------------------------
+  // pendingAction is the type of action awaiting confirmation. In the side-view,
+  // it ALWAYS remains null because the parent’s callbacks are provided: the modal is
+  // handled by QuestLogList.
+  const [pendingAction, setPendingAction] = useState<
+    "delete" | "complete" | "fail" | null
+  >(null);
+
+  // Temporary XP badge (Q17): after a successful completion, we display
+  // “+X XP” for 3 seconds so that the user sees it appear inline.
+  const [xpGained, setXpGained] = useState<number | null>(null);
+
+  // --- Local mutations --------------------------------------------------
+  // These mutations are ONLY needed when the parent does not provide a callback
+  // (full-page). In side-view, they are ‘dormant’: they are never called.
+  // I keep them defined anyway because useMutation is a hook and hooks
+  // must be called unconditionally, in the same order, on every render.
+
+  const deleteMutation = useMutation<QuestInDb>(
+    () => api.patch(`/quests/${currentQuest?.id}`),
+    {
+      pendingMessage: t("questLog.mutations.deleting"),
+      successMessage: t("questLog.mutations.deleted"),
+      onSuccess: () => {
+        setPendingAction(null);
+        // In full-page mode, the query no longer exists: I return to the list.
+        // In side-view mode (edge case: no callback), I simply perform a refetch.
+        if (props.variant === "full-page" || props.variant === undefined) {
+          navigate("/quest-log/list");
+        } else {
+          refetch();
+        }
+      },
+    },
+  );
+
+  const completeMutation = useMutation<{ quest: QuestInDb; userData: unknown }>(
+    () => api.patch(`/quests/${currentQuest?.id}/complete`),
+    {
+      pendingMessage: t("questLog.mutations.completing"),
+      successMessage: t("questLog.mutations.completed"),
+      onSuccess: (data) => {
+        setPendingAction(null);
+        // The payload for the ‘complete’ event is { quest, userData }. I extract the
+        // total_xp to display the temporary badge.
+        const completed = (data as any)?.quest as QuestInDb;
+        if (completed?.total_xp) {
+          setXpGained(completed.total_xp);
+          setTimeout(() => setXpGained(null), 3000);
+        }
+        refetch();
+      },
+    },
+  );
+
+  const failMutation = useMutation<QuestInDb>(
+    () => api.patch(`/quests/${currentQuest?.id}/fail`),
+    {
+      pendingMessage: t("questLog.mutations.failing"),
+      successMessage: t("questLog.mutations.failed"),
+      onSuccess: () => {
+        setPendingAction(null);
+        refetch();
+      },
+    },
+  );
+
+  // Unified handler for the three actions. Logic:
+  //   - if the parent provides the corresponding callback, call that one
+  //     (side-view case: QuestLogList already has a modal and mutations);
+  //   - otherwise, open the local modal (full-page case).
+  function handleActionClick(kind: "delete" | "complete" | "fail") {
+    if (!currentQuest) return;
+    const parentCallback =
+      kind === "delete"
+        ? props.onRequestDelete
+        : kind === "complete"
+          ? props.onRequestComplete
+          : props.onRequestFail;
+    if (parentCallback) {
+      parentCallback(currentQuest);
+    } else {
+      setPendingAction(kind);
+    }
+  }
+
+  function handleConfirmLocal() {
+    if (pendingAction === "delete") deleteMutation.mutate();
+    else if (pendingAction === "complete") completeMutation.mutate();
+    else if (pendingAction === "fail") failMutation.mutate();
+  }
+
+  // Mutation currently active for the local modal (for loading only).
+  const activeLocalMutation =
+    pendingAction === "delete"
+      ? deleteMutation
+      : pendingAction === "complete"
+        ? completeMutation
+        : pendingAction === "fail"
+          ? failMutation
+          : null;
+
+  // Modal labels: the same three actions have different text.
+  const modalCopy: Record<
+    NonNullable<typeof pendingAction>,
+    { title: string; description: string; confirm: string }
+  > = {
+    delete: {
+      title: t("questLog.modals.deleteTitle"),
+      description: t("questLog.modals.deleteDescription"),
+      confirm: t("common.delete"),
+    },
+    complete: {
+      title: t("questLog.modals.completeTitle"),
+      description: t("questLog.modals.completeDescription"),
+      confirm: t("questLog.actions.complete"),
+    },
+    fail: {
+      title: t("questLog.modals.failTitle"),
+      description: t("questLog.modals.failDescription"),
+      confirm: t("questLog.actions.fail"),
+    },
+  };
 
   const QuestDetailsIcon = lazy(() =>
     import("../assets/icons/quest-details.png").then((module) => ({
@@ -181,6 +316,12 @@ export default function QuestDetails(props: QuestDetailsProps) {
                         {t("questLog.details.totalXp")}:{" "}
                         <strong>{currentQuest.total_xp || 0}</strong>
                       </p>
+                      {/* Temporary XP badge (Q17): appears for 3 seconds after completion. */}
+                      {xpGained != null && (
+                        <p className="text-green-300 font-semibold animate-pulse">
+                          +{xpGained} XP
+                        </p>
+                      )}
                     </div>
                   </div>
                 </div>
@@ -268,7 +409,10 @@ export default function QuestDetails(props: QuestDetailsProps) {
               role="toolbar"
               className="w-full flex items-baseline gap-x-2 justify-center sm:justify-evenly quest-actions-grid-area"
             >
-              <button className={classStyles.actionBtn}>
+              <button
+                className={classStyles.actionBtn}
+                onClick={() => handleActionClick("fail")}
+              >
                 <span className="order-1 text-center small-font-size">
                   {t("questLog.actions.fail")}
                 </span>
@@ -278,7 +422,10 @@ export default function QuestDetails(props: QuestDetailsProps) {
                   aria-hidden="true"
                 />
               </button>
-              <button className={classStyles.actionBtn}>
+              <button
+                className={classStyles.actionBtn}
+                onClick={() => handleActionClick("complete")}
+              >
                 <span className="order-1 text-center small-font-size">
                   {t("questLog.actions.complete")}
                 </span>
@@ -288,7 +435,10 @@ export default function QuestDetails(props: QuestDetailsProps) {
                   aria-hidden="true"
                 />
               </button>
-              <button className={classStyles.actionBtn}>
+              <button
+                className={classStyles.actionBtn}
+                onClick={() => handleActionClick("delete")}
+              >
                 <span className="order-1 text-center small-font-size">
                   {t("questLog.actions.delete")}
                 </span>
@@ -298,21 +448,41 @@ export default function QuestDetails(props: QuestDetailsProps) {
                   aria-hidden="true"
                 />
               </button>
-              <Link
-                to={`/quest-log/action/edit/${currentQuest.id}`}
-                className={classStyles.actionBtn}
-              >
-                <span className="order-1 text-center small-font-size">
-                  {t("questLog.actions.edit")}
-                </span>
-                <FontAwesomeIcon
-                  className={classStyles.actionIcon}
-                  icon={faPencil}
-                  aria-hidden="true"
-                />
-              </Link>
+              {/* The ‘Edit’ button is hidden when the quest is tracked or completed:
+                  the backend rejects the update in those cases (see
+                  updateQuestService). Hiding it prevents an unnecessary click. */}
+              {!currentQuest.is_completed && !currentQuest.is_tracked && (
+                <Link
+                  to={`/quest-log/action/edit/${currentQuest.id}`}
+                  className={classStyles.actionBtn}
+                >
+                  <span className="order-1 text-center small-font-size">
+                    {t("questLog.actions.edit")}
+                  </span>
+                  <FontAwesomeIcon
+                    className={classStyles.actionIcon}
+                    icon={faPencil}
+                    aria-hidden="true"
+                  />
+                </Link>
+              )}
             </nav>
           </section>
+
+          {/* Local modal: opens only when `pendingAction` is set,
+              i.e. only if the parent has NOT provided the callbacks (full-page). */}
+          <ConfirmModal
+            open={pendingAction !== null}
+            title={pendingAction ? modalCopy[pendingAction].title : ""}
+            description={
+              pendingAction ? modalCopy[pendingAction].description : ""
+            }
+            confirmLabel={pendingAction ? modalCopy[pendingAction].confirm : ""}
+            cancelLabel={t("common.cancel")}
+            loading={activeLocalMutation?.loading ?? false}
+            onConfirm={handleConfirmLocal}
+            onCancel={() => setPendingAction(null)}
+          />
         </section>
       </Suspense>
     );
@@ -492,4 +662,7 @@ export default function QuestDetails(props: QuestDetailsProps) {
         </aside>
       </Suspense>
     );
+
+  // Fallback for unknown variants (pre-existing behaviour: no
+  // explicit return → undefined). We leave this unchanged.
 }

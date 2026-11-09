@@ -1,5 +1,10 @@
 {
   "loading": "Caricamento...",
+  "common": {
+    "cancel": "Annulla",
+    "delete": "Elimina",
+    "confirm": "Conferma"
+  },
   "header": {
     "navigation": {
       "grinds": "Abitudini",
@@ -17,7 +22,46 @@
     "addAttributeBtnLabel": "Aggiungi attributo",
     "proficiencyHeading": "Maestria",
     "attribute": {
-      "attributeDecayingWarning": "7 giorni al decadimento"
+      "attributeDecayingWarning": "7 giorni al decadimento",
+      "actions": {
+        "edit": "Modifica",
+        "details": "Dettagli",
+        "delete": "Elimina"
+      }
+    }
+  },
+  "attributesPage": {
+    "fields": {
+      "name": "Nome",
+      "description": "Descrizione",
+      "icon": "Icona",
+      "level": "Livello",
+      "xp": "XP",
+      "decayDate": "Data di decadimento"
+    },
+    "add": {
+      "title": "Nuovo attributo",
+      "back": "Torna allo stato",
+      "submit": "Crea attributo",
+      "creating": "Creazione attributo in corso…",
+      "created": "Attributo creato con successo"
+    },
+    "edit": {
+      "title": "Modifica attributo",
+      "back": "Torna allo stato",
+      "submit": "Salva modifiche",
+      "saving": "Salvataggio in corso…",
+      "saved": "Attributo aggiornato con successo"
+    },
+    "details": {
+      "back": "Torna allo stato",
+      "edit": "Modifica",
+      "delete": "Elimina",
+      "notFound": "Attributo non trovato",
+      "deleting": "Eliminazione in corso…",
+      "deleted": "Attributo eliminato con successo",
+      "confirmDeleteTitle": "Eliminare l'attributo?",
+      "confirmDeleteDescription": "L'attributo non sarà più visibile. L'operazione non è reversibile."
     }
   },
   "questLog": {
@@ -50,6 +94,30 @@
       "dueDate": "Data di scadenza",
       "dueTime": "Orario di scadenza",
       "actionsLabel": "Azioni della missione"
+    },
+    "form": {
+      "submit": "Crea missione",
+      "creating": "Creazione missione in corso…",
+      "created": "Missione creata con successo",
+      "saving": "Salvataggio missione in corso…",
+      "saved": "Missione aggiornata con successo",
+      "attributesNotEditable": "Gli attributi non sono modificabili in questa versione."
+    },
+    "mutations": {
+      "deleting": "Eliminazione missione in corso…",
+      "deleted": "Missione eliminata",
+      "completing": "Completamento missione in corso…",
+      "completed": "Missione completata!",
+      "failing": "Segnalazione missione in corso…",
+      "failed": "Missione segnata come fallita"
+    },
+    "modals": {
+      "deleteTitle": "Eliminare la missione?",
+      "deleteDescription": "La missione sarà nascosta dal registro. L'operazione non è reversibile.",
+      "completeTitle": "Completare la missione?",
+      "completeDescription": "L'XP verrà assegnato agli attributi coinvolti.",
+      "failTitle": "Segnare come fallita?",
+      "failDescription": "La missione non assegnerà XP."
     }
   }
 }

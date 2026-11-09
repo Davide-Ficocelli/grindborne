@@ -8,6 +8,10 @@ import { useAuth } from "../context/AuthContext";
 import api from "../lib/api";
 import type { UserInDb } from "../types/user";
 import type { AttributeInDb } from "../types/attribute";
+import { useState } from "react";
+import { Link } from "react-router-dom";
+import { useMutation } from "../hooks/useMutation";
+import ConfirmModal from "../components/ConfirmModal";
 
 // Lazy load all components
 const AttributesChart = lazy(() => import("../components/AttributesChart"));
@@ -43,6 +47,7 @@ type ObjOfStrings = {
 };
 
 export default function PlayerStatusPage() {
+  const [confirmingId, setConfirmingId] = useState<string | null>(null);
   const { t } = useTranslation();
   const { userId } = useAuth();
 
@@ -85,7 +90,24 @@ export default function PlayerStatusPage() {
     data: attributes,
     loading: attrLoading,
     error: attrError,
+    refetch: attrRefetch,
   } = useApi<AttributeInDb[]>(() => api.get("/attributes"), []);
+
+  const { mutate: softDeleteAttr, loading: deletingAttr } = useMutation(
+    () => api.patch(`/attributes/${confirmingId}`),
+    {
+      pendingMessage: t("attributesPage.details.deleting"),
+      successMessage: t("attributesPage.details.deleted"),
+      onSuccess: () => {
+        setConfirmingId(null);
+        // refetch the attribute list (and the user, because the level
+        // The user depends on the attributes — even if the backend updates
+        // level only upon quest completion; it doesn't change upon deletion. Refetch
+        // attributes is necessary anyway).
+        attrRefetch();
+      },
+    },
+  );
 
   if (userLoading || attrLoading) return <LoadingFallback />;
   if (userError || attrError)
@@ -173,13 +195,35 @@ export default function PlayerStatusPage() {
                 ))}
               </Suspense>
             </dl>
-            <button className="small-font-size max-w-60 gap-x-2 self-start flex items-center justify-center pl-4 md:pb-4 cursor-pointer focus:opacity-80 hover:opacity-80">
+            <Link
+              to="/attributes/add"
+              className="small-font-size max-w-60 gap-x-2 self-start flex items-center justify-center pl-4 md:pb-4 cursor-pointer focus:opacity-80 hover:opacity-80"
+            >
               <FontAwesomeIcon
                 icon={faPlus}
                 className="border-2 rounded-xl p-1"
               />
               <span className="w-full text-center">{addAttributeBtnLabel}</span>
-            </button>
+            </Link>
+            {/* Pass callback to Attribute: */}
+            {attributes?.map((attr) => (
+              <Attribute
+                key={attr.id}
+                attrData={attr}
+                onDeleteRequest={() => setConfirmingId(attr.id)}
+              />
+            ))}
+            {/* Modal window */}
+            <ConfirmModal
+              open={confirmingId !== null}
+              title={t("attributesPage.details.confirmDeleteTitle")}
+              description={t("attributesPage.details.confirmDeleteDescription")}
+              confirmLabel={t("common.delete")}
+              cancelLabel={t("common.cancel")}
+              loading={deletingAttr}
+              onConfirm={() => softDeleteAttr()}
+              onCancel={() => setConfirmingId(null)}
+            />
           </section>
 
           <section
