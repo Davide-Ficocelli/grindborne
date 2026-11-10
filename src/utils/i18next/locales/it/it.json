@@ -21,6 +21,7 @@
     "attributesHeading": "Attributi",
     "addAttributeBtnLabel": "Aggiungi attributo",
     "proficiencyHeading": "Maestria",
+    "noAttributesText": "Non hai ancora nessun attributo. Clicca sul pulsante qui sotto per iniziare ad aggiungerli",
     "attribute": {
       "attributeDecayingWarning": "7 giorni al decadimento",
       "actions": {
@@ -28,6 +29,10 @@
         "details": "Dettagli",
         "delete": "Elimina"
       }
+    },
+    "chartPlaceholder": {
+      "notEnoughAttributes_one": "Non ci sono abbastanza attributi da confrontare, aggiungine un altro e un diagramma di confronto comparirà qui",
+      "notEnoughAttributes_other": "Non ci sono abbastanza attributi da confrontare, aggiungine altri {{count}} e un diagramma di confronto comparirà qui"
     }
   },
   "attributesPage": {

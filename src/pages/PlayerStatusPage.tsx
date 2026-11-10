@@ -85,7 +85,11 @@ export default function PlayerStatusPage() {
     [userId], // Difesa: se cambia userId, rifà la fetch
   );
 
-  // Let's retrieve the real attributes
+  // Let's retrieve the real attributes.
+  // NOTE: with the latest backend fixes, a fresh user now receives { ok: true, data: [] }
+  // instead of { ok: false, status: 404 }. So `attributes` becomes [] (not
+  // null) and `attrError` stays null — the early-return on error below only
+  // fires for REAL errors (network, server down, ...).
   const {
     data: attributes,
     loading: attrLoading,
@@ -110,12 +114,20 @@ export default function PlayerStatusPage() {
   );
 
   if (userLoading || attrLoading) return <LoadingFallback />;
+  // This branch now fires only for genuine errors. An empty attribute list
+  // is `data: []`, not `error`.
   if (userError || attrError)
     return (
       <div className="text-red-500 text-center py-8">
         {userError || attrError}
       </div>
     );
+
+  // Convenience flag: "the user has no attributes yet".
+  // Using `=== 0` (not `!attributes.length`) because attributes could be
+  // null on very first mount before useApi has resolved — but we already
+  // gated on loading, so at this point attributes is either [] or non-empty.
+  const hasNoAttributes = !attributes || attributes.length === 0;
 
   return (
     <>
@@ -124,6 +136,7 @@ export default function PlayerStatusPage() {
           aria-labelledby="status-page"
           className="flex flex-col gap-y-18 md:gap-y-0 status-grid-area-container"
         >
+          {/* 1. Title and page icon (always rendered) */}
           <div
             aria-labelledby="status-heading"
             className={`flex flex-wrap gap-x-8 gap-y-8 items-center justify-center py-16 ${classStyles.horizontalPadding} status-heading-grid-area`}
@@ -138,6 +151,7 @@ export default function PlayerStatusPage() {
             </Suspense>
           </div>
 
+          {/* 2. Main info (always rendered) */}
           <section
             aria-labelledby="main-info-section"
             className={`${classStyles.verticalFlexContainer} main-info-section`}
@@ -178,6 +192,7 @@ export default function PlayerStatusPage() {
             </dl>
           </section>
 
+          {/* 3. Attributes section (always rendered: heading + list + text + button) */}
           <section
             aria-labelledby="attributes-section"
             className={`${classStyles.verticalFlexContainer} attributes-section`}
@@ -187,14 +202,32 @@ export default function PlayerStatusPage() {
             </h2>
             <dl className={classStyles.verticalFlexContainer}>
               <Suspense fallback={<LoadingFallback />}>
-                {/* We pass the real data to the Attribute component. 
-                    You will need to update Attribute.tsx to accept an 'attr' prop of type AttributeInDb.
-                    Example: <Attribute key={attr.id} attr={attr} /> */}
+                {/* BUG FIX (Q3): previously this list was rendered TWICE —
+                    once inside <dl> (without onDeleteRequest) and once
+                    outside (with onDeleteRequest). Now there is a single
+                    authoritative map, inside the <dl>, with the callback
+                    wired up. */}
                 {attributes?.map((attr) => (
-                  <Attribute key={attr.id} attrData={attr}></Attribute>
+                  <Attribute
+                    key={attr.id}
+                    attrData={attr}
+                    onDeleteRequest={() => setConfirmingId(attr.id)}
+                  />
                 ))}
               </Suspense>
             </dl>
+
+            {/* Q5: empty-state text ABOVE the button, only when the user
+                has no attributes yet. Showing it when attributes exist
+                would be factually wrong ("you have none" when you do). */}
+            {hasNoAttributes && (
+              <p className="small-font-size px-4 text-center">
+                {t("playerStatusPage.noAttributesText")}
+              </p>
+            )}
+
+            {/* Q9: the button is ALWAYS visible — no business rule
+                forbids the user from adding more attributes. */}
             <Link
               to="/attributes/add"
               className="small-font-size max-w-60 gap-x-2 self-start flex items-center justify-center pl-4 md:pb-4 cursor-pointer focus:opacity-80 hover:opacity-80"
@@ -205,15 +238,10 @@ export default function PlayerStatusPage() {
               />
               <span className="w-full text-center">{addAttributeBtnLabel}</span>
             </Link>
-            {/* Pass callback to Attribute: */}
-            {attributes?.map((attr) => (
-              <Attribute
-                key={attr.id}
-                attrData={attr}
-                onDeleteRequest={() => setConfirmingId(attr.id)}
-              />
-            ))}
-            {/* Modal window */}
+
+            {/* Modal window for attribute deletion. Kept inside the
+                section for locality; being a fixed overlay its DOM
+                position does not affect the layout. */}
             <ConfirmModal
               open={confirmingId !== null}
               title={t("attributesPage.details.confirmDeleteTitle")}
@@ -226,6 +254,7 @@ export default function PlayerStatusPage() {
             />
           </section>
 
+          {/* 4. Chart section (Q4 option a: after the attributes section) */}
           <section
             aria-labelledby="proficiency-section"
             className="flex flex-col justify-center items-center gap-y-8 pb-4 proficiency-section"
@@ -237,8 +266,11 @@ export default function PlayerStatusPage() {
               {proficiencyHeading}
             </h2>
             <Suspense fallback={<LoadingFallback />}>
-              {/* AttributesChart currently has hardcoded data. To pass the real data, 
-                  you will need to modify it to accept a 'data' prop and update the chart. */}
+              {/* AttributesChart decides internally whether to draw the
+                  chart or show the placeholder, based on the 3-attribute
+                  threshold. When the user adds/removes attributes, the
+                  prop changes and the chart updates automatically: no
+                  extra logic needed here. */}
               <AttributesChart data={attributes} />
             </Suspense>
           </section>

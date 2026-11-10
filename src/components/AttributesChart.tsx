@@ -1,26 +1,54 @@
 import { Chart } from "chart.js/auto";
 import type { ChartConfiguration } from "chart.js";
 import { useRef, useEffect } from "react";
+import { useTranslation } from "react-i18next";
 import type { AttributeInDb } from "../types/attribute";
+
+// Minimum number of axes for a meaningful radar chart.
+// 1 axis → a point, 2 axes → a line. Neither is readable as "comparison".
+// 3 is the smallest polygon a radar chart can draw.
+const MIN_ATTRIBUTES_FOR_CHART = 3;
 
 interface AttributesChartProps {
   data: AttributeInDb[] | null;
 }
 
 export default function AttributesChart(props: AttributesChartProps) {
+  const { t } = useTranslation();
+
   // This is a reference to the canvas element
   const chartRef = useRef<HTMLCanvasElement | null>(null);
 
-  useEffect(() => {
-    // If there is no data or the canvas is not ready, do nothing.
-    // This prevents the "vertical line" bug when the component
-    // is mounted before the API fetch is complete.
-    if (!chartRef.current || !props.data || props.data.length === 0) return;
+  // DECISION: the ">= 3 attributes" rule lives HERE, not in the parent.
+  // The chart is the only consumer that cares about the minimum for a
+  // readable radar, so the rule belongs close to it. Moving it to
+  // PlayerStatusPage would duplicate the threshold and risk drift.
+  const shouldRenderChart =
+    !!props.data && props.data.length >= MIN_ATTRIBUTES_FOR_CHART;
 
-    const attrLabels: string[] =
-      props.data?.map((attr) => attr.name ?? "") ?? [];
-    const attrLvlsData: number[] =
-      props.data?.map((attr) => attr.level ?? 0) ?? [];
+  // How many attributes are still missing before the chart can appear.
+  // When data is empty, 3 - 0 = 3 (per spec: "aggiungine altri 3").
+  // When 1 attribute exists, 3 - 1 = 2 (plural form).
+  // When 2 attributes exist, 3 - 2 = 1 (singular form, see i18n _one).
+  const missingCount = props.data
+    ? Math.max(0, MIN_ATTRIBUTES_FOR_CHART - props.data.length)
+    : MIN_ATTRIBUTES_FOR_CHART;
+
+  useEffect(() => {
+    // Only build the chart when we actually need it AND the canvas is
+    // mounted. When data drops below MIN_ATTRIBUTES_FOR_CHART, the canvas
+    // is removed from the DOM; the cleanup below (registered on a
+    // previous render) destroys the chart instance before that happens.
+    if (
+      !shouldRenderChart ||
+      !chartRef.current ||
+      !props.data ||
+      props.data.length === 0
+    )
+      return;
+
+    const attrLabels: string[] = props.data.map((attr) => attr.name ?? "");
+    const attrLvlsData: number[] = props.data.map((attr) => attr.level ?? 0);
 
     const data = {
       // The names of your attributes (the "stats")
@@ -66,17 +94,22 @@ export default function AttributesChart(props: AttributesChartProps) {
     const myRadarChart = new Chart(chartRef.current, config);
 
     // Cleanup function to destroy chart when component unmounts
+    // (or when data changes to a state where the chart should not render).
     return () => {
       myRadarChart.destroy();
     };
-  }, [props.data]);
+  }, [props.data, shouldRenderChart]);
 
-  // Se i dati sono ancora in fase di caricamento, mostriamo un placeholder
-  // In PlayerStatusPage il componente è già sotto Suspense/loading, ma è una sicurezza in più
-  if (!props.data || props.data.length === 0) {
+  // Placeholder when there are not enough attributes yet. The text is
+  // dynamic: it tells the user how many more attributes are needed for
+  // the chart to appear. The count is passed to i18next, which picks the
+  // singular/plural form automatically (see locales).
+  if (!shouldRenderChart) {
     return (
-      <div className="w-full md:max-w-md flex justify-center items-center h-64 text-gray-400">
-        Nessun attributo da mostrare
+      <div className="w-full md:max-w-md flex justify-center items-center h-64 text-gray-400 text-center px-4">
+        {t("playerStatusPage.chartPlaceholder.notEnoughAttributes", {
+          count: missingCount,
+        })}
       </div>
     );
   }

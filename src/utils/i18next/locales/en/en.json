@@ -21,6 +21,7 @@
     "attributesHeading": "Attributes",
     "addAttributeBtnLabel": "Add attribute",
     "proficiencyHeading": "Proficiency",
+    "noAttributesText": "You have no attributes yet. Click the button below to start adding them",
     "attribute": {
       "attributeDecayingWarning": "7 days before decaying",
       "actions": {
@@ -28,6 +29,10 @@
         "details": "Details",
         "delete": "Delete"
       }
+    },
+    "chartPlaceholder": {
+      "notEnoughAttributes_one": "There aren't enough attributes to compare. Add one more and a comparison chart will appear here.",
+      "notEnoughAttributes_other": "There aren't enough attributes to compare. Add {{count}} more and a comparison chart will appear here."
     }
   },
   "attributesPage": {
