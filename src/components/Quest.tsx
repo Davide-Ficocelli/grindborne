@@ -5,6 +5,7 @@ import {
   faTrash,
   faCheck,
   faX,
+  faPlay, // Imported for Track
 } from "@fortawesome/free-solid-svg-icons";
 import { Link } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -20,7 +21,7 @@ type QuestProps = {
   onRequestComplete?: (quest: QuestInDb) => void;
   onRequestFail?: (quest: QuestInDb) => void;
   onRequestDelete?: (quest: QuestInDb) => void;
-  // If set, displays a "+X XP" badge for a few seconds.
+  onRequestTrack?: (quest: QuestInDb) => void;
   xpGained?: number | null;
 };
 
@@ -39,6 +40,13 @@ export default function Quest(props: QuestProps) {
   function handleSelect() {
     props.onSelect?.(quest);
   }
+
+  // FIX: conditional action buttons
+  const canTrack = !quest.is_tracked && !quest.is_completed && !quest.is_failed;
+  const canComplete =
+    quest.is_tracked && !quest.is_completed && !quest.is_failed;
+  const canFail = quest.is_tracked && !quest.is_completed && !quest.is_failed;
+  const canEdit = !quest.is_tracked && !quest.is_completed;
 
   return (
     <article
@@ -62,28 +70,49 @@ export default function Quest(props: QuestProps) {
         aria-label="Actions"
         role="toolbar"
         className="flex items-baseline gap-x-2 justify-center"
-        // stopPropagation qui: un click su qualsiasi icona non deve
-        // anche selezionare la card.
+        // stopPropagation here: clicking on any icon must not
+        // also select the card.
         onClick={(e) => e.stopPropagation()}
       >
-        <button
-          className={classStyles.actionBtn}
-          onClick={() => props.onRequestFail?.(quest)}
-        >
-          <span className="order-1 text-center small-font-size">
-            {t("questLog.actions.fail")}
-          </span>
-          <FontAwesomeIcon className={classStyles.actionIcon} icon={faX} />
-        </button>
-        <button
-          className={classStyles.actionBtn}
-          onClick={() => props.onRequestComplete?.(quest)}
-        >
-          <span className="order-1 text-center small-font-size">
-            {t("questLog.actions.complete")}
-          </span>
-          <FontAwesomeIcon className={classStyles.actionIcon} icon={faCheck} />
-        </button>
+        {canTrack && (
+          <button
+            className={classStyles.actionBtn}
+            onClick={() => props.onRequestTrack?.(quest)}
+          >
+            <span className="order-1 text-center small-font-size">
+              {t("questLog.actions.track")}
+            </span>
+            <FontAwesomeIcon className={classStyles.actionIcon} icon={faPlay} />
+          </button>
+        )}
+
+        {canFail && (
+          <button
+            className={classStyles.actionBtn}
+            onClick={() => props.onRequestFail?.(quest)}
+          >
+            <span className="order-1 text-center small-font-size">
+              {t("questLog.actions.fail")}
+            </span>
+            <FontAwesomeIcon className={classStyles.actionIcon} icon={faX} />
+          </button>
+        )}
+
+        {canComplete && (
+          <button
+            className={classStyles.actionBtn}
+            onClick={() => props.onRequestComplete?.(quest)}
+          >
+            <span className="order-1 text-center small-font-size">
+              {t("questLog.actions.complete")}
+            </span>
+            <FontAwesomeIcon
+              className={classStyles.actionIcon}
+              icon={faCheck}
+            />
+          </button>
+        )}
+
         <button
           className={classStyles.actionBtn}
           onClick={() => props.onRequestDelete?.(quest)}
@@ -93,16 +122,23 @@ export default function Quest(props: QuestProps) {
           </span>
           <FontAwesomeIcon className={classStyles.actionIcon} icon={faTrash} />
         </button>
-        <Link
-          to={`/quest-log/action/edit/${quest.id}`}
-          className={classStyles.actionBtn}
-          onClick={(e) => e.stopPropagation()}
-        >
-          <span className="order-1 text-center small-font-size">
-            {t("questLog.actions.edit")}
-          </span>
-          <FontAwesomeIcon className={classStyles.actionIcon} icon={faPencil} />
-        </Link>
+
+        {canEdit && (
+          <Link
+            to={`/quest-log/action/edit/${quest.id}`}
+            className={classStyles.actionBtn}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <span className="order-1 text-center small-font-size">
+              {t("questLog.actions.edit")}
+            </span>
+            <FontAwesomeIcon
+              className={classStyles.actionIcon}
+              icon={faPencil}
+            />
+          </Link>
+        )}
+
         <Link
           className={classStyles.actionBtn}
           to={`/quest-log/action/view/${quest.id}`}

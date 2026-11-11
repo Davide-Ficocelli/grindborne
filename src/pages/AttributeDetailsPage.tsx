@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useState, useMemo } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import {
   faArrowLeft,
@@ -12,30 +12,7 @@ import { useMutation } from "../hooks/useMutation";
 import ConfirmModal from "../components/ConfirmModal";
 import api from "../lib/api";
 import type { AttributeInDb } from "../types/attribute";
-
-// Local hook: converts the `icon` field (which may come from the backend
-// as a Uint8Array or as {type: "Buffer", data: number[]} depending on the
-// serialisation) into a URL blob that can be used in <img src=...>.
-// I use useMemo so as not to recreate the blob on every render, and useEffect with
-// cleanup to revoke the URL when the component unmounts.
-function useIconUrl(icon: AttributeInDb["icon"]): string | null {
-  const url = useMemo(() => {
-    if (!icon) return null;
-    const bytes =
-      icon instanceof Uint8Array ? icon : new Uint8Array((icon as any).data);
-    // Let’s assume PNG. See note at the bottom: without MIME types in the database, we cannot
-    // do any better until we add the dedicated column.
-    return URL.createObjectURL(new Blob([bytes], { type: "image/png" }));
-  }, [icon]);
-
-  useEffect(() => {
-    return () => {
-      if (url) URL.revokeObjectURL(url);
-    };
-  }, [url]);
-
-  return url;
-}
+import { getIconUrl } from "../lib/iconHelper";
 
 export default function AttributeDetailsPage() {
   const { t } = useTranslation();
@@ -50,10 +27,10 @@ export default function AttributeDetailsPage() {
   } = useApi<AttributeInDb>(() => api.get(`/attributes/${id}`), [id]);
 
   const [confirmOpen, setConfirmOpen] = useState(false);
-  const iconUrl = useIconUrl(attribute?.icon ?? null);
 
-  // Important note: PATCH is a soft delete. The backend sets the `deleted_at` field,
-  // it does not perform a physical DELETE. This complies with requirement Q10.
+  // FIX Q12 & Q13: Use helper to extract correct base64 string
+  const iconUrl = useMemo(() => getIconUrl(attribute?.icon), [attribute?.icon]);
+
   const { mutate: softDelete, loading: deleting } = useMutation<AttributeInDb>(
     () => api.patch(`/attributes/${id}`),
     {
@@ -61,8 +38,6 @@ export default function AttributeDetailsPage() {
       successMessage: t("attributesPage.details.deleted"),
       onSuccess: () => {
         setConfirmOpen(false);
-        // After a soft delete, the attribute can no longer be retrieved via the API
-        // (queries filter by `deleted_at`? see note). Let’s go back to the status.
         navigate("/");
       },
     },

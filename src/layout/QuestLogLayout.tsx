@@ -1,7 +1,6 @@
-// import { useTranslation } from "react-i18next";
 import { lazy, Suspense } from "react";
 import LoadingFallback from "../components/LoadingFallback";
-import { NavLink, Outlet } from "react-router-dom";
+import { NavLink, Outlet, useSearchParams } from "react-router-dom";
 import { faMagnifyingGlass } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import AddQuestBtn from "../components/AddQuestBtn";
@@ -10,7 +9,19 @@ import { useTranslation } from "react-i18next";
 export default function QuestLogLayout() {
   const { t } = useTranslation();
 
-  // Lazy Load the image
+  // FIX Q10: Manage search state via URL search params
+  const [searchParams, setSearchParams] = useSearchParams();
+  const searchQuery = searchParams.get("q") || "";
+
+  function handleSearchChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const value = e.target.value;
+    if (value) {
+      setSearchParams({ q: value }, { replace: true });
+    } else {
+      setSearchParams({}, { replace: true });
+    }
+  }
+
   const QuestLogIcon = lazy(() =>
     import("../assets/icons/quest-log-2.png").then((module) => ({
       default: () => (
@@ -43,12 +54,14 @@ export default function QuestLogLayout() {
             </Suspense>
           </div>
 
-          <form className="relative">
+          <form className="relative" onSubmit={(e) => e.preventDefault()}>
             <input
               className="bg-white rounded-lg text-black py-1 pr-3 pl-9"
               type="text"
               name="search-quests"
               placeholder={t("questLog.searchPlaceholder")}
+              value={searchQuery}
+              onChange={handleSearchChange}
             />
             <FontAwesomeIcon
               icon={faMagnifyingGlass}

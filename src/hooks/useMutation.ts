@@ -1,4 +1,5 @@
 import { useCallback, useState } from "react";
+import { useTranslation } from "react-i18next";
 import type { AxiosResponse } from "axios";
 import type ServiceValidation from "../types/serviceValidation";
 import { pushLog, dismissLog } from "../lib/logMessagesStore";
@@ -30,6 +31,7 @@ export function useMutation<
   TData = unknown,
   TArgs extends unknown[] = unknown[],
 >(fetcher: Fetcher<TData, TArgs>, options: UseMutationOptions<TData> = {}) {
+  const { t } = useTranslation();
   const { pendingMessage, successMessage, onSuccess, onError } = options;
 
   const [loading, setLoading] = useState(false);
@@ -56,7 +58,7 @@ export function useMutation<
 
         // 2) Backend with `ok:false` = application error. This is not an exception.
         if (!payload.ok) {
-          const msg = payload.message || "Errore sconosciuto dal server";
+          const msg = payload.message || "Unknown server error";
           setError(msg);
           setData(null);
           // Removing the pending status and displaying the error
@@ -73,15 +75,14 @@ export function useMutation<
         if (successMessage !== "") {
           pushLog(
             "success",
-            successMessage || payload.message || "Operazione completata",
+            successMessage || payload.message || "Operation completed",
           );
         }
         onSuccess?.(payload.data as TData, payload.message);
         return payload;
       } catch (err: any) {
         // 4) Network error / 4xx–5xx. I extract a meaningful message.
-        const msg =
-          err.response?.data?.message || "Errore di connessione al server";
+        const msg = err.response?.data?.message || t("errors.network");
         setError(msg);
         setData(null);
         if (pendingId) dismissLog(pendingId);

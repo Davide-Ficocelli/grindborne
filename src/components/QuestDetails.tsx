@@ -7,6 +7,7 @@ import {
   faTrash,
   faCheck,
   faX,
+  faPlay,
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import LoadingFallback from "./LoadingFallback";
@@ -26,6 +27,7 @@ type QuestDetailsProps = {
   onRequestComplete?: (quest: QuestInDb) => void;
   onRequestFail?: (quest: QuestInDb) => void;
   onRequestDelete?: (quest: QuestInDb) => void;
+  onRequestTrack?: (quest: QuestInDb) => void;
 };
 
 export default function QuestDetails(props: QuestDetailsProps) {
@@ -50,10 +52,10 @@ export default function QuestDetails(props: QuestDetailsProps) {
   // it ALWAYS remains null because the parent’s callbacks are provided: the modal is
   // handled by QuestLogList.
   const [pendingAction, setPendingAction] = useState<
-    "delete" | "complete" | "fail" | null
+    "delete" | "complete" | "fail" | "track" | null
   >(null);
 
-  // Temporary XP badge (Q17): after a successful completion, we display
+  // Temporary XP badge: after a successful completion, we display
   // “+X XP” for 3 seconds so that the user sees it appear inline.
   const [xpGained, setXpGained] = useState<number | null>(null);
 
@@ -112,18 +114,28 @@ export default function QuestDetails(props: QuestDetailsProps) {
     },
   );
 
-  // Unified handler for the three actions. Logic:
-  //   - if the parent provides the corresponding callback, call that one
-  //     (side-view case: QuestLogList already has a modal and mutations);
-  //   - otherwise, open the local modal (full-page case).
-  function handleActionClick(kind: "delete" | "complete" | "fail") {
+  const trackMutation = useMutation<QuestInDb>(
+    () => api.patch(`/quests/${currentQuest?.id}/track`),
+    {
+      pendingMessage: t("questLog.mutations.tracking"),
+      successMessage: t("questLog.mutations.tracked"),
+      onSuccess: () => {
+        setPendingAction(null);
+        refetch();
+      },
+    },
+  );
+
+  function handleActionClick(kind: "delete" | "complete" | "fail" | "track") {
     if (!currentQuest) return;
     const parentCallback =
       kind === "delete"
         ? props.onRequestDelete
         : kind === "complete"
           ? props.onRequestComplete
-          : props.onRequestFail;
+          : kind === "fail"
+            ? props.onRequestFail
+            : props.onRequestTrack;
     if (parentCallback) {
       parentCallback(currentQuest);
     } else {
@@ -135,6 +147,7 @@ export default function QuestDetails(props: QuestDetailsProps) {
     if (pendingAction === "delete") deleteMutation.mutate();
     else if (pendingAction === "complete") completeMutation.mutate();
     else if (pendingAction === "fail") failMutation.mutate();
+    else if (pendingAction === "track") trackMutation.mutate();
   }
 
   // Mutation currently active for the local modal (for loading only).
@@ -145,13 +158,20 @@ export default function QuestDetails(props: QuestDetailsProps) {
         ? completeMutation
         : pendingAction === "fail"
           ? failMutation
-          : null;
+          : pendingAction === "track"
+            ? trackMutation
+            : null;
 
-  // Modal labels: the same three actions have different text.
+  // Modal labels: the same four  actions have different text.
   const modalCopy: Record<
     NonNullable<typeof pendingAction>,
     { title: string; description: string; confirm: string }
   > = {
+    track: {
+      title: t("questLog.modals.trackTitle"),
+      description: t("questLog.modals.trackDescription"),
+      confirm: t("questLog.actions.track"),
+    },
     delete: {
       title: t("questLog.modals.deleteTitle"),
       description: t("questLog.modals.deleteDescription"),
@@ -181,11 +201,7 @@ export default function QuestDetails(props: QuestDetailsProps) {
     })),
   );
 
-  type ObjOfStrings = {
-    [key: string]: string;
-  };
-
-  // sm:flex-row sm:justify-baseline sm:items-start
+  type ObjOfStrings = { [key: string]: string };
 
   const classStyles: ObjOfStrings = {
     fieldsWrapper:
@@ -208,8 +224,21 @@ export default function QuestDetails(props: QuestDetailsProps) {
   if (!currentQuest)
     return <div className="text-center py-8">{t("questLog.noQuests")}</div>;
 
-  // Conditional rendering based on the variant props
-  // --- FULL PAGE VARIANT ---
+  // FIX: calculate action visibility
+  const canTrack =
+    !currentQuest.is_tracked &&
+    !currentQuest.is_completed &&
+    !currentQuest.is_failed;
+  const canComplete =
+    currentQuest.is_tracked &&
+    !currentQuest.is_completed &&
+    !currentQuest.is_failed;
+  const canFail =
+    currentQuest.is_tracked &&
+    !currentQuest.is_completed &&
+    !currentQuest.is_failed;
+  const canEdit = !currentQuest.is_tracked && !currentQuest.is_completed;
+
   if (props.variant === "full-page" || props.variant === undefined)
     return (
       <Suspense fallback={<LoadingFallback />}>
@@ -269,9 +298,7 @@ export default function QuestDetails(props: QuestDetailsProps) {
             </div>
 
             <div className="bottom-linear-gradient-border after:from-orange-100 after:to-[#111] divider-1-grid-area" />
-            {/* Attributes and Duration */}
-            {/* NOTE: The API currently doesn't return the list of attributes directly in the quest object. 
-                I am keeping the hardcoded placeholder for the attributes list until the API supports it. */}
+
             {currentQuest.estimated_time && (
               <>
                 <div
@@ -316,7 +343,7 @@ export default function QuestDetails(props: QuestDetailsProps) {
                         {t("questLog.details.totalXp")}:{" "}
                         <strong>{currentQuest.total_xp || 0}</strong>
                       </p>
-                      {/* Temporary XP badge (Q17): appears for 3 seconds after completion. */}
+                      {/* Temporary XP badge: appears for 3 seconds after completion. */}
                       {xpGained != null && (
                         <p className="text-green-300 font-semibold animate-pulse">
                           +{xpGained} XP
@@ -409,32 +436,51 @@ export default function QuestDetails(props: QuestDetailsProps) {
               role="toolbar"
               className="w-full flex items-baseline gap-x-2 justify-center sm:justify-evenly quest-actions-grid-area"
             >
-              <button
-                className={classStyles.actionBtn}
-                onClick={() => handleActionClick("fail")}
-              >
-                <span className="order-1 text-center small-font-size">
-                  {t("questLog.actions.fail")}
-                </span>
-                <FontAwesomeIcon
-                  className={classStyles.actionIcon}
-                  icon={faX}
-                  aria-hidden="true"
-                />
-              </button>
-              <button
-                className={classStyles.actionBtn}
-                onClick={() => handleActionClick("complete")}
-              >
-                <span className="order-1 text-center small-font-size">
-                  {t("questLog.actions.complete")}
-                </span>
-                <FontAwesomeIcon
-                  className={classStyles.actionIcon}
-                  icon={faCheck}
-                  aria-hidden="true"
-                />
-              </button>
+              {canTrack && (
+                <button
+                  className={classStyles.actionBtn}
+                  onClick={() => handleActionClick("track")}
+                >
+                  <span className="order-1 text-center small-font-size">
+                    {t("questLog.actions.track")}
+                  </span>
+                  <FontAwesomeIcon
+                    className={classStyles.actionIcon}
+                    icon={faPlay}
+                    aria-hidden="true"
+                  />
+                </button>
+              )}
+              {canFail && (
+                <button
+                  className={classStyles.actionBtn}
+                  onClick={() => handleActionClick("fail")}
+                >
+                  <span className="order-1 text-center small-font-size">
+                    {t("questLog.actions.fail")}
+                  </span>
+                  <FontAwesomeIcon
+                    className={classStyles.actionIcon}
+                    icon={faX}
+                    aria-hidden="true"
+                  />
+                </button>
+              )}
+              {canComplete && (
+                <button
+                  className={classStyles.actionBtn}
+                  onClick={() => handleActionClick("complete")}
+                >
+                  <span className="order-1 text-center small-font-size">
+                    {t("questLog.actions.complete")}
+                  </span>
+                  <FontAwesomeIcon
+                    className={classStyles.actionIcon}
+                    icon={faCheck}
+                    aria-hidden="true"
+                  />
+                </button>
+              )}
               <button
                 className={classStyles.actionBtn}
                 onClick={() => handleActionClick("delete")}
@@ -448,10 +494,7 @@ export default function QuestDetails(props: QuestDetailsProps) {
                   aria-hidden="true"
                 />
               </button>
-              {/* The ‘Edit’ button is hidden when the quest is tracked or completed:
-                  the backend rejects the update in those cases (see
-                  updateQuestService). Hiding it prevents an unnecessary click. */}
-              {!currentQuest.is_completed && !currentQuest.is_tracked && (
+              {canEdit && (
                 <Link
                   to={`/quest-log/action/edit/${currentQuest.id}`}
                   className={classStyles.actionBtn}
@@ -658,11 +701,96 @@ export default function QuestDetails(props: QuestDetailsProps) {
                 </div>
               </>
             )}
+
+            <nav
+              aria-label={t("questLog.details.actionsLabel")}
+              role="toolbar"
+              className="w-full flex items-baseline gap-x-2 justify-center sm:justify-evenly quest-actions-grid-area py-4"
+            >
+              {canTrack && (
+                <button
+                  className={classStyles.actionBtn}
+                  onClick={() => handleActionClick("track")}
+                >
+                  <span className="order-1 text-center small-font-size">
+                    {t("questLog.actions.track")}
+                  </span>
+                  <FontAwesomeIcon
+                    className={classStyles.actionIcon}
+                    icon={faPlay}
+                  />
+                </button>
+              )}
+              {canFail && (
+                <button
+                  className={classStyles.actionBtn}
+                  onClick={() => handleActionClick("fail")}
+                >
+                  <span className="order-1 text-center small-font-size">
+                    {t("questLog.actions.fail")}
+                  </span>
+                  <FontAwesomeIcon
+                    className={classStyles.actionIcon}
+                    icon={faX}
+                  />
+                </button>
+              )}
+              {canComplete && (
+                <button
+                  className={classStyles.actionBtn}
+                  onClick={() => handleActionClick("complete")}
+                >
+                  <span className="order-1 text-center small-font-size">
+                    {t("questLog.actions.complete")}
+                  </span>
+                  <FontAwesomeIcon
+                    className={classStyles.actionIcon}
+                    icon={faCheck}
+                  />
+                </button>
+              )}
+              <button
+                className={classStyles.actionBtn}
+                onClick={() => handleActionClick("delete")}
+              >
+                <span className="order-1 text-center small-font-size">
+                  {t("questLog.actions.delete")}
+                </span>
+                <FontAwesomeIcon
+                  className={classStyles.actionIcon}
+                  icon={faTrash}
+                />
+              </button>
+              {canEdit && (
+                <Link
+                  to={`/quest-log/action/edit/${currentQuest.id}`}
+                  className={classStyles.actionBtn}
+                >
+                  <span className="order-1 text-center small-font-size">
+                    {t("questLog.actions.edit")}
+                  </span>
+                  <FontAwesomeIcon
+                    className={classStyles.actionIcon}
+                    icon={faPencil}
+                  />
+                </Link>
+              )}
+            </nav>
           </section>
+
+          <ConfirmModal
+            open={pendingAction !== null}
+            title={pendingAction ? modalCopy[pendingAction].title : ""}
+            description={
+              pendingAction ? modalCopy[pendingAction].description : ""
+            }
+            confirmLabel={pendingAction ? modalCopy[pendingAction].confirm : ""}
+            cancelLabel={t("common.cancel")}
+            loading={activeLocalMutation?.loading ?? false}
+            onConfirm={handleConfirmLocal}
+            onCancel={() => setPendingAction(null)}
+          />
         </aside>
       </Suspense>
     );
-
-  // Fallback for unknown variants (pre-existing behaviour: no
-  // explicit return → undefined). We leave this unchanged.
 }

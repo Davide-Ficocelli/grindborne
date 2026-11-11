@@ -3,6 +3,8 @@ import { faInfo, faPencil, faTrash } from "@fortawesome/free-solid-svg-icons";
 import { Link } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { type AttributeInDb } from "../types/attribute";
+import { getIconUrl } from "../lib/iconHelper";
+import { useMemo } from "react";
 
 interface AttributeProps {
   key: string;
@@ -29,10 +31,20 @@ export default function Attribute(props: AttributeProps) {
   const max = data.xp_to_next_level ?? 100;
   const currentXp = data.xp ?? 0;
 
+  // FIX: extract icon URL
+  const iconUrl = useMemo(() => getIconUrl(data.icon), [data.icon]);
+
   return (
     <dt className="flex flex-col gap-4 standard-font-size bottom-linear-gradient-border pb-4 after:from-[#ffffff] after:to-[#111]">
       <div className="flex justify-between items-center w-full px-4">
         <div className="attribute-name-grid-area flex items-center justify-between gap-x-4">
+          {iconUrl && (
+            <img
+              src={iconUrl}
+              alt=""
+              className="size-8 rounded-md border border-[#FFD6A7] object-cover"
+            />
+          )}
           <p className="text-start">{data?.name || "N/A"}</p>
         </div>
         <p className="text-center">{data?.level || 0}</p>
@@ -52,7 +64,6 @@ export default function Attribute(props: AttributeProps) {
         {tAttribute.attributeDecayingWarning}
       </span>
 
-      {/* Stock icons: consistent with Quest.tsx. No ‘complete’ or ‘fail’ here. */}
       <nav
         aria-label="Attribute actions"
         role="toolbar"

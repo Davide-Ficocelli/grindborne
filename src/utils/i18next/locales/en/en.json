@@ -3,7 +3,21 @@
   "common": {
     "cancel": "Cancel",
     "delete": "Delete",
-    "confirm": "Confirm"
+    "confirm": "Confirm",
+    "add": "Add",
+    "yes": "Yes",
+    "no": "No"
+  },
+  "errors": {
+    "network": "Network error. Please try again."
+  },
+  "login": {
+    "title": "Log in",
+    "email": "Email",
+    "password": "Password",
+    "submit": "Log in",
+    "submitting": "Logging in...",
+    "error": "Invalid credentials. Try again."
   },
   "header": {
     "navigation": {
@@ -40,6 +54,7 @@
       "name": "Name",
       "description": "Description",
       "icon": "Icon",
+      "iconWarning": "Only PNG images are supported as attribute icons.",
       "level": "Level",
       "xp": "XP",
       "decayDate": "Decay date"
@@ -77,6 +92,7 @@
     "noQuests": "No quests found. Create a new one!",
     "loadingQuest": "Loading quest...",
     "actions": {
+      "track": "Track",
       "fail": "Mark as failed",
       "complete": "Mark as completed",
       "delete": "Delete",
@@ -101,14 +117,32 @@
       "actionsLabel": "Quest actions"
     },
     "form": {
-      "submit": "Create quest",
+      "backToLog": "Return to quest log",
+      "newQuest": "New quest",
+      "editQuest": "Edit quest",
+      "title": "Title",
+      "titlePlaceholder": "Title...",
+      "description": "Description",
+      "descriptionPlaceholder": "Description...",
+      "rewards": "Quest rewards",
+      "disable": "Disable",
+      "enable": "Enable",
+      "involvedAttributes": "Involved attributes",
+      "attributesNotEditable": "Attributes are not editable in this version.",
+      "estimatedTime": "Estimated duration",
+      "durationPlaceholder": "Duration...",
+      "minutes": "Expressed in minutes",
+      "trackPrompt": "Track at creation?",
+      "create": "Create quest",
       "creating": "Creating quest…",
       "created": "Quest created successfully",
+      "save": "Save quest",
       "saving": "Saving quest…",
-      "saved": "Quest updated successfully",
-      "attributesNotEditable": "Attributes are not editable in this version."
+      "saved": "Quest updated successfully"
     },
     "mutations": {
+      "tracking": "Tracking quest…",
+      "tracked": "Quest tracked",
       "deleting": "Deleting quest…",
       "deleted": "Quest deleted",
       "completing": "Completing quest…",
@@ -117,6 +151,8 @@
       "failed": "Quest marked as failed"
     },
     "modals": {
+      "trackTitle": "Track quest?",
+      "trackDescription": "The quest will start tracking time.",
       "deleteTitle": "Delete quest?",
       "deleteDescription": "The quest will be hidden from the log. The operation is irreversible.",
       "completeTitle": "Complete quest?",

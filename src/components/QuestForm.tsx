@@ -14,18 +14,6 @@ type QuestFormProps = {
   variant: string;
 };
 
-// ================================================================
-// PAYLOAD TYPES
-//
-// Listed here (rather than inline) because there are two mutations with different payloads:
-// POST (add) accepts attributes_ids + is_tracked, whilst PUT (edit) does not. This makes the contract with the backend explicit.
-// ================================================================
-
-// POST /quests (createNewQuestController):
-//   { name, description, icon, is_rewardable, is_tracked,
-//     estimated_time, attributes_ids }
-// users_id should not be sent: the backend derives it from the JWT.
-
 type CreateQuestPayload = {
   name: string;
   description?: string;
@@ -35,9 +23,6 @@ type CreateQuestPayload = {
   attributes_ids: string[];
 };
 
-// PUT /quests/:id (updateQuestController):
-//   { name, description, icon, is_rewardable, estimated_time }
-// attributes_ids is NOT accepted (P2). We document it here.
 type UpdateQuestPayload = {
   name: string;
   description?: string;
@@ -51,42 +36,19 @@ export default function QuestForm(props: QuestFormProps) {
   const { id } = useParams();
   const isEdit = props.variant === "edit-quest";
 
-  // ================================================================
-  // SHARED STATE
-  //
-  // ‘Add’ and ‘Edit’ share the same state because the component is
-  // re-rendered when the route changes. There is no risk of one variant
-  // ‘contaminating’ the other: only one is active at a time.
-  // ================================================================
   const [isQuestRewardable, setIsQuestRewardable] = useState(true);
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
-  // estimatedTime: "" when empty, otherwise a number. We use the empty string
-  // as a sentinel to distinguish between "not compiled" and "0 minutes".
-  // (Number("") = 0, so we cannot use 0 as a sentinel.)
   const [estimatedTime, setEstimatedTime] = useState<number | "">("");
   const [selectedAttributeIds, setSelectedAttributeIds] = useState<string[]>(
     [],
   );
   const [trackOnCreate, setTrackOnCreate] = useState(false);
 
-  // ================================================================
-  // FETCH DATA
-  // ================================================================
-
-  // User attributes: these are required both in the ‘add’ function (for the checkboxes) and in the
-  // ‘edit’ function (for the read-only list). A single call.
   const { data: attributes, loading: attrLoading } = useApi<AttributeInDb[]>(
     () => api.get("/attributes"),
     [],
   );
-
-  // Existing quest: fetch ONLY in edit mode. In add mode, we return a
-  // Promise that has already been resolved with `data: undefined` to avoid making an
-  // to `/quests/undefined` (useApi processes the response as if
-  // the backend had replied `ok: true, data: undefined`, and sets
-  // data = null). This workaround maintains the hook rule
-  // (useApi is always called) without any side effects in add mode.
 
   const { data: existingQuest, loading: loadingQuest } =
     useApi<QuestInDb>(() => {
@@ -98,10 +60,6 @@ export default function QuestForm(props: QuestFormProps) {
       return api.get(`/quests/${id}`);
     }, [id, isEdit]);
 
-  // Pre-populate the fields when the quest arrives (edit mode only). The dependencies
-  // [existingQuest, isEdit] prevent the fields from being overwritten every time
-  // the user types (the effect only runs when the quest arrives
-  // or the variant changes).
   useEffect(() => {
     if (!existingQuest || !isEdit) return;
     setName(existingQuest.name ?? "");
@@ -110,9 +68,13 @@ export default function QuestForm(props: QuestFormProps) {
     setIsQuestRewardable(existingQuest.is_rewardable ?? true);
   }, [existingQuest, isEdit]);
 
-  // ================================================================
-  // MUTATIONS
-  // ================================================================
+  // FIX Q15: reset trackOnCreate when rewardable is false
+  useEffect(() => {
+    if (!isQuestRewardable) {
+      setTrackOnCreate(false);
+    }
+  }, [isQuestRewardable]);
+
   const createMutation = useMutation<QuestInDb, [CreateQuestPayload]>(
     (payload) => api.post("/quests", payload),
     {
@@ -131,9 +93,6 @@ export default function QuestForm(props: QuestFormProps) {
     },
   );
 
-  // ================================================================
-  // HANDLERS
-  // ================================================================
   function toggleQuestRewards(e: React.MouseEvent) {
     e.preventDefault();
     setIsQuestRewardable((prev) => !prev);
@@ -150,30 +109,22 @@ export default function QuestForm(props: QuestFormProps) {
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
 
-    // If rewardable, `estimated_time` is required. If not rewardable,
-    // the backend rejects non-empty `attributes_ids` and (in theory) does not
-    // expect a duration. We send `estimated_time = undefined` in that case.
     const estimated_time =
       isQuestRewardable && estimatedTime !== ""
         ? Number(estimatedTime)
         : undefined;
 
     if (isEdit) {
-      // EDIT: the backend only accepts name/description/is_rewardable/
-      // estimated_time. attributes_ids is ignored, so we do not send it.
       await updateMutation.mutate({
         name,
-        description,
+        description: description.trim() || undefined,
         is_rewardable: isQuestRewardable,
         estimated_time,
       });
     } else {
-      // ADD: Full POST request with `attributes_ids` and `is_tracked`. The backend
-      // creates the quest, then if `is_tracked` is set, it calls `trackQuestService` (a single
-      // POST request: no separate PATCH is required).
       await createMutation.mutate({
         name,
-        description,
+        description: description.trim() || undefined,
         is_rewardable: isQuestRewardable,
         estimated_time,
         is_tracked: trackOnCreate,
@@ -194,9 +145,7 @@ export default function QuestForm(props: QuestFormProps) {
     })),
   );
 
-  type ObjOfStrings = {
-    [key: string]: string;
-  };
+  type ObjOfStrings = { [key: string]: string };
 
   const classStyles: ObjOfStrings = {
     inputsWrapper:
@@ -209,9 +158,6 @@ export default function QuestForm(props: QuestFormProps) {
 
   if (isEdit && loadingQuest) return <LoadingFallback />;
 
-  // ================================================================
-  // VARIANT ADD
-  // ================================================================
   if (props.variant === "add-quest" || props.variant === undefined)
     return (
       <>
@@ -225,7 +171,7 @@ export default function QuestForm(props: QuestFormProps) {
               className="flex items-center justify-center medium-font-size text-orange-200 hover:text-yellow-500 focus:text-yellow-500 hover:border-b-yellow-500 px-4 pt-4 sm:justify-start"
             >
               <span className="order-1 focus:border-b-yellow-500 hover:border-b-2 focus:border-b-2 transition-[border] duration-100 ease-in">
-                Ritorna al registro missioni
+                {t("questLog.form.backToLog")}
               </span>
               <FontAwesomeIcon icon={faArrowLeft} />
             </Link>
@@ -234,28 +180,25 @@ export default function QuestForm(props: QuestFormProps) {
                 aria-labelledby="add-quest-heading"
                 className="h1-font-size text-center order-1"
               >
-                Nuova missione
+                {t("questLog.form.newQuest")}
               </h1>
               <Suspense fallback={<LoadingFallback />}>
                 <AddQuestIcon />
               </Suspense>
             </div>
 
-            {/* --- ADD QUEST FORM --- */}
             <form
               className="quest-form-grid-area-container"
               onSubmit={handleSubmit}
             >
-              {/* Container for title and description */}
               <fieldset
                 className={`${classStyles.inputsWrapper} quest-title-description-grid-area`}
               >
-                {/* Title field */}
                 <fieldset
                   className={`${classStyles.labelAndInputContainer} ${classStyles.firstGridInput}`}
                 >
                   <label htmlFor="quest-title" className="input-label">
-                    Titolo *
+                    {t("questLog.form.title")} *
                   </label>
                   <input
                     id="quest-title"
@@ -263,24 +206,23 @@ export default function QuestForm(props: QuestFormProps) {
                     type="text"
                     required
                     aria-required="true"
-                    placeholder="Titolo..."
+                    placeholder={t("questLog.form.titlePlaceholder")}
                     className="quest-form-input"
                     value={name}
                     onChange={(e) => setName(e.target.value)}
                   />
                 </fieldset>
 
-                {/* Description field */}
                 <fieldset
                   className={`${classStyles.labelAndInputContainer} ${classStyles.secondGridInput}`}
                 >
                   <label htmlFor="quest-description" className="input-label">
-                    Descrizione
+                    {t("questLog.form.description")}
                   </label>
                   <textarea
                     id="quest-description"
                     name="quest_description"
-                    placeholder="Descrizione..."
+                    placeholder={t("questLog.form.descriptionPlaceholder")}
                     rows={6}
                     className="quest-form-input text-sm resize-vertical"
                     value={description}
@@ -291,30 +233,28 @@ export default function QuestForm(props: QuestFormProps) {
 
               <div className="bottom-linear-gradient-border after:from-orange-100 after:to-[#111] divider-1-grid-area"></div>
 
-              {/* Container for Attributes and duration field */}
-              {/* These are the main fields that will determine the total XP reward from quest completion */}
               <fieldset
                 className={`${classStyles.inputsWrapper} quest-attributes-duration-grid-area`}
               >
-                {/* Toggle quest rewards button */}
                 <div className="flex flex-col gap-y-4 sm:col-start-2 sm:col-end-2">
                   <span className="medium-font-size text-center">
-                    Ricompense missione
+                    {t("questLog.form.rewards")}
                   </span>
                   <button
                     type="button"
                     className="btn-primary"
                     onClick={toggleQuestRewards}
                   >
-                    {isQuestRewardable ? "Disattiva" : "Attiva"}
+                    {isQuestRewardable
+                      ? t("questLog.form.disable")
+                      : t("questLog.form.enable")}
                   </button>
                 </div>
 
-                {/* Attributes fieldset (loadeed via API, clickable checkboxes) */}
                 {isQuestRewardable && (
                   <fieldset className={classStyles.firstGridInput}>
                     <legend className="input-label">
-                      Attributi coinvolti *
+                      {t("questLog.form.involvedAttributes")} *
                     </legend>
                     <div>
                       {attrLoading && <p>{t("loading")}</p>}
@@ -334,7 +274,6 @@ export default function QuestForm(props: QuestFormProps) {
                   </fieldset>
                 )}
 
-                {/* Duration field with measure unit */}
                 <fieldset
                   className={`${classStyles.labelAndInputContainer} ${
                     isQuestRewardable
@@ -343,7 +282,8 @@ export default function QuestForm(props: QuestFormProps) {
                   }`}
                 >
                   <label htmlFor="duration" className="input-label">
-                    Durata stimata {isQuestRewardable ? "*" : null}
+                    {t("questLog.form.estimatedTime")}{" "}
+                    {isQuestRewardable ? "*" : null}
                   </label>
                   <div className="flex flex-col items-start gap-y-2">
                     <input
@@ -352,7 +292,7 @@ export default function QuestForm(props: QuestFormProps) {
                       type="number"
                       min="0"
                       step="1"
-                      placeholder="Durata..."
+                      placeholder={t("questLog.form.durationPlaceholder")}
                       aria-describedby="duration-input"
                       className="quest-form-input order-1"
                       required={isQuestRewardable ? true : false}
@@ -363,65 +303,18 @@ export default function QuestForm(props: QuestFormProps) {
                         )
                       }
                     />
-                    <span id="duration-unit">Espressa in minuti</span>
+                    <span id="duration-unit">{t("questLog.form.minutes")}</span>
                   </div>
-                  {/*
-                    NOTE (Q4): There used to be a placeholder block here: “Reward
-                    XP per attribute: 200 / Total XP reward: 400”.
-                    Removed: the total XP is calculated by the backend only upon 
-                    completion (the `calculateQuestTotalXPHelper` depends on `actual_time`, 
-                    which does not exist beforehand). Displaying an estimate on the frontend 
-                    would duplicate a formula that is subject to change. For now, the reward is 
-                    only visible upon completion.
-                  */}
                 </fieldset>
               </fieldset>
 
               <div className="bottom-linear-gradient-border after:from-orange-100 after:to-[#111] divider-2-grid-area"></div>
 
-              {/*
-                START AND END DATE/TIME — COMMENTED OUT (Q3)
-
-                The backend does NOT persist these fields: `createNewQuestModel`
-                only inserts `name`, `description`, `icon`, `is_rewardable`,
-                `estimated_time`. We keep them in the code (commented out) for a
-                future extension: when the backend supports date/time/
-                two_date/two_time, we’ll simply need to remove the comments and add
-                the fields to the handleSubmit payload.
-
-              <div className="bottom-linear-gradient-border after:from-orange-100 after:to-[#111] divider-3-grid-area"></div>
-
-              <fieldset className={`${classStyles.inputsWrapper} quest-date-time-grid-area`}>
-                <fieldset className={`${classStyles.labelAndInputContainer} ${classStyles.firstGridInput}`}>
-                  <label htmlFor="date" className="input-label">Data</label>
-                  <input id="date" name="date" type="date" className="quest-form-input" />
-                </fieldset>
-                <fieldset className={`${classStyles.labelAndInputContainer} ${classStyles.secondGridInput}`}>
-                  <label htmlFor="time" className="input-label">Orario</label>
-                  <input id="time" name="time" type="time" className="quest-form-input" />
-                </fieldset>
-              </fieldset>
-
-              <div className="bottom-linear-gradient-border after:from-orange-100 after:to-[#111] divider-4-grid-area"></div>
-
-              <fieldset className={`${classStyles.inputsWrapper} quest-due-date-due-time-grid-area`}>
-                <fieldset className={`${classStyles.labelAndInputContainer} ${classStyles.firstGridInput}`}>
-                  <label htmlFor="due-date" className="input-label">Data di scadenza</label>
-                  <input id="due-date" name="due_date" type="date" className="quest-form-input" />
-                </fieldset>
-                <fieldset className={`${classStyles.labelAndInputContainer} ${classStyles.secondGridInput}`}>
-                  <label htmlFor="due-time" className="input-label">Orario di scadenza</label>
-                  <input id="due-time" name="due_time" type="time" className="quest-form-input" />
-                </fieldset>
-              </fieldset>
-              */}
-
-              {/* Tracking fieldset */}
               {isQuestRewardable && (
                 <>
                   <fieldset className="quest-do-track-grid-area">
                     <legend className="input-label">
-                      Traccia al momento della creazione? *
+                      {t("questLog.form.trackPrompt")} *
                     </legend>
                     <div>
                       <div className="flex gap-x-1">
@@ -433,7 +326,7 @@ export default function QuestForm(props: QuestFormProps) {
                           checked={trackOnCreate}
                           onChange={() => setTrackOnCreate(true)}
                         />
-                        <label htmlFor="track-yes">Sì</label>
+                        <label htmlFor="track-yes">{t("common.yes")}</label>
                       </div>
                       <div className="flex gap-x-1">
                         <input
@@ -444,7 +337,7 @@ export default function QuestForm(props: QuestFormProps) {
                           checked={!trackOnCreate}
                           onChange={() => setTrackOnCreate(false)}
                         />
-                        <label htmlFor="track-no">No</label>
+                        <label htmlFor="track-no">{t("common.no")}</label>
                       </div>
                     </div>
                   </fieldset>
@@ -453,7 +346,6 @@ export default function QuestForm(props: QuestFormProps) {
                 </>
               )}
 
-              {/* Submit Button */}
               <button
                 type="submit"
                 disabled={createMutation.loading}
@@ -461,7 +353,7 @@ export default function QuestForm(props: QuestFormProps) {
               >
                 {createMutation.loading
                   ? t("questLog.form.creating")
-                  : "Crea missione"}
+                  : t("questLog.form.create")}
               </button>
             </form>
           </section>
@@ -469,9 +361,6 @@ export default function QuestForm(props: QuestFormProps) {
       </>
     );
 
-  // ================================================================
-  // VARIANT EDIT
-  // ================================================================
   const EditQuestIcon = lazy(() =>
     import("../assets/icons/edit-quest.png").then((module) => ({
       default: () => (
@@ -497,7 +386,7 @@ export default function QuestForm(props: QuestFormProps) {
               className="flex items-center justify-center medium-font-size text-orange-200 hover:text-yellow-500 focus:text-yellow-500 hover:border-b-yellow-500 px-4 pt-4 sm:justify-start"
             >
               <span className="order-1 focus:border-b-yellow-500 hover:border-b-2 focus:border-b-2 transition-[border] duration-100 ease-in">
-                Ritorna al registro missioni
+                {t("questLog.form.backToLog")}
               </span>
               <FontAwesomeIcon icon={faArrowLeft} />
             </Link>
@@ -506,19 +395,17 @@ export default function QuestForm(props: QuestFormProps) {
                 aria-labelledby="add-quest-heading"
                 className="h1-font-size text-center order-1"
               >
-                Modifica missione
+                {t("questLog.form.editQuest")}
               </h1>
               <Suspense fallback={<LoadingFallback />}>
                 <EditQuestIcon />
               </Suspense>
             </div>
 
-            {/* --- EDIT QUEST FORM --- */}
             <form
               className="quest-form-grid-area-container"
               onSubmit={handleSubmit}
             >
-              {/* Container for title and description */}
               <fieldset
                 className={`${classStyles.inputsWrapper} quest-title-description-grid-area`}
               >
@@ -526,7 +413,7 @@ export default function QuestForm(props: QuestFormProps) {
                   className={`${classStyles.labelAndInputContainer} ${classStyles.firstGridInput}`}
                 >
                   <label htmlFor="quest-title" className="input-label">
-                    Titolo *
+                    {t("questLog.form.title")} *
                   </label>
                   <input
                     id="quest-title"
@@ -534,7 +421,7 @@ export default function QuestForm(props: QuestFormProps) {
                     type="text"
                     required
                     aria-required="true"
-                    placeholder="Titolo..."
+                    placeholder={t("questLog.form.titlePlaceholder")}
                     className="quest-form-input"
                     value={name}
                     onChange={(e) => setName(e.target.value)}
@@ -545,12 +432,12 @@ export default function QuestForm(props: QuestFormProps) {
                   className={`${classStyles.labelAndInputContainer} ${classStyles.secondGridInput}`}
                 >
                   <label htmlFor="quest-description" className="input-label">
-                    Descrizione
+                    {t("questLog.form.description")}
                   </label>
                   <textarea
                     id="quest-description"
                     name="quest_description"
-                    placeholder="Descrizione..."
+                    placeholder={t("questLog.form.descriptionPlaceholder")}
                     rows={6}
                     className="quest-form-input text-sm resize-vertical"
                     value={description}
@@ -566,37 +453,24 @@ export default function QuestForm(props: QuestFormProps) {
               >
                 <div className="flex flex-col gap-y-4 sm:col-start-2 sm:col-end-2">
                   <span className="medium-font-size text-center">
-                    Ricompense missione
+                    {t("questLog.form.rewards")}
                   </span>
                   <button
                     type="button"
                     className="btn-primary"
                     onClick={toggleQuestRewards}
                   >
-                    {isQuestRewardable ? "Disattiva" : "Attiva"}
+                    {isQuestRewardable
+                      ? t("questLog.form.disable")
+                      : t("questLog.form.enable")}
                   </button>
                 </div>
 
-                {/*
-                  ATTRIBUTES IN EDIT — READ-ONLY (P2)
-
-                  The updateQuestController backend does not accept
-                  attributes_ids: the PUT request can only modify name,
-                  description, is_rewardable and estimated_time. We display
-                  the list of user attributes for reference only
-                  (disabled), with a note explaining that they are not
-                  editable in this version.
-
-                  NOTE: In future, to correctly pre-select the
-                  CURRENT attributes of the quest, we will use
-                  GET /quests-attributes/:questId (existing endpoint).
-                  For now, we display the user’s global list as a
-                  placeholder.
-                */}
                 {isQuestRewardable && (
                   <fieldset className={classStyles.firstGridInput} disabled>
                     <legend className="input-label">
-                      Attributi coinvolti (non modificabili)
+                      {t("questLog.form.involvedAttributes")} (
+                      {t("questLog.form.attributesNotEditable")})
                     </legend>
                     <div>
                       {attrLoading && <p>{t("loading")}</p>}
@@ -614,9 +488,6 @@ export default function QuestForm(props: QuestFormProps) {
                         </div>
                       ))}
                     </div>
-                    <p className="small-font-size">
-                      {t("questLog.form.attributesNotEditable")}
-                    </p>
                   </fieldset>
                 )}
 
@@ -628,7 +499,8 @@ export default function QuestForm(props: QuestFormProps) {
                   }`}
                 >
                   <label htmlFor="duration" className="input-label">
-                    Durata stimata {isQuestRewardable ? "*" : null}
+                    {t("questLog.form.estimatedTime")}{" "}
+                    {isQuestRewardable ? "*" : null}
                   </label>
                   <div className="flex flex-col items-start gap-y-2">
                     <input
@@ -637,7 +509,7 @@ export default function QuestForm(props: QuestFormProps) {
                       type="number"
                       min="0"
                       step="1"
-                      placeholder="Durata..."
+                      placeholder={t("questLog.form.durationPlaceholder")}
                       aria-describedby="duration-input"
                       className="quest-form-input order-1"
                       required={isQuestRewardable ? true : false}
@@ -648,20 +520,13 @@ export default function QuestForm(props: QuestFormProps) {
                         )
                       }
                     />
-                    <span id="duration-unit">Espressa in minuti</span>
+                    <span id="duration-unit">{t("questLog.form.minutes")}</span>
                   </div>
-                  {/* XP rewards placeholder REMOVED here too (Q4). */}
                 </fieldset>
               </fieldset>
 
               <div className="bottom-linear-gradient-border after:from-orange-100 after:to-[#111] divider-2-grid-area"></div>
 
-              {/*
-                DATE/TIME: COMMENTS (Q3). Same reason as the
-                additional variant. See above.
-              */}
-
-              {/* Submit Button */}
               <button
                 type="submit"
                 disabled={updateMutation.loading}
@@ -669,7 +534,7 @@ export default function QuestForm(props: QuestFormProps) {
               >
                 {updateMutation.loading
                   ? t("questLog.form.saving")
-                  : "Modifica missione"}
+                  : t("questLog.form.save")}
               </button>
             </form>
           </section>

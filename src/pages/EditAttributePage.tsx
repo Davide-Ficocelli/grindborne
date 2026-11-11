@@ -18,8 +18,6 @@ export default function EditAttributePage() {
   const { id } = useParams();
   const navigate = useNavigate();
 
-  // useApi to load the existing attribute. This depends on the id: if it changes,
-  // the hook re-fetches (but in practice the route has a stable id).
   const {
     data: attribute,
     loading: loadingAttr,
@@ -31,15 +29,10 @@ export default function EditAttributePage() {
   const [iconBase64, setIconBase64] = useState<string | null>(null);
   const [iconPreview, setIconPreview] = useState<string | null>(null);
 
-  // Pre-populate the fields when the attribute is loaded. useEffect with
-  // the [attribute] dependency prevents the fields from being overwritten on every render.
   useEffect(() => {
     if (!attribute) return;
     setName(attribute.name ?? "");
     setDescription(attribute.description ?? "");
-    // The existing icon cannot easily be reconstructed from the URL
-    // (it is a Buffer/Uint8Array and has no MIME type). We only display it if
-    // the user uploads a new one. See notes at the bottom.
   }, [attribute]);
 
   const { mutate, loading } = useMutation<
@@ -69,16 +62,13 @@ export default function EditAttributePage() {
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    // If the user has not changed the icon, we DO NOT send `icon` (the field
-    // remains undefined and the backend ignores it — thanks to `updateRow`
-    // which skips undefined fields).
     const payload: {
       name: string;
       description?: string;
       icon?: string | null;
     } = {
       name,
-      description,
+      description: description.trim() || undefined,
     };
     if (iconBase64 !== null) payload.icon = iconBase64;
     await mutate(payload);
@@ -107,7 +97,6 @@ export default function EditAttributePage() {
         onSubmit={handleSubmit}
         className="flex flex-col gap-y-6 max-w-md w-full self-center"
       >
-        {/* stessi campi di Add, precompilati */}
         <div className="flex flex-col gap-y-2">
           <label htmlFor="attr-name" className="input-label">
             {t("attributesPage.fields.name")} *
@@ -140,10 +129,13 @@ export default function EditAttributePage() {
           <input
             id="attr-icon"
             type="file"
-            accept="image/*"
+            accept="image/png"
             onChange={handleFileChange}
             className="text-white"
           />
+          <p className="text-sm text-gray-400">
+            {t("attributesPage.fields.iconWarning")}
+          </p>
           {iconPreview && (
             <img
               src={iconPreview}

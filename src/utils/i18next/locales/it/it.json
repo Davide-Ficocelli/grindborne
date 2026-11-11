@@ -3,7 +3,21 @@
   "common": {
     "cancel": "Annulla",
     "delete": "Elimina",
-    "confirm": "Conferma"
+    "confirm": "Conferma",
+    "add": "Aggiungi",
+    "yes": "Sì",
+    "no": "No"
+  },
+  "errors": {
+    "network": "Errore di connessione al server. Riprova."
+  },
+  "login": {
+    "title": "Accedi",
+    "email": "Email",
+    "password": "Password",
+    "submit": "Accedi",
+    "submitting": "Accesso in corso...",
+    "error": "Credenziali non valide. Riprova."
   },
   "header": {
     "navigation": {
@@ -40,6 +54,7 @@
       "name": "Nome",
       "description": "Descrizione",
       "icon": "Icona",
+      "iconWarning": "Come icona per l'attributo viene supportato solo il formato PNG.",
       "level": "Livello",
       "xp": "XP",
       "decayDate": "Data di decadimento"
@@ -77,6 +92,7 @@
     "noQuests": "Nessuna missione trovata. Creane una nuova!",
     "loadingQuest": "Caricamento missione...",
     "actions": {
+      "track": "Traccia",
       "fail": "Segna come fallita",
       "complete": "Segna come completata",
       "delete": "Elimina",
@@ -101,14 +117,32 @@
       "actionsLabel": "Azioni della missione"
     },
     "form": {
-      "submit": "Crea missione",
+      "backToLog": "Ritorna al registro missioni",
+      "newQuest": "Nuova missione",
+      "editQuest": "Modifica missione",
+      "title": "Titolo",
+      "titlePlaceholder": "Titolo...",
+      "description": "Descrizione",
+      "descriptionPlaceholder": "Descrizione...",
+      "rewards": "Ricompense missione",
+      "disable": "Disattiva",
+      "enable": "Attiva",
+      "involvedAttributes": "Attributi coinvolti",
+      "attributesNotEditable": "Gli attributi non sono modificabili in questa versione.",
+      "estimatedTime": "Durata stimata",
+      "durationPlaceholder": "Durata...",
+      "minutes": "Espressa in minuti",
+      "trackPrompt": "Traccia al momento della creazione?",
+      "create": "Crea missione",
       "creating": "Creazione missione in corso…",
       "created": "Missione creata con successo",
+      "save": "Modifica missione",
       "saving": "Salvataggio missione in corso…",
-      "saved": "Missione aggiornata con successo",
-      "attributesNotEditable": "Gli attributi non sono modificabili in questa versione."
+      "saved": "Missione aggiornata con successo"
     },
     "mutations": {
+      "tracking": "Tracciamento missione in corso…",
+      "tracked": "Missione tracciata",
       "deleting": "Eliminazione missione in corso…",
       "deleted": "Missione eliminata",
       "completing": "Completamento missione in corso…",
@@ -117,6 +151,8 @@
       "failed": "Missione segnata come fallita"
     },
     "modals": {
+      "trackTitle": "Tracciare la missione?",
+      "trackDescription": "La missione inizierà a contare il tempo.",
       "deleteTitle": "Eliminare la missione?",
       "deleteDescription": "La missione sarà nascosta dal registro. L'operazione non è reversibile.",
       "completeTitle": "Completare la missione?",
