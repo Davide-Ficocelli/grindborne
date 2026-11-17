@@ -37,7 +37,8 @@
     "proficiencyHeading": "Maestria",
     "noAttributesText": "Non hai ancora nessun attributo. Clicca sul pulsante qui sotto per iniziare ad aggiungerli",
     "attribute": {
-      "attributeDecayingWarning": "7 giorni al decadimento",
+      "decayDateLabel": "Decade il",
+      "decayNotStarted": "Quando guadagnerai XP con questo attributo sarà soggetto a decadimento e qui apparirà la prima data di decadimento.",
       "actions": {
         "edit": "Modifica",
         "details": "Dettagli",

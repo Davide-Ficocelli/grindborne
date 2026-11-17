@@ -37,7 +37,8 @@
     "proficiencyHeading": "Proficiency",
     "noAttributesText": "You have no attributes yet. Click the button below to start adding them",
     "attribute": {
-      "attributeDecayingWarning": "7 days before decaying",
+      "decayDateLabel": "Decays on",
+      "decayNotStarted": "Once you earn XP with this attribute it will be subject to decay, and its first decay date will appear here.",
       "actions": {
         "edit": "Edit",
         "details": "Details",

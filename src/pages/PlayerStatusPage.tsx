@@ -80,9 +80,11 @@ export default function PlayerStatusPage() {
     data: user,
     loading: userLoading,
     error: userError,
+    // Needed to re-read the overall level after an attribute is deleted.
+    refetch: userRefetch,
   } = useApi<UserInDb>(
     () => api.get(`/users/${userId}`),
-    [userId], // Difesa: se cambia userId, rifà la fetch
+    [userId], // Defence: if the userId changes, perform the fetch again
   );
 
   // Let's retrieve the real attributes.
@@ -104,11 +106,13 @@ export default function PlayerStatusPage() {
       successMessage: t("attributesPage.details.deleted"),
       onSuccess: () => {
         setConfirmingId(null);
-        // refetch the attribute list (and the user, because the level
-        // The user depends on the attributes — even if the backend updates
-        // level only upon quest completion; it doesn't change upon deletion. Refetch
-        // attributes is necessary anyway).
+        // Refetch the attribute list AND the user. The backend recalculates the
+        // overall user level whenever an attribute is soft-deleted
+        // (see softDeleteAttributeService), so the level shown in the
+        // "Main info" section would be stale if we only refetched attributes.
+        // The two requests are independent, so they run in parallel.
         attrRefetch();
+        userRefetch();
       },
     },
   );

@@ -55,7 +55,9 @@ export default function AttributesChart(props: AttributesChartProps) {
       labels: attrLabels,
       datasets: [
         {
-          label: "La mia maestria",
+          // DECISION: no `label` on purpose. With a single dataset a legend
+          // would just repeat the section heading, and tooltips look cleaner
+          // without a dataset name.
           // The proficiency values for each attribute
           data: attrLvlsData,
           backgroundColor: "rgba(255, 99, 132, 0.2)", // Fill color
@@ -69,6 +71,11 @@ export default function AttributesChart(props: AttributesChartProps) {
       type: "radar",
       data: data,
       options: {
+        plugins: {
+          // DECISION: the legend only showed the removed "La mia maestria"
+          // label, so it is hidden altogether.
+          legend: { display: false },
+        },
         scales: {
           r: {
             angleLines: {
@@ -79,6 +86,11 @@ export default function AttributesChart(props: AttributesChartProps) {
               color: "rgba(255, 255, 255, 0.1)", // Very faint white grid
             },
             ticks: {
+              // DECISION: hide the numbers of the radial scale. The lone number
+              // above the chart (e.g. "2") was the top tick label: it had no
+              // clear meaning for the user. The grid rings (stepSize below)
+              // stay, only the numbers disappear.
+              display: false,
               // Only show whole numbers on the scale
               stepSize: 20,
               color: "rgba(200, 200, 200, 1)", // A light grey color

@@ -13,6 +13,7 @@ import ConfirmModal from "../components/ConfirmModal";
 import api from "../lib/api";
 import type { AttributeInDb } from "../types/attribute";
 import { getIconUrl } from "../lib/iconHelper";
+import { getAttributeXpCeiling } from "../lib/attributeDisplayHelpers";
 
 export default function AttributeDetailsPage() {
   const { t } = useTranslation();
@@ -86,7 +87,9 @@ export default function AttributeDetailsPage() {
         <div>
           <dt className="field-title">{t("attributesPage.fields.xp")}</dt>
           <dd>
-            {attribute.xp ?? 0} / {attribute.xp_to_next_level}
+            {/* Same rule as the status page: the second number is the level
+                ceiling (xp + xp_to_next_level), not the XP still missing. */}
+            {attribute.xp ?? 0} / {getAttributeXpCeiling(attribute)}
           </dd>
         </div>
         <div>
