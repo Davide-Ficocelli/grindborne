@@ -68,12 +68,11 @@ export default function QuestForm(props: QuestFormProps) {
     setIsQuestRewardable(existingQuest.is_rewardable ?? true);
   }, [existingQuest, isEdit]);
 
-  // FIX Q15: reset trackOnCreate when rewardable is false
-  useEffect(() => {
-    if (!isQuestRewardable) {
-      setTrackOnCreate(false);
-    }
-  }, [isQuestRewardable]);
+  // HISTORY: trackOnCreate used to be reset to false when rewards
+  // were disabled, because non-rewardable quests could not be tracked.
+  // Business rule changed: non-rewardable quests CAN be tracked (from this
+  // form and from the quest list), so that reset was removed on purpose.
+  // Do not add it back.
 
   const createMutation = useMutation<QuestInDb, [CreateQuestPayload]>(
     (payload) => api.post("/quests", payload),
@@ -109,10 +108,11 @@ export default function QuestForm(props: QuestFormProps) {
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
 
+    // The estimated time is mandatory for rewardable quests (enforced by the
+    // input's `required` attribute) and OPTIONAL for non-rewardable ones.
+    // In both cases it is sent when the user filled it in.
     const estimated_time =
-      isQuestRewardable && estimatedTime !== ""
-        ? Number(estimatedTime)
-        : undefined;
+      estimatedTime !== "" ? Number(estimatedTime) : undefined;
 
     if (isEdit) {
       await updateMutation.mutate({
@@ -310,41 +310,39 @@ export default function QuestForm(props: QuestFormProps) {
 
               <div className="bottom-linear-gradient-border after:from-orange-100 after:to-[#111] divider-2-grid-area"></div>
 
-              {isQuestRewardable && (
-                <>
-                  <fieldset className="quest-do-track-grid-area">
-                    <legend className="input-label">
-                      {t("questLog.form.trackPrompt")} *
-                    </legend>
-                    <div>
-                      <div className="flex gap-x-1">
-                        <input
-                          id="track-yes"
-                          name="track"
-                          type="radio"
-                          value="sì"
-                          checked={trackOnCreate}
-                          onChange={() => setTrackOnCreate(true)}
-                        />
-                        <label htmlFor="track-yes">{t("common.yes")}</label>
-                      </div>
-                      <div className="flex gap-x-1">
-                        <input
-                          id="track-no"
-                          name="track"
-                          type="radio"
-                          value="no"
-                          checked={!trackOnCreate}
-                          onChange={() => setTrackOnCreate(false)}
-                        />
-                        <label htmlFor="track-no">{t("common.no")}</label>
-                      </div>
-                    </div>
-                  </fieldset>
+              {/* Tracking on creation is available for ALL quests, rewardable
+                  or not (business rule). */}
+              <fieldset className="quest-do-track-grid-area">
+                <legend className="input-label">
+                  {t("questLog.form.trackPrompt")} *
+                </legend>
+                <div>
+                  <div className="flex gap-x-1">
+                    <input
+                      id="track-yes"
+                      name="track"
+                      type="radio"
+                      value="sì"
+                      checked={trackOnCreate}
+                      onChange={() => setTrackOnCreate(true)}
+                    />
+                    <label htmlFor="track-yes">{t("common.yes")}</label>
+                  </div>
+                  <div className="flex gap-x-1">
+                    <input
+                      id="track-no"
+                      name="track"
+                      type="radio"
+                      value="no"
+                      checked={!trackOnCreate}
+                      onChange={() => setTrackOnCreate(false)}
+                    />
+                    <label htmlFor="track-no">{t("common.no")}</label>
+                  </div>
+                </div>
+              </fieldset>
 
-                  <div className="bottom-linear-gradient-border after:from-[#FFFFFF] after:to-[#111] divider-5-grid-area"></div>
-                </>
-              )}
+              <div className="bottom-linear-gradient-border after:from-[#FFFFFF] after:to-[#111] divider-5-grid-area"></div>
 
               <button
                 type="submit"

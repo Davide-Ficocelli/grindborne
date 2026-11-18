@@ -1,4 +1,4 @@
-import { lazy, Suspense } from "react";
+import { lazy, Suspense, useState, useEffect } from "react";
 import LoadingFallback from "../components/LoadingFallback";
 import { NavLink, Outlet, useSearchParams } from "react-router-dom";
 import { faMagnifyingGlass } from "@fortawesome/free-solid-svg-icons";
@@ -6,33 +6,50 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import AddQuestBtn from "../components/AddQuestBtn";
 import { useTranslation } from "react-i18next";
 
+// Declared at module level on purpose: a `lazy()` created inside the component
+// is a brand new component on every render, so React remounts it (and shows
+// the Suspense fallback) each time the layout re-renders.
+const QuestLogIcon = lazy(() =>
+  import("../assets/icons/quest-log-2.png").then((module) => ({
+    default: () => (
+      <img
+        src={module.default}
+        alt="Quest log icon"
+        className="size-20 rounded-lg border border-[#FFD6A7]"
+      />
+    ),
+  })),
+);
+
 export default function QuestLogLayout() {
   const { t } = useTranslation();
 
-  // FIX Q10: Manage search state via URL search params
+  // Manage search state via URL search params
   const [searchParams, setSearchParams] = useSearchParams();
   const searchQuery = searchParams.get("q") || "";
 
-  function handleSearchChange(e: React.ChangeEvent<HTMLInputElement>) {
-    const value = e.target.value;
-    if (value) {
-      setSearchParams({ q: value }, { replace: true });
+  // What the user is typing. It is kept in local state and applied to the URL
+  // only on submit (Enter or click on the search icon): this avoids filtering
+  // and updating the URL on every keystroke, and keeps the input from being
+  // driven by the URL while typing.
+  const [searchInput, setSearchInput] = useState(searchQuery);
+
+  // Keep the input in sync when the URL changes from outside (browser Back /
+  // Forward, or a link with ?q=...).
+  useEffect(() => {
+    setSearchInput(searchQuery);
+  }, [searchQuery]);
+
+  function handleSearchSubmit(e: React.FormEvent) {
+    // Prevent the browser from reloading the page on form submit.
+    e.preventDefault();
+    const trimmedSearch = searchInput.trim();
+    if (trimmedSearch) {
+      setSearchParams({ q: trimmedSearch }, { replace: true });
     } else {
       setSearchParams({}, { replace: true });
     }
   }
-
-  const QuestLogIcon = lazy(() =>
-    import("../assets/icons/quest-log-2.png").then((module) => ({
-      default: () => (
-        <img
-          src={module.default}
-          alt="Quest log icon"
-          className="size-20 rounded-lg border border-[#FFD6A7]"
-        />
-      ),
-    })),
-  );
 
   const normalStyles =
     "medium-font-size text-orange-200 hover:text-yellow-500 focus:text-yellow-500 hover:border-b-yellow-500 focus:border-b-yellow-500 hover:border-b-2 focus:border-b-2 transition-[border] duration-100 ease-in";
@@ -54,19 +71,22 @@ export default function QuestLogLayout() {
             </Suspense>
           </div>
 
-          <form className="relative" onSubmit={(e) => e.preventDefault()}>
+          <form className="relative" onSubmit={handleSearchSubmit}>
             <input
               className="bg-white rounded-lg text-black py-1 pr-3 pl-9"
               type="text"
               name="search-quests"
               placeholder={t("questLog.searchPlaceholder")}
-              value={searchQuery}
-              onChange={handleSearchChange}
+              value={searchInput}
+              onChange={(e) => setSearchInput(e.target.value)}
             />
-            <FontAwesomeIcon
-              icon={faMagnifyingGlass}
+            <button
+              type="submit"
+              aria-label={t("questLog.searchButtonLabel")}
               className="absolute left-1 bottom-2 text-black cursor-pointer hover:opacity-70"
-            />
+            >
+              <FontAwesomeIcon icon={faMagnifyingGlass} />
+            </button>
           </form>
           <nav className="py-4 w-screen flex justify-around text-center">
             <NavLink

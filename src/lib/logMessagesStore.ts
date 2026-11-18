@@ -12,7 +12,7 @@
 //   and guaranteed uniqueness. Notification is synchronous (forEach) as in tokenStore.
 // ---------------------------------------------------------------------------
 
-export type LogLevel = "info" | "success" | "error";
+export type LogLevel = "info" | "success" | "error" | "reward";
 
 export interface LogMessage {
   id: string;
@@ -22,6 +22,11 @@ export interface LogMessage {
   // (e.g. "in progress…"). If defined, LogMessages removes it after N ms.
   autoDismissMs?: number;
 }
+
+// How long the XP reward message stays on screen (ms). It is also used as
+// the duration of its fade animation, so message and animation always end
+// together.
+const REWARD_LOG_DURATION_MS = 4000;
 
 let messages: LogMessage[] = [];
 const listeners = new Set<() => void>();
@@ -51,6 +56,7 @@ export function pushLog(
   //   • info: undefined → remains until you remove it (it is 'pending')
   //   • success: 3000ms
   //   • error: 5000ms (more time to read)
+  //   • reward: REWARD_LOG_DURATION_MS (XP earned; also the fade duration)
   let resolvedAutoDismiss: number | undefined = autoDismissMs;
 
   // An explicit value always takes precedence, so only fall back to
@@ -63,6 +69,9 @@ export function pushLog(
       case "error":
         resolvedAutoDismiss = 5000;
         break;
+      case "reward":
+        resolvedAutoDismiss = REWARD_LOG_DURATION_MS;
+        break;
       default:
         // "info" (or any other level): stays undefined
         resolvedAutoDismiss = undefined;
@@ -70,8 +79,15 @@ export function pushLog(
     }
   }
 
+  // The newest reward message always wins: it replaces any reward message
+  // still on screen, so two XP messages never overlap.
+  const messagesToKeep =
+    level === "reward"
+      ? messages.filter((m) => m.level !== "reward")
+      : messages;
+
   messages = [
-    ...messages,
+    ...messagesToKeep,
     { id, level, text, autoDismissMs: resolvedAutoDismiss },
   ];
   notify();

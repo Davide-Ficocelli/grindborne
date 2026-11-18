@@ -24,29 +24,57 @@ function AutoDismiss({ id, ms }: { id: string; ms: number }) {
 export default function LogMessages() {
   const messages = useSyncExternalStore(subscribe, getLogMessages);
 
+  // Reward messages (XP earned) have their own position and style, so they
+  // are rendered separately from the regular toasts.
+  const toastMessages = messages.filter((m) => m.level !== "reward");
+  const rewardMessages = messages.filter((m) => m.level === "reward");
+
   return (
-    // `pointer-events: none` on the wrapper: toasts do not block clicks
-    // `pointer-events: auto` on individual toasts: the X button works
-    <div className="fixed top-4 right-4 z-[1000] flex flex-col gap-2 pointer-events-none">
-      {messages.map((m) => (
-        <div
-          key={m.id}
-          role="status"
-          className={`pointer-events-auto text-white px-4 py-2 rounded border shadow-lg max-w-sm flex items-start gap-2 ${levelClasses[m.level]}`}
-        >
-          <span className="flex-1">{m.text}</span>
-          <button
-            aria-label="Dismiss"
-            className="text-white/80 hover:text-white"
-            onClick={() => dismissLog(m.id)}
+    <>
+      {/* `pointer-events: none` on the wrapper: toasts do not block clicks
+          `pointer-events: auto` on individual toasts: the X button works */}
+      <div className="fixed top-4 right-4 z-[1000] flex flex-col gap-2 pointer-events-none">
+        {toastMessages.map((m) => (
+          <div
+            key={m.id}
+            role="status"
+            className={`pointer-events-auto text-white px-4 py-2 rounded border shadow-lg max-w-sm flex items-start gap-2 ${levelClasses[m.level]}`}
           >
-            ×
-          </button>
-          {m.autoDismissMs !== undefined && (
-            <AutoDismiss id={m.id} ms={m.autoDismissMs} />
-          )}
-        </div>
-      ))}
-    </div>
+            <span className="flex-1">{m.text}</span>
+            <button
+              aria-label="Dismiss"
+              className="text-white/80 hover:text-white"
+              onClick={() => dismissLog(m.id)}
+            >
+              ×
+            </button>
+            {m.autoDismissMs !== undefined && (
+              <AutoDismiss id={m.id} ms={m.autoDismissMs} />
+            )}
+          </div>
+        ))}
+      </div>
+
+      {/* XP reward message: top-center of the screen, above everything else
+          (z-index above the toasts and the confirm modal), whatever page the
+          user is on. It lives here, outside the router, so it survives
+          navigation. The fade duration comes from the message itself, so it
+          ends exactly when AutoDismiss removes the message. */}
+      <div className="fixed top-6 left-1/2 -translate-x-1/2 z-[1100] flex flex-col gap-2 pointer-events-none">
+        {rewardMessages.map((m) => (
+          <div
+            key={m.id}
+            role="status"
+            style={{ animationDuration: `${m.autoDismissMs}ms` }}
+            className="reward-log-fade bg-black/90 text-green-300 border-2 border-green-300 rounded-lg px-8 py-4 text-4xl font-bold shadow-2xl"
+          >
+            {m.text}
+            {m.autoDismissMs !== undefined && (
+              <AutoDismiss id={m.id} ms={m.autoDismissMs} />
+            )}
+          </div>
+        ))}
+      </div>
+    </>
   );
 }

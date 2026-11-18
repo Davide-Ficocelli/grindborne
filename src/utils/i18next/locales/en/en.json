@@ -88,6 +88,7 @@
   "questLog": {
     "title": "Quests",
     "searchPlaceholder": "Search...",
+    "searchButtonLabel": "Search",
     "list": "List",
     "calendar": "Calendar",
     "noQuests": "No quests found. Create a new one!",
@@ -149,7 +150,8 @@
       "completing": "Completing quest…",
       "completed": "Quest completed!",
       "failing": "Marking quest as failed…",
-      "failed": "Quest marked as failed"
+      "failed": "Quest marked as failed",
+      "xpGained": "+{{xp}} XP"
     },
     "modals": {
       "trackTitle": "Track quest?",

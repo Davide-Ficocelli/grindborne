@@ -15,6 +15,7 @@ import ConfirmModal from "./ConfirmModal";
 import { useApi } from "../hooks/useApi";
 import { useMutation } from "../hooks/useMutation";
 import api from "../lib/api";
+import { pushLog } from "../lib/logMessagesStore";
 import type { QuestInDb } from "../types/quest";
 
 type QuestDetailsProps = {
@@ -55,9 +56,10 @@ export default function QuestDetails(props: QuestDetailsProps) {
     "delete" | "complete" | "fail" | "track" | null
   >(null);
 
-  // Temporary XP badge: after a successful completion, we display
-  // “+X XP” for 3 seconds so that the user sees it appear inline.
-  const [xpGained, setXpGained] = useState<number | null>(null);
+  // NOTE: the XP earned after completing a quest used to be a temporary inline
+  // badge (xpGained state + setTimeout). It is now a global reward message
+  // pushed through pushLog("reward", ...), shown at the top of the screen
+  // whatever page the user is on.
 
   // --- Local mutations --------------------------------------------------
   // These mutations are ONLY needed when the parent does not provide a callback
@@ -90,12 +92,15 @@ export default function QuestDetails(props: QuestDetailsProps) {
       successMessage: t("questLog.mutations.completed"),
       onSuccess: (data) => {
         setPendingAction(null);
-        // The payload for the ‘complete’ event is { quest, userData }. I extract the
-        // total_xp to display the temporary badge.
+        // The payload for the ‘complete’ event is { quest, userData }. Extracting the
+        // total_xp to display the reward message. Non-rewardable quests earn no
+        // XP (and their payload is the bare quest), so no message is shown.
         const completed = (data as any)?.quest as QuestInDb;
         if (completed?.total_xp) {
-          setXpGained(completed.total_xp);
-          setTimeout(() => setXpGained(null), 3000);
+          pushLog(
+            "reward",
+            t("questLog.mutations.xpGained", { xp: completed.total_xp }),
+          );
         }
         refetch();
       },
@@ -343,12 +348,6 @@ export default function QuestDetails(props: QuestDetailsProps) {
                         {t("questLog.details.totalXp")}:{" "}
                         <strong>{currentQuest.total_xp || 0}</strong>
                       </p>
-                      {/* Temporary XP badge: appears for 3 seconds after completion. */}
-                      {xpGained != null && (
-                        <p className="text-green-300 font-semibold animate-pulse">
-                          +{xpGained} XP
-                        </p>
-                      )}
                     </div>
                   </div>
                 </div>

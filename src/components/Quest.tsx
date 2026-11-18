@@ -22,7 +22,8 @@ type QuestProps = {
   onRequestFail?: (quest: QuestInDb) => void;
   onRequestDelete?: (quest: QuestInDb) => void;
   onRequestTrack?: (quest: QuestInDb) => void;
-  xpGained?: number | null;
+  // (xpGained was removed: the XP message is now a global reward message,
+  // see logMessagesStore / LogMessages)
 };
 
 export default function Quest(props: QuestProps) {
@@ -59,12 +60,6 @@ export default function Quest(props: QuestProps) {
         </h2>
       </div>
       <p className="text-md text-center">{quest.description}</p>
-
-      {props.xpGained != null && (
-        <span className="text-green-300 font-semibold">
-          +{props.xpGained} XP
-        </span>
-      )}
 
       <nav
         aria-label="Actions"

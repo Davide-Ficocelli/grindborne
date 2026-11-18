@@ -6,6 +6,7 @@ import ConfirmModal from "../components/ConfirmModal";
 import { useApi } from "../hooks/useApi";
 import { useMutation } from "../hooks/useMutation";
 import api from "../lib/api";
+import { pushLog } from "../lib/logMessagesStore";
 import type { QuestInDb } from "../types/quest";
 
 const Quest = lazy(() => import("../components/Quest"));
@@ -34,11 +35,6 @@ export default function QuestLogPage() {
   const [selectedId, setSelectedId] = useState<string | undefined>(undefined);
   const [version, setVersion] = useState(0);
   const [pending, setPending] = useState<Pending>(null);
-
-  const [xpGained, setXpGained] = useState<{
-    questId: string;
-    xp: number;
-  } | null>(null);
 
   const trackMutation = useMutation<QuestInDb>(
     () => api.patch(`/quests/${pending?.quest.id}/track`),
@@ -77,12 +73,17 @@ export default function QuestLogPage() {
       successMessage: t("questLog.mutations.completed"),
       onSuccess: (data) => {
         const completed = (data as any)?.quest as QuestInDb;
+        clearSelectionIfSelected(pending?.quest.id);
         setPending(null);
         refetch();
         setVersion((v) => v + 1);
+        // Global reward message (top-center, survives navigation). Only
+        // rewardable quests return total_xp, so non-rewardable ones show none.
         if (completed?.total_xp) {
-          setXpGained({ questId: completed.id, xp: completed.total_xp });
-          setTimeout(() => setXpGained(null), 3000);
+          pushLog(
+            "reward",
+            t("questLog.mutations.xpGained", { xp: completed.total_xp }),
+          );
         }
       },
     },
@@ -94,6 +95,7 @@ export default function QuestLogPage() {
       pendingMessage: t("questLog.mutations.failing"),
       successMessage: t("questLog.mutations.failed"),
       onSuccess: () => {
+        clearSelectionIfSelected(pending?.quest.id);
         setPending(null);
         refetch();
         setVersion((v) => v + 1);
@@ -101,12 +103,24 @@ export default function QuestLogPage() {
     },
   );
 
+  // If on desktop, it shows the selected quest's details in the side view
   function handleSelect(quest: QuestInDb) {
     const isDesktop = window.matchMedia("(min-width: 1024px)").matches;
     if (isDesktop) {
       setSelectedId(quest.id);
     } else {
       navigate(`/quest-log/action/view/${quest.id}`);
+    }
+  }
+
+  // A completed or failed quest disappears from the list (see the visibility
+  // filter below). If it was the one shown in the side view, the side view
+  // must stop pointing at it, otherwise it would keep showing a quest that is
+  // no longer in the list. Clearing the selection makes the side view fall
+  // back to the first visible quest (see effectiveSelectedId).
+  function clearSelectionIfSelected(questId: string | undefined) {
+    if (questId !== undefined && questId === selectedId) {
+      setSelectedId(undefined);
     }
   }
 
@@ -121,8 +135,13 @@ export default function QuestLogPage() {
     );
   }
 
-  // FIX Q10: filter quests
   const filteredQuests = quests.filter((q) => {
+    // Completed and failed quests are not shown in the quest log: they would
+    // pile up and push the quests still to do out of view. They are kept in
+    // the database (to be used later for statistics or a dedicated view); this
+    // is only a frontend filter for now.
+    if (q.is_completed || q.is_failed) return false;
+
     if (!query) return true;
     const matchName = q.name.toLowerCase().includes(query);
     const matchDesc = q.description?.toLowerCase().includes(query) || false;
@@ -176,6 +195,12 @@ export default function QuestLogPage() {
             ? trackMutation
             : null;
 
+  // Show the full-page loader only on the FIRST load. On later refetches
+  // (e.g. after completing a quest) the data is already on screen, and
+  // replacing the whole list with the loader collapses the page height and
+  // throws the scroll position back to the top.
+  if (loading && !quests) return <LoadingFallback />;
+
   return (
     <Suspense fallback={<LoadingFallback />}>
       <section aria-label="quest-log-list" className="lg:grid lg:grid-cols-2">
@@ -214,7 +239,6 @@ export default function QuestLogPage() {
                 onRequestDelete={(x) =>
                   setPending({ kind: "delete", quest: x })
                 }
-                xpGained={xpGained?.questId === q.id ? xpGained.xp : null}
               />
             );
           })}

@@ -88,6 +88,7 @@
   "questLog": {
     "title": "Missioni",
     "searchPlaceholder": "Cerca...",
+    "searchButtonLabel": "Cerca",
     "list": "Lista",
     "calendar": "Calendario",
     "noQuests": "Nessuna missione trovata. Creane una nuova!",
@@ -149,7 +150,8 @@
       "completing": "Completamento missione in corso…",
       "completed": "Missione completata!",
       "failing": "Segnalazione missione in corso…",
-      "failed": "Missione segnata come fallita"
+      "failed": "Missione segnata come fallita",
+      "xpGained": "+{{xp}} XP"
     },
     "modals": {
       "trackTitle": "Tracciare la missione?",
