@@ -2,11 +2,14 @@ import { Outlet } from "react-router-dom";
 import { lazy, Suspense } from "react";
 import LoadingFallback from "../components/LoadingFallback";
 
-export default function Layout() {
-  // Lazy load components
-  const Header = lazy(() => import("./Header"));
-  const Footer = lazy(() => import("./Footer"));
+// Lazy load components
+// Declared at module level on purpose: inside `Layout` they would be new
+// components on every render, so the header and footer would remount (and
+// flash the loader) on every navigation.
+const Header = lazy(() => import("./Header"));
+const Footer = lazy(() => import("./Footer"));
 
+export default function Layout() {
   return (
     <>
       <Suspense fallback={<LoadingFallback />}>

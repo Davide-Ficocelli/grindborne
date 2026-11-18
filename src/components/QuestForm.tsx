@@ -10,6 +10,34 @@ import api from "../lib/api";
 import type { AttributeInDb } from "../types/attribute";
 import type { QuestInDb } from "../types/quest";
 
+// Both icons are declared at module level on purpose. A `lazy()` created
+// inside the component is a brand new component on every render, so React
+// would remount the icon (and flash the Suspense fallback) each time the user
+// types a character in the form.
+const AddQuestIcon = lazy(() =>
+  import("../assets/icons/add-quest.png").then((module) => ({
+    default: () => (
+      <img
+        src={module.default}
+        alt="Add quest icon"
+        className="size-20 rounded-lg"
+      />
+    ),
+  })),
+);
+
+const EditQuestIcon = lazy(() =>
+  import("../assets/icons/edit-quest.png").then((module) => ({
+    default: () => (
+      <img
+        src={module.default}
+        alt="Edit quest icon"
+        className="size-20 rounded-lg border border-[#FFD6A7]"
+      />
+    ),
+  })),
+);
+
 type QuestFormProps = {
   variant: string;
 };
@@ -132,18 +160,6 @@ export default function QuestForm(props: QuestFormProps) {
       });
     }
   }
-
-  const AddQuestIcon = lazy(() =>
-    import("../assets/icons/add-quest.png").then((module) => ({
-      default: () => (
-        <img
-          src={module.default}
-          alt="Add quest icon"
-          className="size-20 rounded-lg"
-        />
-      ),
-    })),
-  );
 
   type ObjOfStrings = { [key: string]: string };
 
@@ -358,18 +374,6 @@ export default function QuestForm(props: QuestFormProps) {
         </Suspense>
       </>
     );
-
-  const EditQuestIcon = lazy(() =>
-    import("../assets/icons/edit-quest.png").then((module) => ({
-      default: () => (
-        <img
-          src={module.default}
-          alt="Edit quest icon"
-          className="size-20 rounded-lg border border-[#FFD6A7]"
-        />
-      ),
-    })),
-  );
 
   if (props.variant === "edit-quest")
     return (

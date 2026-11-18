@@ -17,6 +17,22 @@ import { useMutation } from "../hooks/useMutation";
 import api from "../lib/api";
 import { pushLog } from "../lib/logMessagesStore";
 import type { QuestInDb } from "../types/quest";
+import QuestInvolvedAttributes from "./QuestInvolvedAttributes";
+
+// Declared at module level on purpose: a `lazy()` inside the component is a
+// new component on every render, which remounts the icon each time the
+// component re-renders (e.g. after a refetch or when a modal opens).
+const QuestDetailsIcon = lazy(() =>
+  import("../assets/icons/quest-details.png").then((module) => ({
+    default: () => (
+      <img
+        src={module.default}
+        alt="Quest details icon"
+        className="size-20 rounded-lg border border-[#FFD6A7]"
+      />
+    ),
+  })),
+);
 
 type QuestDetailsProps = {
   variant: string;
@@ -194,18 +210,6 @@ export default function QuestDetails(props: QuestDetailsProps) {
     },
   };
 
-  const QuestDetailsIcon = lazy(() =>
-    import("../assets/icons/quest-details.png").then((module) => ({
-      default: () => (
-        <img
-          src={module.default}
-          alt="Quest details icon"
-          className="size-20 rounded-lg border border-[#FFD6A7]"
-        />
-      ),
-    })),
-  );
-
   type ObjOfStrings = { [key: string]: string };
 
   const classStyles: ObjOfStrings = {
@@ -309,22 +313,27 @@ export default function QuestDetails(props: QuestDetailsProps) {
                 <div
                   className={`${classStyles.fieldsWrapper} gap-y-8 sm:relative quest-attributes-duration-grid-area`}
                 >
-                  <div className="flex flex-col gap-y-4 sm:col-start-2 sm:col-end-2">
-                    <p className="medium-font-size text-center">
-                      {t("questLog.details.rewardsActive")}
-                    </p>
-                  </div>
+                  {/* Rewards-related parts are only for rewardable quests:
+                      a non-rewardable quest can have an estimated time too,
+                      but it has no attributes and earns no XP. */}
+                  {currentQuest.is_rewardable && (
+                    <div className="flex flex-col gap-y-4 sm:col-start-2 sm:col-end-2">
+                      <p className="medium-font-size text-center">
+                        {t("questLog.details.rewardsActive")}
+                      </p>
+                    </div>
+                  )}
 
-                  <div className={classStyles.firstGridField}>
-                    <h3 className="field-title">
-                      {t("questLog.details.involvedAttributes")}
-                    </h3>
-                    <ul className="flex flex-col gap-y-2">
-                      {/* Placeholder until API provides attributes */}
-                      <li>Forza</li>
-                      <li>Intelligenza</li>
-                    </ul>
-                  </div>
+                  {currentQuest.is_rewardable && (
+                    <div className={classStyles.firstGridField}>
+                      <h3 className="field-title">
+                        {t("questLog.details.involvedAttributes")}
+                      </h3>
+                      {/* Real attributes, loaded from the existing
+                          GET /quests-attributes/:questId endpoint. */}
+                      <QuestInvolvedAttributes questId={currentQuest.id} />
+                    </div>
+                  )}
 
                   <div
                     className={`${classStyles.labelAndFieldContainer} ${classStyles.secondGridField}`}
@@ -337,18 +346,18 @@ export default function QuestDetails(props: QuestDetailsProps) {
                       <span>{t("questLog.details.minutes")}</span>
                     </p>
 
-                    <div className="small-font-size pt-8 flex flex-col gap-y-4 justify-center items-start font-semibold">
-                      <p>
-                        {t("questLog.details.xpPerAttribute")}:{" "}
-                        <strong>
-                          {Math.floor((currentQuest.total_xp || 0) / 2)}
-                        </strong>
-                      </p>
-                      <p>
-                        {t("questLog.details.totalXp")}:{" "}
-                        <strong>{currentQuest.total_xp || 0}</strong>
-                      </p>
-                    </div>
+                    {/* The XP earned per attribute is NOT shown for now: it
+                        used to be a hard-coded total_xp / 2. It will come
+                        back once it is calculated with the real number of
+                        attributes. */}
+                    {currentQuest.is_rewardable && (
+                      <div className="small-font-size pt-8 flex flex-col gap-y-4 justify-center items-start font-semibold">
+                        <p>
+                          {t("questLog.details.totalXp")}:{" "}
+                          <strong>{currentQuest.total_xp || 0}</strong>
+                        </p>
+                      </div>
+                    )}
                   </div>
                 </div>
                 <div className="bottom-linear-gradient-border after:from-orange-100 after:to-[#111] divider-2-grid-area" />
@@ -583,45 +592,51 @@ export default function QuestDetails(props: QuestDetailsProps) {
                 <div
                   className={`${classStyles.fieldsWrapper} gap-y-8 sm:relative quest-attributes-duration-grid-area`}
                 >
-                  <div className="flex flex-col gap-y-4 sm:col-start-2 sm:col-end-2">
-                    <p className="medium-font-size text-center">
-                      {t("questLog.details.rewardsActive")}
-                    </p>
-                  </div>
+                  {/* Rewards-related parts are only for rewardable quests:
+                      a non-rewardable quest can have an estimated time too,
+                      but it has no attributes and earns no XP. */}
+                  {currentQuest.is_rewardable && (
+                    <div className="flex flex-col gap-y-4 sm:col-start-2 sm:col-end-2">
+                      <p className="medium-font-size text-center">
+                        {t("questLog.details.rewardsActive")}
+                      </p>
+                    </div>
+                  )}
 
-                  <div className={classStyles.firstGridField}>
-                    <h4 className="field-title">
-                      {t("questLog.details.involvedAttributes")}
-                    </h4>
-                    <ul className="flex flex-col gap-y-2">
-                      <li>Forza</li>
-                      <li>Intelligenza</li>
-                    </ul>
-                  </div>
+                  {currentQuest.is_rewardable && (
+                    <div className={classStyles.firstGridField}>
+                      <h3 className="field-title">
+                        {t("questLog.details.involvedAttributes")}
+                      </h3>
+                      {/* Real attributes, loaded from the existing
+                          GET /quests-attributes/:questId endpoint. */}
+                      <QuestInvolvedAttributes questId={currentQuest.id} />
+                    </div>
+                  )}
 
                   <div
                     className={`${classStyles.labelAndFieldContainer} ${classStyles.secondGridField}`}
                   >
-                    <h4 className="field-title">
+                    <h3 className="field-title">
                       {t("questLog.details.estimatedDuration")}
-                    </h4>
+                    </h3>
                     <p>
                       {currentQuest.estimated_time}{" "}
                       <span>{t("questLog.details.minutes")}</span>
                     </p>
 
-                    <div className="small-font-size pt-8 flex flex-col gap-y-4 justify-center items-start font-semibold">
-                      <p>
-                        {t("questLog.details.xpPerAttribute")}:{" "}
-                        <strong>
-                          {Math.floor((currentQuest.total_xp || 0) / 2)}
-                        </strong>
-                      </p>
-                      <p>
-                        {t("questLog.details.totalXp")}:{" "}
-                        <strong>{currentQuest.total_xp || 0}</strong>
-                      </p>
-                    </div>
+                    {/* The XP earned per attribute is NOT shown for now: it
+                        used to be a hard-coded total_xp / 2. It will come
+                        back once it is calculated with the real number of
+                        attributes. */}
+                    {currentQuest.is_rewardable && (
+                      <div className="small-font-size pt-8 flex flex-col gap-y-4 justify-center items-start font-semibold">
+                        <p>
+                          {t("questLog.details.totalXp")}:{" "}
+                          <strong>{currentQuest.total_xp || 0}</strong>
+                        </p>
+                      </div>
+                    )}
                   </div>
                 </div>
                 <div className="bottom-linear-gradient-border after:from-orange-100 after:to-[#111] divider-2-grid-area" />

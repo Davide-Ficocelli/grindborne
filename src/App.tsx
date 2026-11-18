@@ -5,6 +5,7 @@ import LoginPage from "./pages/LoginPage";
 import ProtectedRoute from "./components/ProtectedRoute";
 import { useAuth } from "./context/AuthContext";
 import LogMessages from "./components/LogMessages";
+import ScrollToTop from "./components/ScrollToTop";
 
 // Lazy load components
 const PlayerStatusPage = lazy(() => import("./pages/PlayerStatusPage"));
@@ -38,6 +39,9 @@ function App() {
     <>
       <LogMessages />
       <BrowserRouter>
+        {/* Scrolls to the top on every navigation (see ScrollToTop). It must
+            be inside the router because it reads the current location. */}
+        <ScrollToTop />
         {/* All routes included in the Routes component */}
         <Routes>
           {/* Public route: login page has its own full-screen layout */}
