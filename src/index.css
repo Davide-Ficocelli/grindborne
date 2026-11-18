@@ -79,7 +79,7 @@ h6 {
   isolation: isolate;
 }
 
-/* ------ GLOBAL STYLES ------ */
+/* ------ BEGIN GLOBAL STYLES ------ */
 
 /* * {
   outline: red solid 1px;
@@ -167,6 +167,38 @@ input[type="time"] {
     @apply relative after:absolute after:content-[''] after:w-full after:h-[1px] after:left-0 after:bottom-0 after:bg-linear-to-r;
   }
 }
+
+/* --- REWARD MESSAGE (XP earned) --- */
+
+/* The duration is NOT set here: LogMessages sets it inline from the
+   message's autoDismissMs, so the fade and the removal timer share one value.
+   Timeline (as % of the duration): fade in during the first 10%, stay fully
+   visible until 75%, fade out during the last 25%. `forwards` keeps the final
+   invisible state so the message does not flash back before it is removed. */
+@keyframes reward-log-fade {
+  0% {
+    opacity: 0;
+    transform: translateY(-0.5rem);
+  }
+  10% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  75% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+.reward-log-fade {
+  animation-name: reward-log-fade;
+  animation-timing-function: ease-in-out;
+  animation-fill-mode: forwards;
+}
+
+/* ------ END GLOBAL STYLES ------ */
 
 /* ------ PLAYER STATUS PAGE STYLES ------ */
 

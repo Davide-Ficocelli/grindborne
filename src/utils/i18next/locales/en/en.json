@@ -1,5 +1,24 @@
 {
   "loading": "Loading...",
+  "common": {
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "confirm": "Confirm",
+    "add": "Add",
+    "yes": "Yes",
+    "no": "No"
+  },
+  "errors": {
+    "network": "Network error. Please try again."
+  },
+  "login": {
+    "title": "Log in",
+    "email": "Email",
+    "password": "Password",
+    "submit": "Log in",
+    "submitting": "Logging in...",
+    "error": "Invalid credentials. Try again."
+  },
   "header": {
     "navigation": {
       "grinds": "Grinds",
@@ -16,18 +35,66 @@
     "attributesHeading": "Attributes",
     "addAttributeBtnLabel": "Add attribute",
     "proficiencyHeading": "Proficiency",
+    "noAttributesText": "You have no attributes yet. Click the button below to start adding them",
     "attribute": {
-      "attributeDecayingWarning": "7 days before decaying"
+      "decayDateLabel": "Decays on",
+      "decayNotStarted": "Once you earn XP with this attribute it will be subject to decay, and its first decay date will appear here.",
+      "actions": {
+        "edit": "Edit",
+        "details": "Details",
+        "delete": "Delete"
+      }
+    },
+    "chartPlaceholder": {
+      "notEnoughAttributes_one": "There aren't enough attributes to compare. Add one more and a comparison chart will appear here.",
+      "notEnoughAttributes_other": "There aren't enough attributes to compare. Add {{count}} more and a comparison chart will appear here."
+    }
+  },
+  "attributesPage": {
+    "fields": {
+      "name": "Name",
+      "description": "Description",
+      "icon": "Icon",
+      "iconWarning": "Only PNG images are supported as attribute icons.",
+      "level": "Level",
+      "xp": "XP",
+      "decayDate": "Decay date"
+    },
+    "add": {
+      "title": "New attribute",
+      "back": "Back to status",
+      "submit": "Create attribute",
+      "creating": "Creating attribute…",
+      "created": "Attribute created successfully"
+    },
+    "edit": {
+      "title": "Edit attribute",
+      "back": "Back to status",
+      "submit": "Save changes",
+      "saving": "Saving…",
+      "saved": "Attribute updated successfully"
+    },
+    "details": {
+      "back": "Back to status",
+      "edit": "Edit",
+      "delete": "Delete",
+      "notFound": "Attribute not found",
+      "deleting": "Deleting…",
+      "deleted": "Attribute deleted successfully",
+      "confirmDeleteTitle": "Delete attribute?",
+      "confirmDeleteDescription": "The attribute will no longer be visible. The operation is irreversible."
     }
   },
   "questLog": {
     "title": "Quests",
     "searchPlaceholder": "Search...",
+    "searchButtonLabel": "Search",
     "list": "List",
     "calendar": "Calendar",
     "noQuests": "No quests found. Create a new one!",
     "loadingQuest": "Loading quest...",
     "actions": {
+      "track": "Track",
       "fail": "Mark as failed",
       "complete": "Mark as completed",
       "delete": "Delete",
@@ -50,6 +117,51 @@
       "dueDate": "Due date",
       "dueTime": "Due time",
       "actionsLabel": "Quest actions"
+    },
+    "form": {
+      "backToLog": "Return to quest log",
+      "newQuest": "New quest",
+      "editQuest": "Edit quest",
+      "title": "Title",
+      "titlePlaceholder": "Title...",
+      "description": "Description",
+      "descriptionPlaceholder": "Description...",
+      "rewards": "Quest rewards",
+      "disable": "Disable",
+      "enable": "Enable",
+      "involvedAttributes": "Involved attributes",
+      "attributesNotEditable": "Attributes are not editable in this version.",
+      "estimatedTime": "Estimated duration",
+      "durationPlaceholder": "Duration...",
+      "minutes": "Expressed in minutes",
+      "trackPrompt": "Track at creation?",
+      "create": "Create quest",
+      "creating": "Creating quest…",
+      "created": "Quest created successfully",
+      "save": "Save quest",
+      "saving": "Saving quest…",
+      "saved": "Quest updated successfully"
+    },
+    "mutations": {
+      "tracking": "Tracking quest…",
+      "tracked": "Quest tracked",
+      "deleting": "Deleting quest…",
+      "deleted": "Quest deleted",
+      "completing": "Completing quest…",
+      "completed": "Quest completed!",
+      "failing": "Marking quest as failed…",
+      "failed": "Quest marked as failed",
+      "xpGained": "+{{xp}} XP"
+    },
+    "modals": {
+      "trackTitle": "Track quest?",
+      "trackDescription": "The quest will start tracking time.",
+      "deleteTitle": "Delete quest?",
+      "deleteDescription": "The quest will be hidden from the log. The operation is irreversible.",
+      "completeTitle": "Complete quest?",
+      "completeDescription": "XP will be assigned to the involved attributes.",
+      "failTitle": "Mark as failed?",
+      "failDescription": "The quest will not grant XP."
     }
   }
 }

@@ -4,6 +4,8 @@ import LoadingFallback from "./components/LoadingFallback";
 import LoginPage from "./pages/LoginPage";
 import ProtectedRoute from "./components/ProtectedRoute";
 import { useAuth } from "./context/AuthContext";
+import LogMessages from "./components/LogMessages";
+import ScrollToTop from "./components/ScrollToTop";
 
 // Lazy load components
 const PlayerStatusPage = lazy(() => import("./pages/PlayerStatusPage"));
@@ -12,6 +14,9 @@ const QuestForm = lazy(() => import("./components/QuestForm"));
 const QuestDetails = lazy(() => import("./components/QuestDetails"));
 const Layout = lazy(() => import("./layout/Layout"));
 const QuestLogLayout = lazy(() => import("./layout/QuestLogLayout"));
+const AddAttributePage = lazy(() => import("./pages/AddAttributePage"));
+const EditAttributePage = lazy(() => import("./pages/EditAttributePage"));
+const AttributeDetailsPage = lazy(() => import("./pages/AttributeDetailsPage"));
 
 function App() {
   const { isInitialized, isAuthenticated } = useAuth();
@@ -32,7 +37,11 @@ function App() {
   // have a login page.
   return (
     <>
+      <LogMessages />
       <BrowserRouter>
+        {/* Scrolls to the top on every navigation (see ScrollToTop). It must
+            be inside the router because it reads the current location. */}
+        <ScrollToTop />
         {/* All routes included in the Routes component */}
         <Routes>
           {/* Public route: login page has its own full-screen layout */}
@@ -65,6 +74,33 @@ function App() {
                   </Suspense>
                 }
               />
+              {/* Route for attributes pages */}
+              <Route path="attributes">
+                <Route
+                  path="add"
+                  element={
+                    <Suspense fallback={<LoadingFallback />}>
+                      <AddAttributePage />
+                    </Suspense>
+                  }
+                />
+                <Route
+                  path="edit/:id"
+                  element={
+                    <Suspense fallback={<LoadingFallback />}>
+                      <EditAttributePage />
+                    </Suspense>
+                  }
+                />
+                <Route
+                  path="view/:id"
+                  element={
+                    <Suspense fallback={<LoadingFallback />}>
+                      <AttributeDetailsPage />
+                    </Suspense>
+                  }
+                />
+              </Route>
               {/* Route for quest log pages */}
               <Route
                 path="quest-log"

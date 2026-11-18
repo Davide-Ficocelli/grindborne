@@ -1,5 +1,24 @@
 {
   "loading": "Caricamento...",
+  "common": {
+    "cancel": "Annulla",
+    "delete": "Elimina",
+    "confirm": "Conferma",
+    "add": "Aggiungi",
+    "yes": "Sì",
+    "no": "No"
+  },
+  "errors": {
+    "network": "Errore di connessione al server. Riprova."
+  },
+  "login": {
+    "title": "Accedi",
+    "email": "Email",
+    "password": "Password",
+    "submit": "Accedi",
+    "submitting": "Accesso in corso...",
+    "error": "Credenziali non valide. Riprova."
+  },
   "header": {
     "navigation": {
       "grinds": "Abitudini",
@@ -16,18 +35,66 @@
     "attributesHeading": "Attributi",
     "addAttributeBtnLabel": "Aggiungi attributo",
     "proficiencyHeading": "Maestria",
+    "noAttributesText": "Non hai ancora nessun attributo. Clicca sul pulsante qui sotto per iniziare ad aggiungerli",
     "attribute": {
-      "attributeDecayingWarning": "7 giorni al decadimento"
+      "decayDateLabel": "Decade il",
+      "decayNotStarted": "Quando guadagnerai XP con questo attributo sarà soggetto a decadimento e qui apparirà la prima data di decadimento.",
+      "actions": {
+        "edit": "Modifica",
+        "details": "Dettagli",
+        "delete": "Elimina"
+      }
+    },
+    "chartPlaceholder": {
+      "notEnoughAttributes_one": "Non ci sono abbastanza attributi da confrontare, aggiungine un altro e un diagramma di confronto comparirà qui",
+      "notEnoughAttributes_other": "Non ci sono abbastanza attributi da confrontare, aggiungine altri {{count}} e un diagramma di confronto comparirà qui"
+    }
+  },
+  "attributesPage": {
+    "fields": {
+      "name": "Nome",
+      "description": "Descrizione",
+      "icon": "Icona",
+      "iconWarning": "Come icona per l'attributo viene supportato solo il formato PNG.",
+      "level": "Livello",
+      "xp": "XP",
+      "decayDate": "Data di decadimento"
+    },
+    "add": {
+      "title": "Nuovo attributo",
+      "back": "Torna allo stato",
+      "submit": "Crea attributo",
+      "creating": "Creazione attributo in corso…",
+      "created": "Attributo creato con successo"
+    },
+    "edit": {
+      "title": "Modifica attributo",
+      "back": "Torna allo stato",
+      "submit": "Salva modifiche",
+      "saving": "Salvataggio in corso…",
+      "saved": "Attributo aggiornato con successo"
+    },
+    "details": {
+      "back": "Torna allo stato",
+      "edit": "Modifica",
+      "delete": "Elimina",
+      "notFound": "Attributo non trovato",
+      "deleting": "Eliminazione in corso…",
+      "deleted": "Attributo eliminato con successo",
+      "confirmDeleteTitle": "Eliminare l'attributo?",
+      "confirmDeleteDescription": "L'attributo non sarà più visibile. L'operazione non è reversibile."
     }
   },
   "questLog": {
     "title": "Missioni",
     "searchPlaceholder": "Cerca...",
+    "searchButtonLabel": "Cerca",
     "list": "Lista",
     "calendar": "Calendario",
     "noQuests": "Nessuna missione trovata. Creane una nuova!",
     "loadingQuest": "Caricamento missione...",
     "actions": {
+      "track": "Traccia",
       "fail": "Segna come fallita",
       "complete": "Segna come completata",
       "delete": "Elimina",
@@ -50,6 +117,51 @@
       "dueDate": "Data di scadenza",
       "dueTime": "Orario di scadenza",
       "actionsLabel": "Azioni della missione"
+    },
+    "form": {
+      "backToLog": "Ritorna al registro missioni",
+      "newQuest": "Nuova missione",
+      "editQuest": "Modifica missione",
+      "title": "Titolo",
+      "titlePlaceholder": "Titolo...",
+      "description": "Descrizione",
+      "descriptionPlaceholder": "Descrizione...",
+      "rewards": "Ricompense missione",
+      "disable": "Disattiva",
+      "enable": "Attiva",
+      "involvedAttributes": "Attributi coinvolti",
+      "attributesNotEditable": "Gli attributi non sono modificabili in questa versione.",
+      "estimatedTime": "Durata stimata",
+      "durationPlaceholder": "Durata...",
+      "minutes": "Espressa in minuti",
+      "trackPrompt": "Traccia al momento della creazione?",
+      "create": "Crea missione",
+      "creating": "Creazione missione in corso…",
+      "created": "Missione creata con successo",
+      "save": "Modifica missione",
+      "saving": "Salvataggio missione in corso…",
+      "saved": "Missione aggiornata con successo"
+    },
+    "mutations": {
+      "tracking": "Tracciamento missione in corso…",
+      "tracked": "Missione tracciata",
+      "deleting": "Eliminazione missione in corso…",
+      "deleted": "Missione eliminata",
+      "completing": "Completamento missione in corso…",
+      "completed": "Missione completata!",
+      "failing": "Segnalazione missione in corso…",
+      "failed": "Missione segnata come fallita",
+      "xpGained": "+{{xp}} XP"
+    },
+    "modals": {
+      "trackTitle": "Tracciare la missione?",
+      "trackDescription": "La missione inizierà a contare il tempo.",
+      "deleteTitle": "Eliminare la missione?",
+      "deleteDescription": "La missione sarà nascosta dal registro. L'operazione non è reversibile.",
+      "completeTitle": "Completare la missione?",
+      "completeDescription": "L'XP verrà assegnato agli attributi coinvolti.",
+      "failTitle": "Segnare come fallita?",
+      "failDescription": "La missione non assegnerà XP."
     }
   }
 }

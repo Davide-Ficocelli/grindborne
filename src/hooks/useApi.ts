@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from "react";
 import type { AxiosResponse } from "axios";
 import type ServiceValidation from "../types/serviceValidation"; // Assicurati che il tipo esista o adattalo
+import { useTranslation } from "react-i18next";
 
 // Generic hook for API calls.
 // Decision: We abstract the state logic (loading, error) to avoid
@@ -10,6 +11,7 @@ export function useApi<T>(
   fetcher: () => Promise<AxiosResponse<ServiceValidation<T>>>,
   dependencies: any[] = [],
 ) {
+  const { t } = useTranslation();
   const [data, setData] = useState<T | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
@@ -41,9 +43,9 @@ export function useApi<T>(
     } finally {
       setLoading(false);
     }
-  }, dependencies); // Dependencies control when to rerun fetch
+  }, [...dependencies, t]); // Dependencies control when to rerun fetch. Added t to dependencies to re-fetch on lang change if needed
 
-  // Esegue il fetch al mount e quando cambiano le dipendenze
+  // Runs the fetch on mount and when dependencies change
   useEffect(() => {
     fetchData();
   }, [fetchData]);
