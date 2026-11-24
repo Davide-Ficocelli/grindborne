@@ -9,7 +9,8 @@
     "no": "No"
   },
   "errors": {
-    "network": "Errore di connessione al server. Riprova."
+    "network": "Errore di connessione al server. Riprova.",
+    "unknown": "Errore sconosciuto dal server."
   },
   "login": {
     "title": "Accedi",
@@ -51,7 +52,9 @@
     }
   },
   "attributesPage": {
+    "actionsLabel": "Azioni dell'attributo",
     "fields": {
+      "iconPreviewAlt": "Anteprima dell'icona selezionata",
       "name": "Nome",
       "description": "Descrizione",
       "icon": "Icona",
@@ -119,6 +122,7 @@
       "actionsLabel": "Azioni della missione"
     },
     "form": {
+      "attributesRequired": "Seleziona almeno un attributo.",
       "backToLog": "Ritorna al registro missioni",
       "newQuest": "Nuova missione",
       "editQuest": "Modifica missione",

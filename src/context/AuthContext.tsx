@@ -240,8 +240,8 @@ export function useAuth() {
 
   const accessToken = useSyncExternalStore(subscribe, getAccessToken);
 
-  // Decodifichiamo l'ID utente dal token per usarlo nelle chiamate API
-  // (es. per recuperare i dati del profilo o gli attributi).
+  // Decode the user ID from the token to use in API calls
+  // (e.g. to retrieve profile data or attributes).
   const userId = accessToken ? decodeJwtPayload(accessToken)?.id : null;
 
   return {

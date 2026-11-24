@@ -168,6 +168,51 @@ input[type="time"] {
   }
 }
 
+/* ------ SHARED COMPONENT STYLES ------ */
+/* Used by components that appear in MORE than one page, so they are global.
+   Anything used by a single page lives in src/styles/pages/<PageName>.css.
+   NOTE (Tailwind v4): a custom class cannot be `@apply`-ed inside another
+   one, so these rules only compose real Tailwind utilities. */
+
+@layer components {
+  /* BackLink */
+  .back-link {
+    @apply flex items-center justify-center text-xl text-orange-200 hover:text-yellow-500 focus:text-yellow-500 px-4 pt-4 sm:justify-start;
+  }
+
+  .back-link__label {
+    @apply order-1 transition-[border] duration-100 ease-in group-hover:border-b-2 group-hover:border-b-yellow-500 group-focus:border-b-2 group-focus:border-b-yellow-500;
+  }
+
+  /* PageHeading */
+  .page-heading {
+    @apply flex flex-wrap items-center justify-center gap-x-8 gap-y-8;
+  }
+
+  /* ActionButton / ActionLink: icon on top, label below (the label is first
+     in the DOM but `order-1` moves it after the icon). */
+  .action-item {
+    @apply flex flex-col justify-center items-center gap-y-2 text-white cursor-pointer hover:opacity-80 focus:opacity-80 active:opacity-80;
+  }
+
+  .action-item__label {
+    @apply order-1 text-center text-sm;
+  }
+
+  .action-item__icon {
+    @apply text-xl sm:text-2xl;
+  }
+
+  /* NavTabLink */
+  .nav-tab {
+    @apply text-xl text-orange-200 hover:text-yellow-500 focus:text-yellow-500 hover:border-b-yellow-500 focus:border-b-yellow-500 hover:border-b-2 focus:border-b-2 transition-[border] duration-100 ease-in;
+  }
+
+  .nav-tab--active {
+    @apply border-b-orange-200 border-b-2;
+  }
+}
+
 /* --- REWARD MESSAGE (XP earned) --- */
 
 /* The duration is NOT set here: LogMessages sets it inline from the
@@ -198,154 +243,8 @@ input[type="time"] {
   animation-fill-mode: forwards;
 }
 
-/* ------ END GLOBAL STYLES ------ */
+/* --- FORM FIELDS (shared by QuestPage and AttributePage) --- */
 
-/* ------ PLAYER STATUS PAGE STYLES ------ */
-
-#stamina-bar::-webkit-meter-bar {
-  height: 1rem;
-  background: #808080;
-}
-
-#stamina-bar::-webkit-meter-optimum-value {
-  background: #17743c;
-  border-right: 1px solid white;
-}
-
-#xp-bar::-webkit-progress-bar {
-  background: #808080;
-  height: 1rem;
-}
-
-#xp-bar::-webkit-progress-value {
-  background: #0f689b;
-  border-right: 1px solid white;
-}
-
-/* md: */
-@media (min-width: 768px) {
-  .status-grid-area-container {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    grid-template-rows: repeat(4, auto);
-
-    grid-template-areas:
-      "heading heading"
-      "info proficiency"
-      "info ."
-      "attributes attributes";
-  }
-
-  .status-grid-area-container > * {
-    border-right: 1px solid #ccc;
-  }
-
-  .status-heading-grid-area {
-    grid-area: heading;
-    border-right: none;
-  }
-
-  .main-info-section {
-    grid-area: info;
-  }
-
-  .attributes-section {
-    grid-area: attributes;
-  }
-
-  .proficiency-section {
-    grid-area: proficiency;
-  }
-}
-
-/* ------ QUEST LOG PAGE STYLES ------ */
-
-#quest-details-side-view ::-webkit-scrollbar {
-  width: 10px;
-  background: #111;
-}
-
-#quest-details-side-view ::-webkit-scrollbar-thumb {
-  background-color: oklch(90.1% 0.076 70.697);
-  border-radius: 1rem;
-}
-
-#quest-details-side-view ::-webkit-scrollbar-track {
-  background: #4b4b4b;
-}
-
-/* ------ QUEST FORM PAGE STYLES ------ */
-
-.quest-form-grid-area-container,
-.quest-details-grid-area-container {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  row-gap: 4rem;
-  padding-block: 2rem;
-}
-
-.quest-form-grid-area-container {
-  grid-template-areas:
-    ". title-description ."
-    "divider-1 divider-1 divider-1"
-    ". attributes-duration ."
-    "divider-2 divider-2 divider-2"
-    ". date-time ."
-    "divider-3 divider-3 divider-3"
-    ". due-date-due-time ."
-    "divider-4 divider-4 divider-4"
-    ". do-track ."
-    "divider-5 divider-5 divider-5"
-    ". submit .";
-}
-
-.quest-title-description-grid-area {
-  grid-area: title-description;
-}
-
-.quest-attributes-duration-grid-area {
-  grid-area: attributes-duration;
-}
-
-.quest-date-time-grid-area {
-  grid-area: date-time;
-}
-
-.quest-due-date-due-time-grid-area {
-  grid-area: due-date-due-time;
-}
-
-.quest-do-track-grid-area {
-  grid-area: do-track;
-  place-self: center;
-}
-
-.quest-form-submit-grid-area {
-  grid-area: submit;
-  place-self: center;
-}
-
-.divider-1-grid-area {
-  grid-area: divider-1;
-}
-
-.divider-2-grid-area {
-  grid-area: divider-2;
-}
-
-.divider-3-grid-area {
-  grid-area: divider-3;
-}
-
-.divider-4-grid-area {
-  grid-area: divider-4;
-}
-
-.divider-5-grid-area {
-  grid-area: divider-5;
-}
-
-.input-label,
 .field-title {
   background: linear-gradient(to right, #ffffff, oklch(90.1% 0.076 70.697));
   -webkit-background-clip: text;
@@ -366,78 +265,11 @@ input[type="time"] {
   max-width: 400px;
 }
 
-/* .quest-form-input[name="duration"] {
-  max-width: 150px;
-}
-
-.quest-form-input[name="due_date"],
-.quest-form-input[name="due_time"] {
-  max-width: 200px;
-} */
-
 /* sm: */
 @media (min-width: 640px) {
-  .input-label,
   .field-title {
     word-break: break-all;
   }
-
-  .quest-form-grid-area-container,
-  .quest-details-grid-area-container {
-    grid-template-columns: repeat(5, 1fr);
-  }
-
-  .quest-form-grid-area-container {
-    grid-template-areas:
-      ". title-description title-description title-description ."
-      "divider-1 divider-1 divider-1 divider-1 divider-1"
-      ". attributes-duration attributes-duration attributes-duration ."
-      "divider-2 divider-2 divider-2 divider-2 divider-2"
-      ". date-time date-time date-time ."
-      "divider-3 divider-3 divider-3 divider-3 divider-3"
-      ". due-date-due-time due-date-due-time due-date-due-time ."
-      "divider-4 divider-4 divider-4 divider-4 divider-4"
-      ". do-track do-track do-track ."
-      "divider-5 divider-5 divider-5 divider-5 divider-5"
-      ". submit submit submit .";
-  }
 }
 
-/* ------ QUEST DETAILS PAGE STYLES ------ */
-
-.quest-details-grid-area-container {
-  grid-template-areas:
-    ". title-description ."
-    "divider-1 divider-1 divider-1"
-    ". attributes-duration ."
-    "divider-2 divider-2 divider-2"
-    ". date-time ."
-    "divider-3 divider-3 divider-3"
-    ". due-date-due-time ."
-    "divider-4 divider-4 divider-4"
-    ". actions .";
-}
-
-.quest-actions-grid-area {
-  grid-area: actions;
-}
-
-/* sm: */
-@media (min-width: 640px) {
-  .quest-details-grid-area-container {
-    grid-template-areas:
-      ". title-description title-description title-description ."
-      "divider-1 divider-1 divider-1 divider-1 divider-1"
-      ". attributes-duration attributes-duration attributes-duration ."
-      "divider-2 divider-2 divider-2 divider-2 divider-2"
-      ". date-time date-time date-time ."
-      "divider-3 divider-3 divider-3 divider-3 divider-3"
-      ". due-date-due-time due-date-due-time due-date-due-time ."
-      "divider-4 divider-4 divider-4 divider-4 divider-4"
-      ". actions actions actions .";
-  }
-}
-
-/* * {
-  outline: 1px solid red;
-} */
+/* ------ END GLOBAL STYLES ------ */

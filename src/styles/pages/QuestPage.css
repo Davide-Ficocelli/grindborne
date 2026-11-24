@@ -1,0 +1,119 @@
+@reference "../../index.css";
+
+@layer components {
+  .quest-page {
+    @apply flex flex-col justify-center;
+  }
+
+  /* Side view (desktop quest log): bordered panel with its own scroll. */
+  .quest-page--view-side-view {
+    @apply border-r border-r-white;
+  }
+
+  /* Used together with the global `bottom-linear-gradient-border`. */
+  .quest-page__heading {
+    @apply w-screen px-4 py-16 after:from-[#FFFFFF] after:to-[#111];
+  }
+
+  .quest-page--view-side-view .quest-page__heading {
+    @apply w-auto py-[3.15rem];
+  }
+
+  /* ---- Layout of the content ----
+     Every block is placed with `grid-column` in the order it appears in the
+     JSX, so a block that is not rendered leaves NO empty row (the old
+     `grid-template-areas` kept a row, and a 4rem gap, for each missing block).
+     Mobile: 3 columns, blocks in the middle one. sm: 5 columns, blocks in the
+     middle three. */
+  .quest-page__content {
+    @apply grid grid-cols-3 gap-y-16 py-8 sm:grid-cols-5;
+  }
+
+  .quest-page--view-side-view .quest-page__content {
+    @apply h-screen overflow-y-scroll;
+  }
+
+  .quest-page__section {
+    grid-column: 2 / 3;
+  }
+
+  .quest-page__divider {
+    grid-column: 1 / -1;
+  }
+
+  /* Submit button and the "track on creation" group. */
+  .quest-page__section--centered {
+    place-self: center;
+  }
+
+  .quest-page__actions {
+    @apply w-full sm:justify-evenly;
+  }
+
+  .quest-page--view-side-view .quest-page__actions {
+    @apply py-4;
+  }
+
+  /* A block with several fields side by side (3 sub-columns from sm). */
+  .quest-page__fields {
+    @apply flex flex-col justify-center items-start gap-y-12 w-full sm:grid sm:grid-cols-3;
+  }
+
+  .quest-page--view .quest-page__fields {
+    @apply gap-y-8;
+  }
+
+  /* A single field: its title/label and its value/input. */
+  .quest-page__field {
+    @apply flex flex-col gap-y-4 justify-center items-start sm:text-start;
+  }
+
+  .quest-page__message {
+    @apply py-8 text-center;
+  }
+
+  .quest-page__message--error {
+    @apply text-red-500;
+  }
+
+  /* Scrollbar of the side view. */
+  .quest-page--view-side-view ::-webkit-scrollbar {
+    width: 10px;
+    background: #111;
+  }
+
+  .quest-page--view-side-view ::-webkit-scrollbar-thumb {
+    background-color: oklch(90.1% 0.076 70.697);
+    border-radius: 1rem;
+  }
+
+  .quest-page--view-side-view ::-webkit-scrollbar-track {
+    background: #4b4b4b;
+  }
+}
+
+/* Column of a field inside a `.quest-page__fields` block (sm: and up). */
+@media (min-width: 640px) {
+  .quest-page__section {
+    grid-column: 2 / 5;
+  }
+
+  .quest-page__field--first {
+    grid-column: 1 / 2;
+  }
+
+  .quest-page__field--middle {
+    grid-column: 2 / 3;
+  }
+
+  .quest-page__field--last {
+    grid-column: 3 / 4;
+  }
+
+  /* Without rewards there are no attributes: the duration goes in the middle,
+     under the "rewards" toggle. */
+  .quest-page__fields--no-rewards .quest-page__field--last {
+    grid-column: 2 / 3;
+    grid-row: span 2;
+  }
+}

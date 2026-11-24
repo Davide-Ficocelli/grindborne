@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { useAuth } from "../context/AuthContext";
+import "../styles/pages/LoginPage.css";
 
 export default function LoginPage() {
   const { t } = useTranslation();
@@ -31,15 +32,13 @@ export default function LoginPage() {
   }
 
   return (
-    <section className="flex flex-col justify-center items-center min-h-screen w-screen p-4">
-      <div className="w-full max-w-md bg-[#111]/80 p-8 rounded-lg border border-[#a48621]/30 shadow-2xl">
-        <h1 className="text-4xl text-center text-orange-100 mb-8 font-semibold">
-          {t("login.title")}
-        </h1>
+    <section className="login-page">
+      <div className="login-page__card">
+        <h1 className="login-page__title">{t("login.title")}</h1>
 
-        <form onSubmit={handleSubmit} className="flex flex-col gap-y-6">
-          <div className="flex flex-col gap-y-2">
-            <label htmlFor="email" className="text-orange-100">
+        <form onSubmit={handleSubmit} className="login-page__form">
+          <div className="login-page__field">
+            <label htmlFor="email" className="login-page__label">
               {t("login.email")}
             </label>
             <input
@@ -48,12 +47,12 @@ export default function LoginPage() {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
-              className="bg-white text-black p-2 rounded"
+              className="login-page__input"
             />
           </div>
 
-          <div className="flex flex-col gap-y-2">
-            <label htmlFor="password" className="text-orange-100">
+          <div className="login-page__field">
+            <label htmlFor="password" className="login-page__label">
               {t("login.password")}
             </label>
             <input
@@ -62,11 +61,15 @@ export default function LoginPage() {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
-              className="bg-white text-black p-2 rounded"
+              className="login-page__input"
             />
           </div>
 
-          {error && <p className="text-red-400 text-sm text-center">{error}</p>}
+          {error && (
+            <p role="alert" className="login-page__error">
+              {error}
+            </p>
+          )}
 
           <button
             type="submit"

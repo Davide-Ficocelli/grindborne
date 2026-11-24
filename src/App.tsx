@@ -9,17 +9,14 @@ import ScrollToTop from "./components/ScrollToTop";
 
 // Lazy load components
 const PlayerStatusPage = lazy(() => import("./pages/PlayerStatusPage"));
-const QuestLogList = lazy(() => import("./pages/QuestLogList"));
-const QuestForm = lazy(() => import("./components/QuestForm"));
-const QuestDetails = lazy(() => import("./components/QuestDetails"));
+const QuestLogPage = lazy(() => import("./pages/QuestLogPage"));
+const QuestPage = lazy(() => import("./pages/QuestPage"));
+const AttributePage = lazy(() => import("./pages/AttributePage"));
 const Layout = lazy(() => import("./layout/Layout"));
 const QuestLogLayout = lazy(() => import("./layout/QuestLogLayout"));
-const AddAttributePage = lazy(() => import("./pages/AddAttributePage"));
-const EditAttributePage = lazy(() => import("./pages/EditAttributePage"));
-const AttributeDetailsPage = lazy(() => import("./pages/AttributeDetailsPage"));
 
 function App() {
-  const { isInitialized, isAuthenticated } = useAuth();
+  const { isInitialized } = useAuth();
 
   // Don't render routes until we know the auth state.
   // isInitialized flips to true only after the mount refresh resolves
@@ -42,113 +39,53 @@ function App() {
         {/* Scrolls to the top on every navigation (see ScrollToTop). It must
             be inside the router because it reads the current location. */}
         <ScrollToTop />
-        {/* All routes included in the Routes component */}
-        <Routes>
-          {/* Public route: login page has its own full-screen layout */}
-          <Route
-            path="/login"
-            element={
-              <Suspense fallback={<LoadingFallback />}>
-                <LoginPage />
-              </Suspense>
-            }
-          />
+        {/* One Suspense for the lazy layouts. The lazy PAGES are covered by
+            the Suspense around the <Outlet /> of each layout, so the header
+            stays on screen while a page chunk is loading. */}
+        <Suspense fallback={<LoadingFallback />}>
+          {/* All routes included in the Routes component */}
+          <Routes>
+            {/* Public route: login page has its own full-screen layout */}
+            <Route path="/login" element={<LoginPage />} />
 
-          {/* Protected routes: wrapped in ProtectedRoute.
-              If not authenticated, they redirect to /login.
-              If authenticated, they render <Layout> which contains <Outlet />. */}
-          <Route element={<ProtectedRoute />}>
-            <Route
-              path="/"
-              element={
-                <Suspense fallback={<LoadingFallback />}>
-                  <Layout />
-                </Suspense>
-              }
-            >
-              <Route
-                index
-                element={
-                  <Suspense fallback={<LoadingFallback />}>
-                    <PlayerStatusPage />
-                  </Suspense>
-                }
-              />
-              {/* Route for attributes pages */}
-              <Route path="attributes">
-                <Route
-                  path="add"
-                  element={
-                    <Suspense fallback={<LoadingFallback />}>
-                      <AddAttributePage />
-                    </Suspense>
-                  }
-                />
-                <Route
-                  path="edit/:id"
-                  element={
-                    <Suspense fallback={<LoadingFallback />}>
-                      <EditAttributePage />
-                    </Suspense>
-                  }
-                />
-                <Route
-                  path="view/:id"
-                  element={
-                    <Suspense fallback={<LoadingFallback />}>
-                      <AttributeDetailsPage />
-                    </Suspense>
-                  }
-                />
-              </Route>
-              {/* Route for quest log pages */}
-              <Route
-                path="quest-log"
-                element={
-                  <Suspense fallback={<LoadingFallback />}>
-                    <QuestLogLayout />
-                  </Suspense>
-                }
-              >
-                <Route
-                  path="list"
-                  element={
-                    <Suspense fallback={<LoadingFallback />}>
-                      <QuestLogList />
-                    </Suspense>
-                  }
-                />
-              </Route>
-              {/* Route for quest log actions pages */}
-              <Route path="quest-log/action">
-                <Route
-                  path="view/:id"
-                  element={
-                    <Suspense fallback={<LoadingFallback />}>
-                      <QuestDetails variant="full-page" />
-                    </Suspense>
-                  }
-                />
-                <Route
-                  path="add"
-                  element={
-                    <Suspense fallback={<LoadingFallback />}>
-                      <QuestForm variant="add-quest" />
-                    </Suspense>
-                  }
-                />
-                <Route
-                  path="edit/:id"
-                  element={
-                    <Suspense fallback={<LoadingFallback />}>
-                      <QuestForm variant="edit-quest" />
-                    </Suspense>
-                  }
-                />
+            {/* Protected routes: wrapped in ProtectedRoute.
+                If not authenticated, they redirect to /login.
+                If authenticated, they render <Layout> which contains <Outlet />. */}
+            <Route element={<ProtectedRoute />}>
+              <Route path="/" element={<Layout />}>
+                <Route index element={<PlayerStatusPage />} />
+                {/* Route for attributes pages: one page, three variants */}
+                <Route path="attributes">
+                  <Route path="add" element={<AttributePage variant="add" />} />
+                  <Route
+                    path="edit/:id"
+                    element={<AttributePage variant="edit" />}
+                  />
+                  <Route
+                    path="view/:id"
+                    element={<AttributePage variant="view" />}
+                  />
+                </Route>
+                {/* Route for quest log pages */}
+                <Route path="quest-log" element={<QuestLogLayout />}>
+                  <Route path="list" element={<QuestLogPage />} />
+                </Route>
+                {/* Route for quest log actions pages: one page, three variants */}
+                <Route path="quest-log/action">
+                  <Route
+                    path="view/:id"
+                    element={<QuestPage variant="view-full-page" />}
+                  />
+                  <Route path="add" element={<QuestPage variant="add" />} />
+                  <Route
+                    path="edit/:id"
+                    element={<QuestPage variant="edit" />}
+                  />
+                </Route>
               </Route>
             </Route>
-          </Route>
-        </Routes>
+          </Routes>
+        </Suspense>
       </BrowserRouter>
     </>
   );

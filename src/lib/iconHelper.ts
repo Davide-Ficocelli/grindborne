@@ -119,3 +119,12 @@ export function getIconUrl(icon: unknown): string | null {
   // 4. Otherwise, treat the buffer as raw image bytes and re-encode it.
   return `data:image/png;base64,${bytesToBase64(buffer)}`;
 }
+
+/**
+ * Removes the "data:image/png;base64," prefix from a data URL, because the
+ * backend expects only the base64 part. Shared by every form that uploads an icon.
+ */
+export function dataUrlToBase64(dataUrl: string): string {
+  const idx = dataUrl.indexOf(",");
+  return idx >= 0 ? dataUrl.slice(idx + 1) : dataUrl;
+}

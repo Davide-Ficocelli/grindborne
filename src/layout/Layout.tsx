@@ -16,7 +16,10 @@ export default function Layout() {
         <Header />
       </Suspense>
       <main>
-        <Outlet />
+        {/* The lazy pages suspend HERE, so header and footer stay visible. */}
+        <Suspense fallback={<LoadingFallback />}>
+          <Outlet />
+        </Suspense>
       </main>
       <Suspense fallback={<LoadingFallback />}>
         <Footer />

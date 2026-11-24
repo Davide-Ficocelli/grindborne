@@ -9,7 +9,8 @@
     "no": "No"
   },
   "errors": {
-    "network": "Network error. Please try again."
+    "network": "Network error. Please try again.",
+    "unknown": "Unknown server error."
   },
   "login": {
     "title": "Log in",
@@ -51,7 +52,9 @@
     }
   },
   "attributesPage": {
+    "actionsLabel": "Attributes actions",
     "fields": {
+      "iconPreviewAlt": "Preview of the selected icon",
       "name": "Name",
       "description": "Description",
       "icon": "Icon",
@@ -119,6 +122,7 @@
       "actionsLabel": "Quest actions"
     },
     "form": {
+      "attributesRequired": "Select at least one attribute.",
       "backToLog": "Return to quest log",
       "newQuest": "New quest",
       "editQuest": "Edit quest",

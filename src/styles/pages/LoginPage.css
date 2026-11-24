@@ -1,0 +1,38 @@
+/* `@reference` makes Tailwind's utilities available to `@apply` in this file
+   without emitting them twice. Rules are in `@layer components` so utilities
+   written inline in the JSX can still override them. */
+@reference "../../index.css";
+
+@layer components {
+  .login-page {
+    @apply flex flex-col justify-center items-center min-h-screen w-screen p-4;
+  }
+
+  .login-page__card {
+    @apply w-full max-w-md bg-[#111]/80 p-8 rounded-lg border border-[#a48621]/30 shadow-2xl;
+  }
+
+  .login-page__title {
+    @apply text-4xl text-center text-orange-100 mb-8 font-semibold;
+  }
+
+  .login-page__form {
+    @apply flex flex-col gap-y-6;
+  }
+
+  .login-page__field {
+    @apply flex flex-col gap-y-2;
+  }
+
+  .login-page__label {
+    @apply text-orange-100;
+  }
+
+  .login-page__input {
+    @apply bg-white text-black p-2 rounded;
+  }
+
+  .login-page__error {
+    @apply text-red-400 text-sm text-center;
+  }
+}

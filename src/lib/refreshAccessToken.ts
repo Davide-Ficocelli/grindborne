@@ -71,7 +71,7 @@ export function refreshAccessToken(): Promise<string | null> {
       // cleaner to just bypass).
       const { data } = await axios.post(
         `${API_URL}/auth/refresh`,
-        {}, // body vuoto: il token viaggia nel cookie
+        {}, // empty body: the token travels in the cookie
         { withCredentials: true, headers: { "X-CSRF-Token": CSRF_HEADER } },
       );
 

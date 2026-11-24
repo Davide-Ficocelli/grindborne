@@ -1,0 +1,24 @@
+@reference "../../index.css";
+
+@layer components {
+  .attribute-page {
+    @apply flex flex-col p-4 gap-y-8;
+  }
+
+  .attribute-page__form {
+    @apply flex flex-col gap-y-6 max-w-md w-full self-center;
+  }
+
+  /* Icon of the attribute (view) and preview of the chosen file (forms). */
+  .attribute-page__icon {
+    @apply size-20 rounded-lg border border-[#FFD6A7];
+  }
+
+  .attribute-page__message {
+    @apply p-8;
+  }
+
+  .attribute-page__message--error {
+    @apply text-red-500;
+  }
+}

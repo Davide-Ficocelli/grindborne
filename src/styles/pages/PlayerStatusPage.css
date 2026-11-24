@@ -1,0 +1,82 @@
+@reference "../../index.css";
+
+@layer components {
+  /* Single column on mobile; the 2-column grid starts at md (see below). */
+  .status-page {
+    @apply flex flex-col gap-y-18 md:gap-y-0;
+  }
+
+  .status-page__heading {
+    @apply px-4 py-16;
+  }
+
+  /* Used together with the global `h2-font-size` and `bottom-linear-gradient-border`
+     (a custom class cannot be @apply-ed in Tailwind v4). */
+  .status-page__section-heading {
+    @apply px-4 pb-4 text-orange-100 after:from-orange-100 after:to-[#111];
+  }
+
+  /* A row of the page (player, stamina, level, one attribute). Used together
+     with the global `bottom-linear-gradient-border` and `standard-font-size`. */
+  .status-page__row {
+    @apply pb-4 after:from-[#ffffff] after:to-[#111];
+  }
+
+  /* Stamina meter and XP progress. The ids were replaced by classes: the old
+     `#xp-bar` selector never matched the real ids (`xp-bar-<id>`). */
+  .status-page__stamina-bar::-webkit-meter-bar {
+    height: 1rem;
+    background: #808080;
+  }
+
+  .status-page__stamina-bar::-webkit-meter-optimum-value {
+    background: #17743c;
+    border-right: 1px solid white;
+  }
+
+  .status-page__xp-bar::-webkit-progress-bar {
+    background: #808080;
+    height: 1rem;
+  }
+
+  .status-page__xp-bar::-webkit-progress-value {
+    background: #0f689b;
+    border-right: 1px solid white;
+  }
+}
+
+/* md: */
+@media (min-width: 768px) {
+  .status-page {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    grid-template-rows: repeat(4, auto);
+
+    grid-template-areas:
+      "heading heading"
+      "info proficiency"
+      "info ."
+      "attributes attributes";
+  }
+
+  .status-page > * {
+    border-right: 1px solid #ccc;
+  }
+
+  .status-page__heading {
+    grid-area: heading;
+    border-right: none;
+  }
+
+  .status-page__main-info {
+    grid-area: info;
+  }
+
+  .status-page__attributes {
+    grid-area: attributes;
+  }
+
+  .status-page__proficiency {
+    grid-area: proficiency;
+  }
+}

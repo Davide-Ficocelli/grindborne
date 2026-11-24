@@ -1,0 +1,26 @@
+@reference "../../index.css";
+
+@layer components {
+  .quest-log-page {
+    @apply lg:grid lg:grid-cols-2;
+  }
+
+  /* The side view exists only on desktop; on mobile the card navigates to the page. */
+  .quest-log-page__side-view {
+    @apply hidden lg:block lg:col-start-1;
+  }
+
+  .quest-log-page__message {
+    @apply py-8 text-center text-orange-200;
+  }
+
+  /* Declared after the base class so the red wins. */
+  .quest-log-page__message--error {
+    @apply text-red-500;
+  }
+
+  /* Quest card. Used together with the global `bottom-linear-gradient-border`. */
+  .quest-card {
+    @apply flex flex-col gap-y-4 items-center p-4 w-full after:from-white after:to-[#111];
+  }
+}

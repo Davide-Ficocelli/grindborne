@@ -16,7 +16,7 @@ const api = axios.create({
 });
 
 // ---------------------------------------------------------------------------
-// REQUEST INTERCEPTOR — unchanged from Step 3.
+// REQUEST INTERCEPTOR
 // ---------------------------------------------------------------------------
 api.interceptors.request.use((config) => {
   const token = getAccessToken();
